@@ -2,14 +2,24 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Link } from "react-router-dom";
 function Login() {
+  const history = useNavigate();
   const [username, setUserName] = useState("");
   const [password, setPassWord] = useState("");
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("username", username);
-    console.log("password", password);
+    try {
+      await axios.post("http://localhost:5001/api/accounts/login", {
+        email: username,
+        password: password,
+      });
+      history("/home");
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleEmailInput = (e) => setUserName(e.target.value);
   const handlePwdInput = (e) => setPassWord(e.target.value);
