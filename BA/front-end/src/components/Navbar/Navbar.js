@@ -37,7 +37,7 @@ function Navbar() {
     setAnchorElUser(null);
   };
   return (
-    <AppBar position="static">
+    <AppBar position="static" style={{ backgroundColor: "#58A168" }}>
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
