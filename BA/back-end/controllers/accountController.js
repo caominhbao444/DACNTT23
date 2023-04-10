@@ -7,9 +7,6 @@ const Account = require("../models/accountModel");
 //@desc Register a account
 //@route POST /api/accounts/register
 //@access public
-
-
-
 const register = asyncHandler(async (req, res) => {
   const { username, email, password} = req.body;
   if (!username || !email || !password) {
@@ -75,6 +72,17 @@ const loginAccount = asyncHandler(async (req, res) => {
 });
 
 
+const getAccount = asyncHandler(async(req,res)=>{
+  const account = await Account.find();
+ 
+  if(!account){
+    res.status(404);
+    throw new Error("Account not found");
+  }else{
+    res.json(account);
+  }
+})
+
 //@desc Current account info
 //@route POST /api/accounts/current
 //@access private
@@ -108,6 +116,15 @@ const resetPassword = asyncHandler(async (req,res)=>{
   res.status(200).json({ message: "Reset password successfully" });
 });
 
+const deleteAccount = asyncHandler(async (req, res) => {
+  const account = await Account.findById(req.params.id);
+  if (!account) {
+    res.status(404);
+    throw new Error("Account not found");
+  }
 
+  await account.deleteOne({ _id: req.params.id });
+  res.status(200).json(account);
+});
 
-module.exports = { register,loginAccount, currentAccount,resetPassword};
+module.exports = { register,loginAccount, getAccount,currentAccount,resetPassword,deleteAccount};
