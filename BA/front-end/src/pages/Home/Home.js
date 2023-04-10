@@ -13,6 +13,9 @@ function Home() {
   const hih = () => {
     alert("bao");
   };
+  const Readmore = (e) => {
+    return e.slice(0, 100);
+  };
   return (
     <>
       <Navbar />
@@ -31,7 +34,7 @@ function Home() {
               }}
             >
               <Link
-                to=""
+                to="/home"
                 className="profile-component"
                 style={{
                   textAlign: "center",
@@ -335,7 +338,19 @@ function Home() {
                     </Stack>
                     <span>Được thích bởi Tiến Minh and 2,200 người khác</span>
                   </div>
-                  <div style={{}}></div>
+                  <div style={{ marginTop: "" }}>
+                    <p>
+                      <span style={{ marginRight: "10px", fontWeight: "bold" }}>
+                        Minh Bảo
+                      </span>
+                      <span>
+                        {Readmore(
+                          "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
+                        )}
+                        ...
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </section>
               <section
@@ -365,7 +380,7 @@ function Home() {
                     }}
                   >
                     <img
-                      src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                      src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
                       className="img-src"
                       alt=""
                       style={{
@@ -389,7 +404,7 @@ function Home() {
                       objectFit: "cover",
                       overflow: "hidden",
                     }}
-                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                    src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
                   ></img>
                   <div
                     className="emotions"
@@ -468,14 +483,278 @@ function Home() {
                     </Stack>
                     <span>Được thích bởi Tiến Minh and 2,200 người khác</span>
                   </div>
-                  <div style={{}}></div>
+                  <div style={{ marginTop: "" }}>
+                    <p>
+                      <span style={{ marginRight: "10px", fontWeight: "bold" }}>
+                        Minh Bảo
+                      </span>
+                      <span>
+                        {Readmore(
+                          "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
+                        )}
+                        ...
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </section>
             </section>
           </Grid>
           {/* Right */}
-          <Grid item xs={3} md={3} style={{ backgroundColor: "ButtonFace" }}>
-            <section className="right-component"></section>
+          <Grid item xs={3} md={3} style={{}}>
+            <section
+              className="right-component"
+              style={{
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            >
+              <div
+                style={{
+                  width: "60%",
+                  backgroundColor: "white",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "20px",
+                }}
+              >
+                <span style={{ fontWeight: "500", color: "GrayText" }}>
+                  Lời mời kết bạn
+                </span>
+                {/* Card kết bạn */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      gap: "10px",
+                      width: "100%",
+                    }}
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                      className="img-src"
+                      alt=""
+                      style={{
+                        height: "40px",
+                        width: "40px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+                      <span>8 bạn chung</span>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <button
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        border: "none",
+                        backgroundColor: COLORS.mainColor,
+                        color: "white",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Đồng ý
+                    </button>
+                    <button
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        border: "none",
+                        backgroundColor: COLORS.mainColor,
+                        color: "white",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Từ chối
+                    </button>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      gap: "10px",
+                      width: "100%",
+                    }}
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                      className="img-src"
+                      alt=""
+                      style={{
+                        height: "40px",
+                        width: "40px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+                      <span>8 bạn chung</span>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <button
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        border: "none",
+                        backgroundColor: COLORS.mainColor,
+                        color: "white",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Đồng ý
+                    </button>
+                    <button
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        border: "none",
+                        backgroundColor: COLORS.mainColor,
+                        color: "white",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Từ chối
+                    </button>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      gap: "10px",
+                      width: "100%",
+                    }}
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                      className="img-src"
+                      alt=""
+                      style={{
+                        height: "40px",
+                        width: "40px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+                      <span>8 bạn chung</span>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <button
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        border: "none",
+                        backgroundColor: COLORS.mainColor,
+                        color: "white",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Đồng ý
+                    </button>
+                    <button
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        border: "none",
+                        backgroundColor: COLORS.mainColor,
+                        color: "white",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Từ chối
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
           </Grid>
         </Grid>
       </HomePage>
