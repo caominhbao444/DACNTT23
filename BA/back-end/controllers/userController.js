@@ -16,23 +16,23 @@ const getUsers = asyncHandler(async (req, res) => {
 const createUser = asyncHandler(async (req, res) => {
   console.log("The request body is :", req.body);
 
-  const { fullname, email, phone, city, from } = req.body;
-
-  if (!fullname || !email || !phone || !city || !from) {
-    res.status(400);
-    throw new Error("All fields are mandatory !");
-  }
-  const users = await User.create({
-    fullname,
-    email,
-    phone,
-    city,
-    from,
+  const newUser = new User({
+    fullname: req.body.fullname,
+    phone: req.body.phone,
+    city: req.body.city,
+    from: req.body.from,
+    education: req.body.education,
+    email: req.account.email,
     accountId: req.account.id,
-    //userId : req.user.id
   });
+  try {
+    const savedUser = await newUser.save();
+    res.status(200).json(savedUser);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 
-  res.status(201).json(users);
+  res.status(201).json(savedUser);
 });
 
 //@desc Get user

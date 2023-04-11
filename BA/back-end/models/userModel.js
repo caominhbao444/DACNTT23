@@ -26,6 +26,18 @@ const userSchema = mongoose.Schema(
     from:{
       type: String,
       required:[true, "Please add from"]
+    },
+    education:{
+      type: String,
+      required:[true, "Please add education"]
+    },
+    followers:{
+      type: Array,
+      default: []
+    },
+    followings:{
+      type: Array,
+      default: []
     }
   },
   {
