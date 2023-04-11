@@ -5,11 +5,7 @@ const userSchema = mongoose.Schema(
     accountId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref:"Account",
-    },
-    fullname: {
-      type: String,
-      required: [true, "Please add the full name "],
+      ref: "Account",
     },
     email: {
       type: String,
@@ -19,26 +15,26 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, "Please add the phone number"],
     },
-    city:{
+    city: {
       type: String,
-      required :[true, "Please add the city"],
+      required: [true, "Please add the city"],
     },
-    from:{
+    from: {
       type: String,
-      required:[true, "Please add from"]
+      required: [true, "Please add from"],
     },
-    education:{
+    education: {
       type: String,
-      required:[true, "Please add education"]
+      required: [true, "Please add education"],
     },
-    followers:{
+    followers: {
       type: Array,
-      default: []
+      default: [],
     },
-    followings:{
+    followings: {
       type: Array,
-      default: []
-    }
+      default: [],
+    },
   },
   {
     timestamps: true,

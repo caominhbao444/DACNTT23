@@ -30,8 +30,10 @@ const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 //socket
-const io = require("socket.io")(httpServer, {
-    cors: corsOptions
+const io = require("socket.io")(5002, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
 });
 
 let users = [];

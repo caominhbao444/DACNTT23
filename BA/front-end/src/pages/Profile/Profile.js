@@ -253,7 +253,6 @@ function Profile() {
                         borderRadius: "20px",
                         backgroundColor: "#f0f0f0",
                         outline: "none",
-
                         padding: "0 0 0 10px",
                       }}
                       type="text"

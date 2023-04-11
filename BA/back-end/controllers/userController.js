@@ -15,9 +15,7 @@ const getUsers = asyncHandler(async (req, res) => {
 //@access private
 const createUser = asyncHandler(async (req, res) => {
   console.log("The request body is :", req.body);
-
   const newUser = new User({
-    fullname: req.body.fullname,
     phone: req.body.phone,
     city: req.body.city,
     from: req.body.from,
