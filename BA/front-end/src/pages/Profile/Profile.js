@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
@@ -11,6 +11,10 @@ import RequestFriends from "../../components/RequestFriends/RequestFriends";
 import { Link } from "react-router-dom";
 
 function Profile() {
+  const [friends, setFriends] = useState("1");
+  const Readmore = (e) => {
+    return e.slice(0, 100);
+  };
   return (
     <>
       <Navbar />
@@ -22,7 +26,6 @@ function Profile() {
             justifyContent: "center",
             alignItems: "center",
             padding: "0.9em 2em",
-
             flexDirection: "column",
           }}
         >
@@ -30,7 +33,6 @@ function Profile() {
             style={{
               display: "flex",
               justifyContent: "center",
-
               gap: "10px",
             }}
           >
@@ -89,6 +91,41 @@ function Profile() {
                 />
               </AvatarGroup>
             </div>
+            <div style={{ display: "flex", alignItems: "flex-end" }}>
+              {friends ? (
+                <>
+                  <button
+                    style={{
+                      padding: "10px 20px",
+                      border: "none",
+                      color: "white",
+                      fontWeight: "bold",
+                      borderRadius: "10px",
+                      backgroundColor: "#58A168",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Bạn bè
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    style={{
+                      padding: "10px 20px",
+                      border: "none",
+                      color: "white",
+                      fontWeight: "bold",
+                      borderRadius: "10px",
+                      backgroundColor: "#58A168",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Theo dõi
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </Grid>
         <Grid
@@ -111,8 +148,11 @@ function Profile() {
               // backgroundColor: "green",
               width: "100%",
               display: "flex",
-              justifyContent: "flex-end",
+              alignItems: "flex-end",
+              flexDirection: "column",
+
               padding: "0",
+              gap: "20px",
             }}
           >
             <div
@@ -204,6 +244,124 @@ function Profile() {
                 </div>
               </div>
             </div>
+            <div
+              style={{
+                width: "70%",
+                padding: "10px 20px",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "white",
+                  padding: "10px 20px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  alignItems: "flex-start",
+                }}
+              >
+                <span style={{ fontWeight: "bold", fontSize: "17px" }}>
+                  Album ảnh
+                </span>
+                {/* <Link
+                  to="/"
+                  style={{
+                    textDecoration: "none",
+                    color: "black",
+                    padding: "10px",
+                    width: "100%",
+                    backgroundColor: "whitesmoke",
+                    display: "block",
+                  }}
+                >
+                  <p>Chỉnh sửa thông tin</p>
+                </Link> */}
+
+                <div style={{ width: "100%" }}>
+                  <Grid container style={{ width: "100%" }}>
+                    <Grid item xs={4} md={4} style={{ padding: "5px" }}>
+                      <img
+                        src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                        className="img-src"
+                        alt=""
+                        style={{
+                          height: "70px",
+                          width: "100%",
+                          objectFit: "cover",
+                          overflow: "hidden",
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={4} md={4} style={{ padding: "5px" }}>
+                      <img
+                        src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                        className="img-src"
+                        alt=""
+                        style={{
+                          height: "70px",
+                          width: "100%",
+                          objectFit: "cover",
+                          overflow: "hidden",
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={4} md={4} style={{ padding: "5px" }}>
+                      <img
+                        src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                        className="img-src"
+                        alt=""
+                        style={{
+                          height: "70px",
+                          width: "100%",
+                          objectFit: "cover",
+                          overflow: "hidden",
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={4} md={4} style={{ padding: "5px" }}>
+                      <img
+                        src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                        className="img-src"
+                        alt=""
+                        style={{
+                          height: "70px",
+                          width: "100%",
+                          objectFit: "cover",
+                          overflow: "hidden",
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={4} md={4} style={{ padding: "5px" }}>
+                      <img
+                        src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                        className="img-src"
+                        alt=""
+                        style={{
+                          height: "70px",
+                          width: "100%",
+                          objectFit: "cover",
+                          overflow: "hidden",
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={4} md={4} style={{ padding: "5px" }}>
+                      <img
+                        src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                        className="img-src"
+                        alt=""
+                        style={{
+                          height: "70px",
+                          width: "100%",
+                          objectFit: "cover",
+                          overflow: "hidden",
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </div>
+              </div>
+            </div>
           </Grid>
           {/* Right */}
           <Grid
@@ -222,6 +380,9 @@ function Profile() {
               style={{
                 width: "85%",
                 padding: "10px 20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
               }}
             >
               <div
@@ -231,6 +392,7 @@ function Profile() {
                   borderRadius: "10px",
                   display: "flex",
                   flexDirection: "column",
+                  gap: "10px",
                 }}
               >
                 <Grid container style={{ width: "100%" }}>
@@ -244,21 +406,319 @@ function Profile() {
                     />
                   </Grid>
                   <Grid item xs={11} md={11}>
-                    <input
-                      style={{
-                        width: "100%",
-                        fontSize: "15px",
-                        border: "1px solid black",
-                        height: "50px",
-                        borderRadius: "20px",
-                        backgroundColor: "#f0f0f0",
-                        outline: "none",
-                        padding: "0 0 0 10px",
-                      }}
-                      type="text"
-                    ></input>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        style={{
+                          width: "100%",
+                          fontSize: "15px",
+                          border: "none",
+                          height: "50px",
+                          borderRadius: "20px",
+                          backgroundColor: "#f0f0f0",
+                          outline: "none",
+                          padding: "0 0 0 10px",
+                        }}
+                        type="text"
+                      ></input>
+                      <ion-icon
+                        style={{
+                          position: "absolute",
+                          top: "15px",
+                          right: "10px",
+                          height: "20px",
+                          width: "20px",
+                          cursor: "pointer",
+                        }}
+                        name="paper-plane-outline"
+                      ></ion-icon>
+                    </div>
                   </Grid>
                 </Grid>
+              </div>
+              <div
+                style={{
+                  backgroundColor: "white",
+                  padding: "5px 20px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                }}
+              >
+                <p style={{ fontWeight: "bold" }}>Bài viết</p>
+              </div>
+              {/* Post item */}
+              <div
+                style={{
+                  backgroundColor: "white",
+                  padding: "10px 20px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                }}
+              >
+                <div
+                  className="img-container"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                    className="img-src"
+                    alt=""
+                    style={{
+                      height: "40px",
+                      width: "40px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                    }}
+                  />
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+                    <span>10 phút trước</span>
+                  </div>
+                </div>
+                <img
+                  className="img-src"
+                  alt=""
+                  style={{
+                    height: "400px",
+                    width: "100%",
+                    objectFit: "cover",
+                    overflow: "hidden",
+                  }}
+                  src="https://images.unsplash.com/photo-1543269664-7eef42226a21?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDl8fHBlb3BsZXxlbnwwfDB8MHx8&auto=format&fit=crop&w=600&q=60"
+                ></img>
+                <div
+                  className="emotions"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: "10px",
+                    height: "40px",
+                  }}
+                >
+                  <ion-icon
+                    style={{
+                      cursor: "pointer",
+                      color: "red",
+                      height: "30px",
+                      width: "30px",
+                    }}
+                    name="heart"
+                  ></ion-icon>
+                  <ion-icon
+                    style={{
+                      cursor: "pointer",
+                      height: "30px",
+                      width: "30px",
+                    }}
+                    name="chatbubble-outline"
+                  ></ion-icon>
+                  <ion-icon
+                    style={{
+                      cursor: "pointer",
+                      color: "",
+                      height: "30px",
+                      width: "30px",
+                    }}
+                    name="share-social-outline"
+                  ></ion-icon>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    gap: "5px",
+                  }}
+                >
+                  <Stack direction="row" spacing={-1}>
+                    <Avatar
+                      style={{
+                        height: "30px",
+                        width: "30px",
+                        fontSize: "15px",
+                      }}
+                      alt="Remy Sharp"
+                      src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
+                    />
+                    <Avatar
+                      style={{
+                        height: "30px",
+                        width: "30px",
+                        fontSize: "15px",
+                      }}
+                      alt="Travis Howard"
+                      src="https://images.unsplash.com/photo-1639149888905-fb39731f2e6c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHVzZXJ8ZW58MHx8MHx8&auto=format&fit=crop&w=600&q=60"
+                    />
+                    <Avatar
+                      style={{
+                        height: "30px",
+                        width: "30px",
+                        fontSize: "15px",
+                      }}
+                      alt="Cindy Baker"
+                      src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
+                    />
+                  </Stack>
+                  <span>Được thích bởi Tiến Minh and 2,200 người khác</span>
+                </div>
+                <div style={{ marginTop: "" }}>
+                  <p>
+                    <span style={{ marginRight: "10px", fontWeight: "bold" }}>
+                      Minh Bảo
+                    </span>
+                    <span>
+                      {Readmore(
+                        "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
+                      )}
+                      ...
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div
+                style={{
+                  backgroundColor: "white",
+                  padding: "10px 20px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                }}
+              >
+                <div
+                  className="img-container"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                    className="img-src"
+                    alt=""
+                    style={{
+                      height: "40px",
+                      width: "40px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                    }}
+                  />
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+                    <span>10 phút trước</span>
+                  </div>
+                </div>
+                <img
+                  className="img-src"
+                  alt=""
+                  style={{
+                    height: "400px",
+                    width: "100%",
+                    objectFit: "cover",
+                    overflow: "hidden",
+                  }}
+                  src="https://images.unsplash.com/photo-1543269664-7eef42226a21?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDl8fHBlb3BsZXxlbnwwfDB8MHx8&auto=format&fit=crop&w=600&q=60"
+                ></img>
+                <div
+                  className="emotions"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: "10px",
+                    height: "40px",
+                  }}
+                >
+                  <ion-icon
+                    style={{
+                      cursor: "pointer",
+                      color: "red",
+                      height: "30px",
+                      width: "30px",
+                    }}
+                    name="heart"
+                  ></ion-icon>
+                  <ion-icon
+                    style={{
+                      cursor: "pointer",
+                      height: "30px",
+                      width: "30px",
+                    }}
+                    name="chatbubble-outline"
+                  ></ion-icon>
+                  <ion-icon
+                    style={{
+                      cursor: "pointer",
+                      color: "",
+                      height: "30px",
+                      width: "30px",
+                    }}
+                    name="share-social-outline"
+                  ></ion-icon>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    gap: "5px",
+                  }}
+                >
+                  <Stack direction="row" spacing={-1}>
+                    <Avatar
+                      style={{
+                        height: "30px",
+                        width: "30px",
+                        fontSize: "15px",
+                      }}
+                      alt="Remy Sharp"
+                      src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
+                    />
+                    <Avatar
+                      style={{
+                        height: "30px",
+                        width: "30px",
+                        fontSize: "15px",
+                      }}
+                      alt="Travis Howard"
+                      src="https://images.unsplash.com/photo-1639149888905-fb39731f2e6c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHVzZXJ8ZW58MHx8MHx8&auto=format&fit=crop&w=600&q=60"
+                    />
+                    <Avatar
+                      style={{
+                        height: "30px",
+                        width: "30px",
+                        fontSize: "15px",
+                      }}
+                      alt="Cindy Baker"
+                      src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
+                    />
+                  </Stack>
+                  <span>Được thích bởi Tiến Minh and 2,200 người khác</span>
+                </div>
+                <div style={{ marginTop: "" }}>
+                  <p>
+                    <span style={{ marginRight: "10px", fontWeight: "bold" }}>
+                      Minh Bảo
+                    </span>
+                    <span>
+                      {Readmore(
+                        "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
+                      )}
+                      ...
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
           </Grid>

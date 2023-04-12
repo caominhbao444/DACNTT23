@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
@@ -7,6 +7,7 @@ import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import SideBar from "../../components/SideBar/SideBar";
 import RequestFriends from "../../components/RequestFriends/RequestFriends";
+import axios from "axios";
 function Home() {
   const number = 6;
   const hih = () => {
@@ -15,10 +16,13 @@ function Home() {
   const Readmore = (e) => {
     return e.slice(0, 100);
   };
+  useEffect(() => {
+    axios.get("http://localhost:5001/api/users/current");
+  }, []);
   return (
     <>
       <Navbar />
-      <HomePage style={{ backgroundColor: "#FFD4D8" }}>
+      <HomePage style={{ backgroundColor: "#FFD4D8", position: "relative" }}>
         <Grid container style={{ padding: "0" }}>
           {/* Left */}
           <SideBar />

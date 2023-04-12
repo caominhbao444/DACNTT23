@@ -19,7 +19,7 @@ function Signup() {
         email: username,
         password: password,
       });
-      history("/");
+      history("/signupdetails");
     } catch (error) {
       console.log(error);
     }

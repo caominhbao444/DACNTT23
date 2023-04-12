@@ -67,7 +67,7 @@ function SideBar() {
             }}
           >
             <Link
-              to="/"
+              to="/home"
               className="sidebar-item"
               style={{
                 textDecoration: "none",
@@ -105,7 +105,7 @@ function SideBar() {
               </Grid>
             </Link>
             <Link
-              to="/"
+              to="/message"
               className="sidebar-item"
               style={{
                 textDecoration: "none",
