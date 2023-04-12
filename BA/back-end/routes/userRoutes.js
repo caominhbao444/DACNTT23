@@ -9,7 +9,7 @@ const {
   inforUser,
   followUser,
   unfollowUser,
-  test,
+
 } = require("../controllers/userController");
 
 const validateToken = require("../middleware/validateTokenHandler");
@@ -21,8 +21,6 @@ router.route("/current").get(inforUser);
 router.route("/follow/:id").put(followUser);
 
 router.route("/unfollow/:id").put(unfollowUser);
-
-router.route("/test").get(test);
 
 router.route("/").get(getUsers)
 

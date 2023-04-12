@@ -76,22 +76,19 @@ const deleteUser = asyncHandler(async (req, res) => {
   res.status(200).json(user);
 });
 
-
-const inforUser = asyncHandler(async(req,res)=>{
-  const user = await User.find({accountId : req.account.id});
+const inforUser = asyncHandler(async (req, res) => {
+  const user = await User.find({ accountId: req.account.id });
   res.status(200).json(user);
-})
+});
 
-
-
-const followUser = asyncHandler(async(req,res)=>{
-  if (req.body.accountId !== req.params.id) {
+const followUser = asyncHandler(async (req, res) => {
+  if (req.body._id != req.params.id) {
     try {
       const user = await User.findById(req.params.id);
-      const currentUser = await User.find(req.body.accountId);
-      if (!user.followers.includes(req.body.accountId)) {
-        await user.updateOne({ $push: { followers: req.body.accountId } });
-        await currentUser.updateOne({ $push: { followings: req.params.id } });
+      const currentUser = await User.findOne({ accountId: req.account.id });
+      if (!user.followers.includes(currentUser._id)) {
+        await user.updateOne({ $push: { followers: currentUser._id } });
+        await currentUser.updateOne({ $push: { followings: user._id } });
         res.status(200).json("user has been followed");
       } else {
         res.status(403).json("you allready follow this user");
@@ -104,14 +101,14 @@ const followUser = asyncHandler(async(req,res)=>{
   }
 });
 
-const unfollowUser = asyncHandler(async(req,res)=>{
-  if (req.body.userId !== req.params.id) {
+const unfollowUser = asyncHandler(async (req, res) => {
+  if (req.body._id !== req.params.id) {
     try {
       const user = await User.findById(req.params.id);
-      const currentUser = await User.findById(req.body.userId);
-      if (user.followers.includes(req.body.userId)) {
-        await user.updateOne({ $pull: { followers: req.body.userId } });
-        await currentUser.updateOne({ $pull: { followings: req.params.id } });
+      const currentUser = await User.findOne({ accountId: req.account.id });
+      if (user.followers.includes(currentUser._id)) {
+        await user.updateOne({ $pull: { followers: currentUser._id } });
+        await currentUser.updateOne({ $pull: { followings: user._id } });
         res.status(200).json("user has been unfollowed");
       } else {
         res.status(403).json("you dont follow this user");
@@ -125,10 +122,6 @@ const unfollowUser = asyncHandler(async(req,res)=>{
 });
 
 
-const test = asyncHandler(async(req,res)=>{
-  const user = await User.find({accountId:req.account.id});
-  res.status(200).json(user);
-});
 
 module.exports = {
   getUsers,
@@ -139,5 +132,5 @@ module.exports = {
   inforUser,
   followUser,
   unfollowUser,
-  test,
+
 };
