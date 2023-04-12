@@ -9,6 +9,7 @@ import SideBar from "../../components/SideBar/SideBar";
 import RequestFriends from "../../components/RequestFriends/RequestFriends";
 import axios from "axios";
 function Home() {
+  const [data, setData] = useState({});
   const number = 6;
   const hih = () => {
     alert("bao");
@@ -16,9 +17,24 @@ function Home() {
   const Readmore = (e) => {
     return e.slice(0, 100);
   };
+
+  const authToken = localStorage.getItem("authToken");
+  console.log(authToken);
   useEffect(() => {
-    axios.get("http://localhost:5001/api/users/current");
+    axios
+      .get("http://localhost:5001/api/users/current", {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
+
   return (
     <>
       <Navbar />

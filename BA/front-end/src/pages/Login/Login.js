@@ -11,15 +11,21 @@ function Login() {
   const [password, setPassWord] = useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await axios.post("http://localhost:5001/api/accounts/login", {
+    axios
+      .post("http://localhost:5001/api/accounts/login", {
         email: username,
         password: password,
+      })
+      .then((response) => {
+        // Handle successful login
+        console.log(response.data);
+        localStorage.setItem("authToken", response.data.accessToken);
+        window.location.href = "/home";
+      })
+      .catch((error) => {
+        // Handle failed login
+        console.error(error.response.data);
       });
-      history("/home");
-    } catch (error) {
-      console.log(error);
-    }
   };
   const handleEmailInput = (e) => setUserName(e.target.value);
   const handlePwdInput = (e) => setPassWord(e.target.value);
