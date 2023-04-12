@@ -2,9 +2,14 @@ const mongoose = require("mongoose");
 
 const conversationSchema = mongoose.Schema(
   {
-    members: {
-      type: Array,
+    senderId:{
+      type: String,
+      required:[true]
     },
+    receiverId:{
+      type: String,
+      required:[true]
+    }
   },
   { timestamps: true }
 );

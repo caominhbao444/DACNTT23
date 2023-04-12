@@ -76,10 +76,18 @@ const deleteUser = asyncHandler(async (req, res) => {
   res.status(200).json(user);
 });
 
+
+const currentUser = asyncHandler(async(req,res)=>{
+  const users = await User.find({accountId : req.account.id});
+  res.status(200).json(users);
+})
+
+
 module.exports = {
   getUsers,
   createUser,
   getUser,
   updateUser,
   deleteUser,
+  currentUser
 };
