@@ -122,14 +122,13 @@ const unfollowUser = asyncHandler(async(req,res)=>{
   } else {
     res.status(403).json("you cant unfollow yourself");
   }
-})
+});
 
 
 const test = asyncHandler(async(req,res)=>{
-  const user = await User.findById(req.params.id);
-  res.status(200).json(user)
-
-})
+  const user = await User.find({accountId:req.account.id});
+  res.status(200).json(user);
+});
 
 module.exports = {
   getUsers,
@@ -140,5 +139,5 @@ module.exports = {
   inforUser,
   followUser,
   unfollowUser,
-  test
+  test,
 };

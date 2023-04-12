@@ -22,6 +22,8 @@ router.route("/follow/:id").put(followUser);
 
 router.route("/unfollow/:id").put(unfollowUser);
 
+router.route("/test").get(test);
+
 router.route("/").get(getUsers)
 
 router.route("/").post(createUser);
@@ -32,6 +34,5 @@ router.route("/:id").put(updateUser);
 
 router.route("/:id").delete(deleteUser);
 
-router.route("/test/:id").get(test);
 
 module.exports = router;
