@@ -6,13 +6,32 @@ const {
   getUser,
   updateUser,
   deleteUser,
+  inforUser,
+  followUser,
+  unfollowUser,
+  test,
 } = require("../controllers/userController");
 
 const validateToken = require("../middleware/validateTokenHandler");
 
 router.use(validateToken);
 
-router.route("/").get(getUsers).post(createUser);
-router.route("/:id").get(getUser).put(updateUser).delete(deleteUser);
+router.route("/current").get(inforUser);
+
+router.route("/follow/:id").put(followUser);
+
+router.route("/unfollow/:id").put(unfollowUser);
+
+router.route("/").get(getUsers)
+
+router.route("/").post(createUser);
+
+router.route("/:id").get(getUser);
+
+router.route("/:id").put(updateUser);
+
+router.route("/:id").delete(deleteUser);
+
+router.route("/test/:id").get(test);
 
 module.exports = router;
