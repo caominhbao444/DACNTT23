@@ -20,6 +20,7 @@ const createUser = asyncHandler(async (req, res) => {
     city: req.body.city,
     from: req.body.from,
     education: req.body.education,
+    username : req.account.username,
     email: req.account.email,
     accountId: req.account.id,
   });
@@ -38,10 +39,6 @@ const createUser = asyncHandler(async (req, res) => {
 //@access private
 const getUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
-  if (!users) {
-    res.status(404);
-    throw new Error("Contact not found");
-  }
   res.status(200).json(user);
 });
 
@@ -77,8 +74,13 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 const inforUser = asyncHandler(async (req, res) => {
-  const user = await User.find({ accountId: req.account.id });
-  res.status(200).json(user);
+  const currentUser = await User.findOne({ accountId: req.account.id });
+  if(req.params.id  == currentUser._id){
+    res.status(200).json(currentUser);
+  }else{
+    res.status(404);
+    throw new Error("User not found")
+  }
 });
 
 const followUser = asyncHandler(async (req, res) => {
@@ -138,7 +140,7 @@ const friendsUser = asyncHandler(async (req, res) => {
 
 
 const test = asyncHandler(async (req, res) => {
-  res.json("ok")
+ 
 });
 
 module.exports = {
