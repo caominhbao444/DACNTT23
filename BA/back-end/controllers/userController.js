@@ -20,6 +20,7 @@ const createUser = asyncHandler(async (req, res) => {
     city: req.body.city,
     from: req.body.from,
     education: req.body.education,
+    username : req.account.username,
     email: req.account.email,
     accountId: req.account.id,
   });
