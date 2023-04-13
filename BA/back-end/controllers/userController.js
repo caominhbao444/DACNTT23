@@ -38,10 +38,6 @@ const createUser = asyncHandler(async (req, res) => {
 //@access private
 const getUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
-  if (!users) {
-    res.status(404);
-    throw new Error("Contact not found");
-  }
   res.status(200).json(user);
 });
 
