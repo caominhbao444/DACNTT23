@@ -384,7 +384,7 @@ function Home() {
 const HomePage = styled.section`
   min-height: 100vh;
   width: 100%;
-  box-sizing: border-box;
+
   .left-component {
     paddingright: 10px;
     display: flex;
