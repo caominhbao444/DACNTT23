@@ -26,7 +26,7 @@ router.route("/unfollow/:id").put(unfollowUser);
 
 router.route("/test/:id").get(test);
 
-router.route("/friends/:id").get(friendsUser);
+router.route("/friends").get(friendsUser);
 
 router.route("/").get(getUsers).post(createUser);
 

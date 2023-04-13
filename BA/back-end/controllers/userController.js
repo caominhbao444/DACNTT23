@@ -123,7 +123,7 @@ const unfollowUser = asyncHandler(async (req, res) => {
 });
 
 const friendsUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findOne({ accountId: req.account.id });
   const friends = await Promise.all(
     user.followings.map((friendId) => {
       return User.findById(friendId);
