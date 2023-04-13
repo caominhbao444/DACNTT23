@@ -1,26 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Loading from "../../pages/Loading/Loading";
 import styled from "styled-components";
-function FriendCard() {
-  const [id, setId] = useState("643514a3556bd01cfc62dcda");
-  const handleRequestFriend = (e) => {
-    e.preventDefault();
-    axios
-      .post(`http://localhost:5001/api/users/follow/${id}`)
-      .then((response) => {
-        alert(response);
-      });
-  };
-  const handleListFriend = (e) => {
-    e.preventDefault();
-    axios
-      .get("http://localhost:5001/api/users/friends")
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+import { useNavigate } from "react-router-dom";
+function FriendCard(props) {
+  const handleChatOpen = () => {
+    console.log(props.people._id);
   };
   return (
     <CardFriend
@@ -51,11 +36,10 @@ function FriendCard() {
             overflow: "hidden",
           }}
         />
-        <span style={{ fontWeight: "bold" }}>Minh Bao</span>
-        <button onClick={handleRequestFriend}>Theo doi</button>
-        <button onClick={handleListFriend}>Xem</button>
+        <span style={{ fontWeight: "bold" }}>{props.people.username}</span>
+        {/* <button onClick={handleRequestFriend}>Theo doi</button> */}
       </div>
-      <ion-icon onClick={() => {}} name="navigate-outline"></ion-icon>
+      <ion-icon onClick={handleChatOpen} name="navigate-outline"></ion-icon>
     </CardFriend>
   );
 }

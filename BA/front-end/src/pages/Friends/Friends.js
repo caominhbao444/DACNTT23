@@ -1,10 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Navbar from "../../components/Navbar/Navbar";
 import styled from "styled-components";
 import { Grid } from "@mui/material";
 import FriendCard from "../../components/FriendCard/FriendCard";
-
+import Loading from "../Loading/Loading";
 function Friends() {
+  const [listPeople, setListPeople] = useState("");
+  // const handleRequestFriend = (e) => {
+  //   e.preventDefault();
+  //   axios
+  //     .post(`http://localhost:5001/api/users/follow/${id}`)
+  //     .then((response) => {
+  //       alert(response);
+  //     });
+  // };
+  const authToken = localStorage.getItem("authToken");
+  useEffect(() => {
+    axios
+      .get("http://localhost:5001/api/users/friends", {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
+      .then((response) => {
+        setListPeople(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  console.log(listPeople);
+  if (!listPeople) return <Loading />;
   return (
     <>
       <Navbar />
@@ -57,9 +84,10 @@ function Friends() {
               }}
               className="container-listFriends"
             >
-              <FriendCard />
-              <FriendCard />
-              <FriendCard />
+              {listPeople &&
+                listPeople.map((people, index) => {
+                  return <FriendCard key={index} people={people} />;
+                })}
             </div>
           </section>
           {/* Right */}
