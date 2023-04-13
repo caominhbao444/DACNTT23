@@ -17,7 +17,7 @@ function Home() {
   const Readmore = (e) => {
     return e.slice(0, 100);
   };
-  console.log(window.myAppData);
+
   return (
     <>
       <Navbar />

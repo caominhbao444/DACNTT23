@@ -108,6 +108,7 @@ function Login() {
                   name="username"
                   id="username"
                   placeholder="minhbao@gmail.com"
+                  required
                 />
               </div>
             </div>
@@ -159,6 +160,7 @@ function Login() {
                   id="password"
                   placeholder="Password"
                   onChange={handlePwdInput}
+                  required
                 />
                 <span
                   className="eyes"
