@@ -17,24 +17,7 @@ function Home() {
   const Readmore = (e) => {
     return e.slice(0, 100);
   };
-
-  const authToken = localStorage.getItem("authToken");
-  console.log(authToken);
-  useEffect(() => {
-    axios
-      .get("http://localhost:5001/api/users/current", {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
-
+  console.log(window.myAppData);
   return (
     <>
       <Navbar />
@@ -401,6 +384,7 @@ function Home() {
 const HomePage = styled.section`
   min-height: 100vh;
   width: 100%;
+  box-sizing: border-box;
   .left-component {
     paddingright: 10px;
     display: flex;

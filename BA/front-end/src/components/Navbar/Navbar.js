@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
+import { Outlet, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -16,26 +17,25 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 const pages = ["Products", "Pricing", "Blog"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Profile", "Friends", "Logout"];
 function Navbar() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  let navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
   const srcAva =
     "https://images.unsplash.com/photo-1680992284454-74dcc2b29410?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzN3x8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=60";
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
+  function handleMenu(event) {
+    setAnchorEl(event.currentTarget);
+  }
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
+  function handleClose() {
+    setAnchorEl(null);
+  }
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  function handleLogout() {
+    localStorage.removeItem("authToken");
+    navigate("/");
+  }
   return (
     <AppBar position="static" style={{ backgroundColor: "#58A168" }}>
       <Container maxWidth="xl">
@@ -95,14 +95,14 @@ function Navbar() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <IconButton onClick={handleMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src={srcAva} />
               </IconButton>
             </Tooltip>
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"
-              anchorEl={anchorElUser}
+              anchorEl={anchorEl}
               anchorOrigin={{
                 vertical: "top",
                 horizontal: "right",
@@ -112,14 +112,10 @@ function Navbar() {
                 vertical: "top",
                 horizontal: "right",
               }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
+              open={open}
+              onClose={handleClose}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </Box>
         </Toolbar>

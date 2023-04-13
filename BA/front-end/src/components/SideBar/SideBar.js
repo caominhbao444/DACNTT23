@@ -48,8 +48,10 @@ function SideBar() {
               />
             </div>
             <div className="details">
-              <h4>Minh Bao</h4>
-              <p className="">@minhbaoo</p>
+              <h4>{window.myAppData ? window.myAppData.email : "hi"}</h4>
+              <p className="">
+                {window.myAppData ? window.myAppData.email : ""}
+              </p>
             </div>
           </Link>
           <div
@@ -119,6 +121,24 @@ function SideBar() {
                 </Grid>
                 <Grid item xs={6} md={6} style={{ textAlign: "left" }}>
                   <span>Message</span>
+                </Grid>
+              </Grid>
+            </Link>
+            <Link
+              to="/friends"
+              className="sidebar-item"
+              style={{
+                textDecoration: "none",
+                color: "black",
+                fontWeight: "bold",
+              }}
+            >
+              <Grid container>
+                <Grid item xs={6} md={6} style={{ textAlign: "center" }}>
+                  <ion-icon name="people-outline"></ion-icon>
+                </Grid>
+                <Grid item xs={6} md={6} style={{ textAlign: "left" }}>
+                  <span>Friends</span>
                 </Grid>
               </Grid>
             </Link>

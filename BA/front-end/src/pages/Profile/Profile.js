@@ -52,7 +52,7 @@ function Profile() {
               }}
             >
               <span style={{ fontWeight: "bold", fontSize: "20px" }}>
-                Minh Bảo
+                {window.myAppData ? window.myAppData.username : "hi"}
               </span>
               <span style={{ color: "GrayText", fontSize: "13px" }}>
                 1.1K bạn bè
@@ -211,7 +211,10 @@ function Profile() {
                   <ion-icon name="location-outline"></ion-icon>
                   <span>
                     Sống tại
-                    <span style={{ fontWeight: "bold" }}> Việt Nam</span>
+                    <span style={{ fontWeight: "bold" }}>
+                      {" "}
+                      {window.myAppData ? window.myAppData.city : "hi"}
+                    </span>
                   </span>
                 </div>
                 <div
@@ -225,7 +228,27 @@ function Profile() {
                   <ion-icon name="book-outline"></ion-icon>
                   <span>
                     Học tại
-                    <span style={{ fontWeight: "bold" }}> Tôn Đức Thắng</span>
+                    <span style={{ fontWeight: "bold" }}>
+                      {" "}
+                      {window.myAppData ? window.myAppData.education : "hi"}
+                    </span>
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <ion-icon name="book-outline"></ion-icon>
+                  <span>
+                    Đến từ
+                    <span style={{ fontWeight: "bold" }}>
+                      {" "}
+                      {window.myAppData ? window.myAppData.from : "hi"}
+                    </span>
                   </span>
                 </div>
                 <div

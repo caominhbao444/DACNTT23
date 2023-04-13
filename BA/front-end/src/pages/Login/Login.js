@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
@@ -9,6 +9,9 @@ function Login() {
   const history = useNavigate();
   const [username, setUserName] = useState("");
   const [password, setPassWord] = useState("");
+  useEffect(() => {
+    localStorage.removeItem("authToken");
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
     axios
