@@ -2,11 +2,19 @@ const express = require("express");
 const router = express.Router();
 const{
 createMessage,
-getMessage
+getMessage,
+testm
 } = require("../controllers/messageController");
 
-router.route("/").post(createMessage);
+const validateToken = require("../middleware/validateTokenHandler");
+
+router.use(validateToken);
+
+router.route("/test/:id").get(testm);
+
+router.route("/:id").post(createMessage);
 
 router.route("/:conversationId").get(getMessage);
+
 
 module.exports = router;

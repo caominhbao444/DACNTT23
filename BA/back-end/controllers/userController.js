@@ -51,7 +51,6 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Contact not found");
   }
-
   const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
