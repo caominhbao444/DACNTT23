@@ -18,7 +18,7 @@ const validateToken = require("../middleware/validateTokenHandler");
 
 router.use(validateToken);
 
-router.route("/current/:id").get(inforUser);
+router.route("/current").get(inforUser);
 
 router.route("/follow/:id").put(followUser);
 

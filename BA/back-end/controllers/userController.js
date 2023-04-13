@@ -75,7 +75,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 const inforUser = asyncHandler(async (req, res) => {
   const currentUser = await User.findOne({ accountId: req.account.id });
-  if(req.params.id  == currentUser._id){
+  if(currentUser){
     res.status(200).json(currentUser);
   }else{
     res.status(404);
