@@ -9,6 +9,8 @@ const {
   inforUser,
   followUser,
   unfollowUser,
+  friendsUser,
+  test,
 
 } = require("../controllers/userController");
 
@@ -21,6 +23,10 @@ router.route("/current").get(inforUser);
 router.route("/follow/:id").put(followUser);
 
 router.route("/unfollow/:id").put(unfollowUser);
+
+router.route("/test/:id").get(test);
+
+router.route("/friends/:id").get(friendsUser);
 
 router.route("/").get(getUsers)
 

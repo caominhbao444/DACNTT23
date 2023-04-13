@@ -121,7 +121,25 @@ const unfollowUser = asyncHandler(async (req, res) => {
   }
 });
 
+const friendsUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  const friends = await Promise.all(
+    user.followings.map((friendId) => {
+      return User.findById(friendId);
+    })
+  );
+  const friendList = friends.map((friend) => {
+    const { _id, username } = friend;
+    return { _id, username };
+  });
+  res.status(200).json(friendList);
+});
 
+
+
+const test = asyncHandler(async (req, res) => {
+  res.json("ok")
+});
 
 module.exports = {
   getUsers,
@@ -132,5 +150,6 @@ module.exports = {
   inforUser,
   followUser,
   unfollowUser,
-
+  friendsUser,
+  test,
 };

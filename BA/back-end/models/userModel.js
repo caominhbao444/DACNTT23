@@ -7,6 +7,9 @@ const userSchema = mongoose.Schema(
       required: true,
       ref: "Account",
     },
+    username: {
+      type: String,
+    },
     email: {
       type: String,
       required: [true, "Please add the email"],
