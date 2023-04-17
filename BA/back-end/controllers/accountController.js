@@ -220,6 +220,20 @@ const friendsAccount = asyncHandler(async (req, res) => {
   }
 });
 
+const notFriendsAccount = asyncHandler(async(req,res)=>{
+    try {
+      const account = await Account.find();
+      const currentAccount = await Account.findOne(req.account);
+      if (!currentAccount.followings.includes(account._id)) {
+        res.status(200).json(account);
+      } else {
+        res.status(403).json("cant find friends");
+      }
+    } catch (err) {
+      res.status(500).json(err);
+    }
+});
+
 
 const checkFriends = asyncHandler(async(req,res)=>{
   if (req.body._id !== req.params.id) {
@@ -237,7 +251,6 @@ const checkFriends = asyncHandler(async(req,res)=>{
   } else {
     res.status(404).json("Friends not found");
   }
-  
 });
 
 module.exports = {
@@ -251,6 +264,6 @@ module.exports = {
   followAccount,
   unfollowAccount,
   friendsAccount,
-  checkFriends
-  
+  notFriendsAccount,
+  checkFriends,
 };

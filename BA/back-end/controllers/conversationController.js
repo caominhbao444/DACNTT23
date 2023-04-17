@@ -1,15 +1,15 @@
 const asyncHandler = require("express-async-handler");
 const Conversation = require("../models/conversationModel");
-const User = require("../models/userModel");
+const Account = require("../models/accountModel");
 
 const createConversation = asyncHandler(async (req, res) => {
   try {
-    const currentUser = await User.findOne({ accountId: req.account.id });
-    const user = await User.findById(req.params.id);
-    if (currentUser != user) {
+    const currentAccount = await Account.findOne(req.Account);
+    const account = await Account.findById(req.params.id);
+    if (currentAccount != account) {
       const newConversation = new Conversation({
-        senderId: currentUser._id,
-        receiverId: user._id,
+        senderId: currentAccount._id,
+        receiverId: account._id,
       });
       const savedConversation = await newConversation.save();
       res.status(200).json(savedConversation);

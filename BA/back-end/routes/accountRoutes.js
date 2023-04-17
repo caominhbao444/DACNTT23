@@ -10,7 +10,8 @@ const {
   followAccount,
   unfollowAccount,
   friendsAccount,
-  checkFriends
+  checkFriends,
+  notFriendsAccount
 } = require("../controllers/accountController");
 const validateToken = require("../middleware/validateTokenHandler");
 
@@ -29,6 +30,8 @@ router.get("/all",validateToken,getAccounts);
 router.get("/current", validateToken, currentAccount);
 
 router.get("/friends",validateToken,friendsAccount);
+
+router.get("/notfriends",validateToken,notFriendsAccount);
 
 router.get("/checkfriends/:id",validateToken,checkFriends);
 
