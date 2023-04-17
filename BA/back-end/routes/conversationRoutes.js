@@ -5,6 +5,7 @@ const {
   getConversation,
   getConversations,
   testc,
+  getConversationAccount,
 } = require("../controllers/conversationController");
 
 // const validateToken = require("../middleware/validateTokenHandler");
@@ -17,10 +18,12 @@ router.use(validateToken);
 
 router.route("/test").get(testc);
 
-router.route("/:id").post(createConversation);
+router.route("/current").get(getConversationAccount);
 
 router.route("/:id").get(getConversations);
 
 router.route("/find/:senderId/:receiverId").get(getConversation);
+
+router.route("/:id").post(createConversation);
 
 module.exports = router;

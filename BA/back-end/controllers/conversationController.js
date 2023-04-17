@@ -46,6 +46,16 @@ const getConversations = asyncHandler(async (req, res) => {
   }
 });
 
+
+const getConversationAccount = asyncHandler(async(req,res)=>{
+  try{
+    const conversation = await Conversation.find({senderId : req.account.id});
+    res.status(200).json(conversation);
+  }catch(err){
+    res.status(500).json(err);
+  }
+});
+
 const testc = asyncHandler(async (req, res) => {
   res.status(200).json("OK");
 });
@@ -54,5 +64,6 @@ module.exports = {
   createConversation,
   getConversation,
   getConversations,
+  getConversationAccount,
   testc,
 };
