@@ -123,7 +123,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   //check account exist
   const accountAvailable = await Account.findOne({ email: req.params.email });
   if (!accountAvailable) {
-    res.status(400);
+    res.status(403);
     throw new Error("Account have not already registered!");
   }
   //Hash password
@@ -182,7 +182,7 @@ const unfollowAccount = asyncHandler(async (req, res) => {
         await currentAccount.updateOne({ $pull: { followings: account._id } });
         res.status(200).json("user has been unfollowed");
       } else {
-        res.status(403).json("you dont follow this user");
+        res.status(404).json("you dont follow this user");
       }
     } catch (err) {
       res.status(500).json(err);
@@ -227,7 +227,7 @@ const notFriendsAccount = asyncHandler(async(req,res)=>{
       if (!currentAccount.followings.includes(account._id)) {
         res.status(200).json(account);
       } else {
-        res.status(403).json("cant find friends");
+        res.status(404).json("cant find friends");
       }
     } catch (err) {
       res.status(500).json(err);

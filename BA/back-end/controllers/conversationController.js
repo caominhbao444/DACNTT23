@@ -4,12 +4,13 @@ const Account = require("../models/accountModel");
 
 const createConversation = asyncHandler(async (req, res) => {
   try {
-    const currentAccount = await Account.findOne(req.Account);
-    const account = await Account.findById(req.params.id);
-    if (currentAccount != account) {
+    const conversation = await Conversation.findOne({senderId : req.account.id, receiverId : req.params.id});
+    if(conversation){
+      res.status(201).json({checkConversation : 1,message:"cuộc trò chuyện đã tồn tại"});
+    }else if (!conversation && req.account.id != req.params.id ) {
       const newConversation = new Conversation({
-        senderId: currentAccount._id,
-        receiverId: account._id,
+        senderId: req.account.id,
+        receiverId: req.params.id,
       });
       const savedConversation = await newConversation.save();
       res.status(200).json(savedConversation);
@@ -28,7 +29,7 @@ const getConversation = asyncHandler(async (req, res) => {
     if (conversation) {
       res.status(200).json(conversation);
     } else {
-      res.status(400);
+      res.status(404);
       throw new Error("Conversation not found");
     }
   } catch (err) {

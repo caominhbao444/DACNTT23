@@ -15,7 +15,7 @@ const createMessage = asyncHandler(async (req, res) => {
       const savedMessage = await message.save();
       res.status(200).json(savedMessage);
     } else {
-      res.status(400);
+      res.status(403);
       throw new Error("cant create message");
     }
   } catch (err) {
