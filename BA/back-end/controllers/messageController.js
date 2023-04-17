@@ -1,12 +1,11 @@
 const asyncHandler = require("express-async-handler");
 const Message = require("../models/messageModel");
 const Conversation = require("../models/conversationModel");
-const Account = require("../models/accountModel")
 
 const createMessage = asyncHandler(async (req, res) => {
   try {
     const conversation = await Conversation.findById(req.params.id);
-    if (req.params.id == conversation._id) {
+    if (conversation) {
       const message = new Message({
         conversationId: conversation._id,
         senderId: req.account.id,

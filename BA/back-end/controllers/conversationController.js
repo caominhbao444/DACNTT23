@@ -20,7 +20,7 @@ const createConversation = asyncHandler(async (req, res) => {
   }
 });
 
-const getConversation = asyncHandler(async (req, res) => {
+const getConversationByTwoUsers = asyncHandler(async (req, res) => {
   try {
     const conversation = await Conversation.find({
       senderId: req.params.senderId,
@@ -37,9 +37,9 @@ const getConversation = asyncHandler(async (req, res) => {
   }
 });
 
-const getConversations = asyncHandler(async (req, res) => {
+const getConversationsById = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.find({ senderId: req.params.id });
+    const conversation = await Conversation.findById(req.params.id );
     res.status(200).json(conversation);
   } catch (err) {
     res.status(500).json(err);
@@ -47,7 +47,7 @@ const getConversations = asyncHandler(async (req, res) => {
 });
 
 
-const getConversationAccount = asyncHandler(async(req,res)=>{
+const getCurrentConversations = asyncHandler(async(req,res)=>{
   try{
     const conversation = await Conversation.find({senderId : req.account.id});
     res.status(200).json(conversation);
@@ -62,8 +62,8 @@ const testc = asyncHandler(async (req, res) => {
 
 module.exports = {
   createConversation,
-  getConversation,
-  getConversations,
-  getConversationAccount,
+  getConversationByTwoUsers,
+  getConversationsById,
+  getCurrentConversations,
   testc,
 };

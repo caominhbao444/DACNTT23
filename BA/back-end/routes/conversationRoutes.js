@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const {
   createConversation,
-  getConversation,
-  getConversations,
   testc,
-  getConversationAccount,
+  getConversationsById,
+  getConversationByTwoUsers,
+  getCurrentConversations,
 } = require("../controllers/conversationController");
 
 // const validateToken = require("../middleware/validateTokenHandler");
@@ -18,11 +18,11 @@ router.use(validateToken);
 
 router.route("/test").get(testc);
 
-router.route("/current").get(getConversationAccount);
+router.route("/current").get(getCurrentConversations);
 
-router.route("/:id").get(getConversations);
+router.route("/:id").get(getConversationsById);
 
-router.route("/find/:senderId/:receiverId").get(getConversation);
+router.route("/find/:senderId/:receiverId").get(getConversationByTwoUsers);
 
 router.route("/:id").post(createConversation);
 

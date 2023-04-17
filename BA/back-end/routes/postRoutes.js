@@ -6,12 +6,14 @@ const {
   getPostById,
   updatePost,
   deletePost,
+  getCurrentPosts,
 } = require("../controllers/postController");
 
 const validateToken = require("../middleware/validateTokenHandler");
 router.use(validateToken);
 
 
+router.route("/current").get(getCurrentPosts);
 router.route("/").get(getPosts).post(createPost);
 router.route("/:id").get(getPostById).put(updatePost).delete(deletePost);
 

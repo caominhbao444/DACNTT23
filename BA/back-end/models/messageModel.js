@@ -5,7 +5,7 @@ const messageSchema = mongoose.Schema(
     conversationId: {
       type: String,
     },
-    accountId: {
+    senderId: {
       type: mongoose.Schema.Types.ObjectId,
       required:[true],
       ref:"Account"

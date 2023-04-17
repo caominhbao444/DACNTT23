@@ -10,7 +10,7 @@ const getPosts = asyncHandler(async (req, res) => {
   }
 });
 
-const getPostsAccount = asyncHandler(async (req, res) => {
+const getCurrentPosts = asyncHandler(async (req, res) => {
   try {
     const post = await Post.find({ accountId: req.account.id });
     res.json(post);
@@ -61,7 +61,7 @@ module.exports = {
   getPosts,
   createPost,
   getPostById,
-  getPostsAccount,
+  getCurrentPosts,
   updatePost,
   deletePost,
 };
