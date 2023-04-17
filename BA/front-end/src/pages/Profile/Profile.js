@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
+import Loading from "../../pages/Loading/Loading";
 import Navbar from "../../components/Navbar/Navbar";
 import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
@@ -9,12 +10,51 @@ import SideBar from "../../components/SideBar/SideBar";
 import AvatarGroup from "@mui/material/AvatarGroup";
 import RequestFriends from "../../components/RequestFriends/RequestFriends";
 import { Link } from "react-router-dom";
-
+import { useDispatch, useSelector } from "react-redux";
+import {
+  CallApiUser,
+  CallApiUserID,
+  CallApiAllUsers,
+} from "../../features/userSlice";
+import { useParams } from "react-router";
 function Profile() {
+  let { userID } = useParams();
   const [friends, setFriends] = useState("1");
   const Readmore = (e) => {
     return e.slice(0, 100);
   };
+  const dispatch = useDispatch();
+  const authToken = localStorage.getItem("authToken");
+  const { userInforId, userInfor, allUserInfor } = useSelector(
+    (state) => state.user
+  );
+  console.log("userid", userInforId._id);
+  console.log("usercurrent", userInfor._id);
+  console.log("allusers", allUserInfor);
+  // if (userInforId._id !== userInfor._id) {
+  //   setFriends("");
+  // }
+  useEffect(() => {
+    dispatch(
+      CallApiUserID({
+        headers: { authorization: `Bearer ${authToken}` },
+        userID,
+      })
+    );
+    dispatch(
+      CallApiUser({ headers: { authorization: `Bearer ${authToken}` } })
+    );
+    dispatch(
+      CallApiAllUsers({ headers: { authorization: `Bearer ${authToken}` } })
+    );
+  }, []);
+  const check = () => {
+    return userInforId._id === userInfor._id;
+  };
+  console.log(check());
+  if (!userInforId && !userInfor) {
+    return <Loading />;
+  }
   return (
     <>
       <Navbar />
@@ -52,7 +92,7 @@ function Profile() {
               }}
             >
               <span style={{ fontWeight: "bold", fontSize: "20px" }}>
-                {window.myAppData ? window.myAppData.username : "hi"}
+                {userInforId.username}
               </span>
               <span style={{ color: "GrayText", fontSize: "13px" }}>
                 1.1K bạn bè
@@ -92,7 +132,7 @@ function Profile() {
               </AvatarGroup>
             </div>
             <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {friends ? (
+              {check() ? (
                 <>
                   <button
                     style={{
@@ -213,7 +253,7 @@ function Profile() {
                     Sống tại
                     <span style={{ fontWeight: "bold" }}>
                       {" "}
-                      {window.myAppData ? window.myAppData.city : "hi"}
+                      {userInforId.city}
                     </span>
                   </span>
                 </div>
@@ -230,7 +270,7 @@ function Profile() {
                     Học tại
                     <span style={{ fontWeight: "bold" }}>
                       {" "}
-                      {window.myAppData ? window.myAppData.education : "hi"}
+                      {userInforId.education ? userInforId.education : "Empty"}
                     </span>
                   </span>
                 </div>
@@ -247,7 +287,7 @@ function Profile() {
                     Đến từ
                     <span style={{ fontWeight: "bold" }}>
                       {" "}
-                      {window.myAppData ? window.myAppData.from : "hi"}
+                      {userInforId.from}
                     </span>
                   </span>
                 </div>

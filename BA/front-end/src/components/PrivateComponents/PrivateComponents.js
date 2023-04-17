@@ -17,7 +17,7 @@ function PrivateComponents() {
           },
         })
         .then((response) => {
-          console.log((window.myAppData = response.data[0]));
+          // console.log((window.myAppData = response.data[0]));
         })
         .catch((error) => {
           console.log(error);

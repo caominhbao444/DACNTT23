@@ -12,16 +12,20 @@ function SignupDetails() {
   const [country, setCountry] = useState("");
   const [education, setEducation] = useState("");
   const [numberPhone, setNumberPhone] = useState("");
-
+  const authToken = localStorage.getItem("authToken");
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5001/api/users/", {
-        phone: numberPhone,
-        city: city,
-        from: country,
-        education: education,
-      });
+      await axios.post(
+        "http://localhost:5001/api/users/",
+        {
+          phone: numberPhone,
+          city: city,
+          from: country,
+          education: education,
+        },
+        {}
+      );
       history("/home");
     } catch (error) {
       console.log(error);

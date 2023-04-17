@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Loading from "../../pages/Loading/Loading";
+import { COLORS } from "../../assets/Color";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 function FriendCard(props) {
   const handleChatOpen = () => {
     console.log(props.people._id);
+  };
+  const handleProfileOpen = () => {
+    alert(props.people._id);
   };
   return (
     <CardFriend
@@ -39,9 +43,50 @@ function FriendCard(props) {
         <span style={{ fontWeight: "bold" }}>{props.people.username}</span>
         {/* <button onClick={handleRequestFriend}>Theo doi</button> */}
       </div>
-      <ion-icon onClick={handleChatOpen} name="navigate-outline"></ion-icon>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <Link to="" className="button_chat" style={{ textDecoration: "none" }}>
+          <span>Chat</span>
+          <ion-icon
+            name="navigate-outline"
+            style={{ display: "inline-block" }}
+          ></ion-icon>
+        </Link>
+        <Link
+          to={`/profile/${props.people._id}`}
+          className="button_chat"
+          style={{ textDecoration: "none" }}
+        >
+          <span>Profile</span>
+          <ion-icon
+            name="accessibility-outline"
+            style={{ display: "inline-block" }}
+          ></ion-icon>
+        </Link>
+      </div>
     </CardFriend>
   );
 }
-const CardFriend = styled.section``;
+const CardFriend = styled.section`
+  .button_chat {
+    background-color: ${COLORS.green};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    flex-direction: row;
+    gap: 10px;
+    color: white;
+    font-weight: bold;
+  }
+`;
 export default FriendCard;
