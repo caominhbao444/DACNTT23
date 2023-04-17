@@ -7,8 +7,16 @@ const Account = require("../models/accountModel");
 //@route POST /api/accounts/register
 //@access public
 const register = asyncHandler(async (req, res) => {
-  const { fullname, email, password,phone , city ,from ,education} = req.body;
-  if (!fullname || !email || !password || !phone || !city || !from || !education) {
+  const { fullname, email, password, phone, city, from, education } = req.body;
+  if (
+    !fullname ||
+    !email ||
+    !password ||
+    !phone ||
+    !city ||
+    !from ||
+    !education
+  ) {
     res.status(400);
     throw new Error("All fields are mandatory!");
   }
@@ -28,7 +36,7 @@ const register = asyncHandler(async (req, res) => {
     phone,
     city,
     from,
-    education
+    education,
   });
 
   console.log(`Account created ${account}`);
@@ -61,10 +69,10 @@ const loginAccount = asyncHandler(async (req, res) => {
           fullname: account.fullname,
           email: account.email,
           id: account.id,
-          phone : account.phone,
+          phone: account.phone,
           city: account.city,
-          from : account.from,
-          education : account.education
+          from: account.from,
+          education: account.education,
         },
       },
       process.env.ACCESS_TOKEN_SECERT,
@@ -81,12 +89,12 @@ const loginAccount = asyncHandler(async (req, res) => {
 const getAccounts = asyncHandler(async (req, res) => {
   try {
     const account = await Account.find();
-   if(!account){
-    res.status(404);
-    throw new Error("Account not found");
-   }else{
-    res.status(200).json(account);
-   }
+    if (!account) {
+      res.status(404);
+      throw new Error("Account not found");
+    } else {
+      res.status(200).json(account);
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -101,12 +109,12 @@ const currentAccount = asyncHandler(async (req, res) => {
   if (account && account.isAdmin === true) {
     res.send({
       message: "You Are ADMIN",
-      account
+      account,
     });
   } else {
     res.send({
       message: "You Are NOT ADMIN",
-      account
+      account,
     });
   }
 });
@@ -164,13 +172,12 @@ const followAccount = asyncHandler(async (req, res) => {
   }
 });
 
-
 const unfollowAccount = asyncHandler(async (req, res) => {
   if (req.body._id !== req.params.id) {
     try {
       const account = await Account.findById(req.params.id);
       const currentAccount = await Account.findOne(req.account);
-      if (account.followers.includes(currentUser._id)) {
+      if (account.followers.includes(currentAccount._id)) {
         await account.updateOne({ $pull: { followers: currentAccount._id } });
         await currentAccount.updateOne({ $pull: { followings: account._id } });
         res.status(200).json("user has been unfollowed");
@@ -185,6 +192,54 @@ const unfollowAccount = asyncHandler(async (req, res) => {
   }
 });
 
+const friendsAccount = asyncHandler(async (req, res) => {
+  //   const account = await Account.findOne(req.account);
+  //   const friends = await Promise.all(
+  //     account.followings.map((friendId) => {
+  //       return Account.findById(friendId);
+  //     })
+  //   );
+  //   const friendList = friends.map((friend) => {
+  //     const { _id, fullname } = friend;
+  //     return { _id, fullname };
+  //   });
+  //   res.status(200).json(friendList);
+  // });
+
+  try {
+    const account = await Account.findOne(req.account).lean();
+    const friendIds = account.followings;
+    const friends = await Account.find({ _id: { $in: friendIds } }).lean();
+    const friendList = friends.map((friend) => ({
+      _id: friend._id,
+      fullname: friend.fullname,
+    }));
+    res.status(200).json(friendList);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+
+const checkFriends = asyncHandler(async(req,res)=>{
+  if (req.body._id !== req.params.id) {
+    try {
+      const account = await Account.findById(req.params.id);
+      const currentAccount = await Account.findOne(req.account);
+      if (currentAccount.followings.includes(account._id)) {
+        res.status(200).json({check :"1"});
+      } else {
+        res.status(403).json({check :"0"});
+      }
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  } else {
+    res.status(404).json("Friends not found");
+  }
+  
+});
+
 module.exports = {
   register,
   loginAccount,
@@ -194,5 +249,8 @@ module.exports = {
   resetPassword,
   deleteAccount,
   followAccount,
-  unfollowAccount
+  unfollowAccount,
+  friendsAccount,
+  checkFriends
+  
 };
