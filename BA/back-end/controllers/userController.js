@@ -20,7 +20,7 @@ const createUser = asyncHandler(async (req, res) => {
     city: req.body.city,
     from: req.body.from,
     education: req.body.education,
-    username : req.account.username,
+    username: req.account.username,
     email: req.account.email,
     accountId: req.account.id,
   });
@@ -74,11 +74,11 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 const inforUser = asyncHandler(async (req, res) => {
   const currentUser = await User.findOne({ accountId: req.account.id });
-  if(currentUser){
+  if (currentUser) {
     res.status(200).json(currentUser);
-  }else{
+  } else {
     res.status(404);
-    throw new Error("User not found")
+    throw new Error("User not found");
   }
 });
 
@@ -123,23 +123,46 @@ const unfollowUser = asyncHandler(async (req, res) => {
 });
 
 const friendsUser = asyncHandler(async (req, res) => {
-  const user = await User.findOne({ accountId: req.account.id });
-  const friends = await Promise.all(
-    user.followings.map((friendId) => {
-      return User.findById(friendId);
-    })
-  );
-  const friendList = friends.map((friend) => {
-    const { _id, username } = friend;
-    return { _id, username };
-  });
-  res.status(200).json(friendList);
+  //   const user = await User.findOne({ accountId: req.account.id });
+  //   const friends = await Promise.all(
+  //     user.followings.map((friendId) => {
+  //       return User.findById(friendId);
+  //     })
+  //   );
+  //   const friendList = friends.map((friend) => {
+  //     const { _id, username } = friend;
+  //     return { _id, username };
+  //   });
+  //   res.status(200).json(friendList);
+  // });
+
+  try {
+    const user = await User.findOne({ accountId: req.account.id }).lean();
+    const friendIds = user.followings;
+    const friends = await User.find({ _id: { $in: friendIds } }).lean();
+    const friendList = friends.map((friend) => ({
+      _id: friend._id,
+      username: friend.username,
+    }));
+    res.status(200).json(friendList);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
 });
-
-
-
 const test = asyncHandler(async (req, res) => {
- 
+  // const user = await User.findOne({ accountId: req.account.id }).lean();
+  // const friendIds = user.followings;
+  // // const friends = await User.find({ _id: { $in: friendIds } }).lean();
+  // // const friendList = friends.map((friend) => ({
+  // //   _id: friend._id,
+  // // }));
+  //  const check = await User.findById(req.params.id);
+  // if (friendIds._id === check) {
+  //   res.status(200)
+  // } else {
+  //   res.status(404)
+  //   throw new Error("Friends not found");
+  // }
 });
 
 module.exports = {

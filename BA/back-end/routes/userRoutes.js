@@ -16,6 +16,8 @@ const {
 
 const validateToken = require("../middleware/validateTokenHandler");
 
+router.route("/create").post(createUser);
+
 router.use(validateToken);
 
 router.route("/current").get(inforUser);
@@ -28,7 +30,7 @@ router.route("/test/:id").get(test);
 
 router.route("/friends").get(friendsUser);
 
-router.route("/").get(getUsers).post(createUser);
+router.route("/").get(getUsers)
 
 router.route("/:id").get(getUser).put(updateUser).delete(deleteUser);
 
