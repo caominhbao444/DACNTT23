@@ -246,7 +246,7 @@ const checkFriends = asyncHandler(async(req,res)=>{
         res.status(201).json({check : 2})
       }
       else {
-        res.status(403).json({check : 0});
+        res.status(202).json({check : 0});
       } 
     } catch (err) {
       res.status(500).json(err);
