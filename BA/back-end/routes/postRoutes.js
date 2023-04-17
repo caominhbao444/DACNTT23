@@ -8,6 +8,10 @@ const {
   deletePost,
 } = require("../controllers/postController");
 
+const validateToken = require("../middleware/validateTokenHandler");
+router.use(validateToken);
+
+
 router.route("/").get(getPosts).post(createPost);
 router.route("/:id").get(getPostById).put(updatePost).delete(deletePost);
 

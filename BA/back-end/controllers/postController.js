@@ -20,14 +20,17 @@ const getPostsAccount = asyncHandler(async (req, res) => {
 });
 
 const createPost = asyncHandler(async (req, res) => {
-  const newPost = new Post({
-    accountId: req.account.id,
-    desc: req.body.desc,
-  });
-  const savePost = await newPost.save();
-  res.status(200).json(savePost);
-  console.log("ok");
-
+  try {
+    const newPost = new Post({
+      accountId: req.account.id,
+      desc: req.body.desc,
+    });
+    const savePost = await newPost.save();
+    res.status(200).json(savePost);
+    console.log("ok");
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 const getPostById = asyncHandler(async (req, res) => {

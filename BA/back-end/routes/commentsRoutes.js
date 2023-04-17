@@ -8,8 +8,8 @@ const {
 const validateToken = require("../middleware/validateTokenHandler");
 router.use(validateToken);
 
-router.route("/").post(createComments);
+router.route("/:id").post(createComments);
 
-router.route("/:id", getCommentsPost);
+router.route("/:id").get(getCommentsPost);
 
 module.exports = router;

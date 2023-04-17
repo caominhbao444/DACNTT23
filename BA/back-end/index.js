@@ -19,9 +19,10 @@ app.use(express.json());
 
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/accounts", require("./routes/accountRoutes"));
-app.use("/api/posts", require("./routes/postRoutes"));
 app.use("/api/conversations", require("./routes/conversationRoutes"));
 app.use("/api/messages", require("./routes/messageRoutes"));
+app.use("/api/posts", require("./routes/postRoutes"));
+app.use("/api/comments", require("./routes/commentsRoutes"));
 
 app.use(errorHandler);
 

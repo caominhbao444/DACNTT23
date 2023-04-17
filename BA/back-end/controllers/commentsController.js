@@ -7,7 +7,7 @@ const createComments = asyncHandler(async (req, res) => {
     const post = await Post.findById(req.params.id);
     const newComments = new Comments({
       postId: post._id,
-      accountId: req.account.id,
+      senderId: req.account.id,
       content: req.body.content,
     });
     const saveNewComments = await newComments.save();
@@ -19,13 +19,18 @@ const createComments = asyncHandler(async (req, res) => {
 
 const getCommentsPost = asyncHandler(async (req, res) => {
   try {
-    const comments = Post.findById(req.params.id);
-    res
-      .status(200)
-      .json({ accountId: comments.accountId, content: comments.content });
+    const comments = Comments.find({postID : req.params.id})
+    if (!comments) {
+      res.status(404);
+      throw new Error("Comments not found");
+    } else {
+      res
+        .status(200)
+        .json(comments);
+    }
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-module.exports = {createComments, getCommentsPost};
+module.exports = { createComments, getCommentsPost };
