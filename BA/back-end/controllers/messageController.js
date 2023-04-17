@@ -5,12 +5,11 @@ const Account = require("../models/accountModel")
 
 const createMessage = asyncHandler(async (req, res) => {
   try {
-    const account = await Account.findOne(req.account);
     const conversation = await Conversation.findById(req.params.id);
-    if (account && req.params.id == conversation._id) {
+    if (req.params.id == conversation._id) {
       const message = new Message({
         conversationId: conversation._id,
-        senderId: account._id,
+        senderId: req.account.id,
         text: req.body.text,
       });
       const savedMessage = await message.save();

@@ -241,9 +241,9 @@ const checkFriends = asyncHandler(async(req,res)=>{
       const account = await Account.findById(req.params.id);
       const currentAccount = await Account.findOne(req.account);
       if (currentAccount.followings.includes(account._id)) {
-        res.status(200).json({check :"1"});
+        res.status(200).json({check : true});
       } else {
-        res.status(403).json({check :"0"});
+        res.status(403).json({check : false});
       }
     } catch (err) {
       res.status(500).json(err);

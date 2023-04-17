@@ -5,11 +5,14 @@ const messageSchema = mongoose.Schema(
     conversationId: {
       type: String,
     },
-    senderId: {
-      type: String,
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required:[true],
+      ref:"Account"
     },
     text: {
       type: String,
+      required:[true]
     },
   },
   { timestamps: true }
