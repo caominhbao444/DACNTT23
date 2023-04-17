@@ -39,7 +39,7 @@ const getConversationByTwoUsers = asyncHandler(async (req, res) => {
 
 const getConversationsById = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.findById(req.params.id );
+    const conversation = await Conversation.find({receiverId :req.params.id} );
     res.status(200).json(conversation);
   } catch (err) {
     res.status(500).json(err);
