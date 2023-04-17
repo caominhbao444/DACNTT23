@@ -14,12 +14,17 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5001/api/accounts/register", {
-        username: fullname,
-        email: username,
-        password: password,
-      });
-      history("/signupdetails");
+      await axios
+        .post("http://localhost:5001/api/accounts/register", {
+          username: fullname,
+          email: username,
+          password: password,
+        })
+        .then((response) => {
+          console.log(response.data.accessToken);
+          localStorage.setItem("authToken", response.data.accessToken);
+          history("/signupdetails");
+        });
     } catch (error) {
       console.log(error);
     }

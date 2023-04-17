@@ -1,15 +1,26 @@
-import React from "react";
-import styled from "styled-components";
-import { COLORS } from "../../assets/Color";
+import React, { useEffect, useState } from "react";
+
 import Grid from "@mui/material/Grid";
 import { Link } from "react-router-dom";
-import Navbar from "../../components/Navbar/Navbar";
-import Avatar from "@mui/material/Avatar";
-import AvatarGroup from "@mui/material/AvatarGroup";
-import { Paper } from "@mui/material";
-import Stack from "@mui/material/Stack";
 
+import { useDispatch, useSelector } from "react-redux";
+import { CallApiUser } from "../../features/userSlice";
+import Loading from "../../pages/Loading/Loading";
 function SideBar() {
+  const dispatch = useDispatch();
+  const authToken = localStorage.getItem("authToken");
+  const { userInfor, isLoading } = useSelector((state) => state.user);
+  // const [isFriends, setIsFriends] = useState(true);
+  console.log(userInfor);
+  useEffect(() => {
+    dispatch(
+      CallApiUser({ headers: { authorization: `Bearer ${authToken}` } })
+    );
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <>
       <Grid item xs={3} md={3} style={{}}>
@@ -47,11 +58,8 @@ function SideBar() {
                 alt=""
               />
             </div>
-            <div className="details">
-              <h4>{window.myAppData ? window.myAppData.email : "hi"}</h4>
-              <p className="">
-                {window.myAppData ? window.myAppData.email : ""}
-              </p>
+            <div className="details" style={{ boxSizing: "border-box" }}>
+              <h4>{userInfor.username}</h4>
             </div>
           </Link>
           <div
@@ -89,7 +97,7 @@ function SideBar() {
               </Grid>
             </Link>
             <Link
-              to="/profile"
+              to={`/profile/${userInfor._id}`}
               className="sidebar-item"
               style={{
                 textDecoration: "none",

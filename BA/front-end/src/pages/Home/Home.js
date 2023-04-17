@@ -3,21 +3,33 @@ import styled from "styled-components";
 import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
 import Navbar from "../../components/Navbar/Navbar";
+import Loading from "../../pages/Loading/Loading";
 import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import SideBar from "../../components/SideBar/SideBar";
 import RequestFriends from "../../components/RequestFriends/RequestFriends";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { CallApiUser } from "../../features/userSlice";
 function Home() {
-  const [data, setData] = useState({});
-  const number = 6;
+  const dispatch = useDispatch();
+  const authToken = localStorage.getItem("authToken");
+  const { userInfor } = useSelector((state) => state.user);
+  useEffect(() => {
+    dispatch(
+      CallApiUser({ headers: { authorization: `Bearer ${authToken}` } })
+    );
+  }, []);
+
   const hih = () => {
     alert("bao");
   };
   const Readmore = (e) => {
     return e.slice(0, 100);
   };
-
+  if (!userInfor) {
+    return <Loading />;
+  }
   return (
     <>
       <Navbar />

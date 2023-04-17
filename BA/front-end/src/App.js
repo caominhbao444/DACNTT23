@@ -15,7 +15,7 @@ function App() {
         <Routes>
           <Route element={<PrivateComponents />}>
             <Route path="/home" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:userID" element={<Profile />} />
             <Route path="/message" element={<Message />} />
             <Route path="/friends" element={<Friends />} />
           </Route>
