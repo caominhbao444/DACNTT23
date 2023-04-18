@@ -4,10 +4,15 @@ const Account = require("../models/accountModel");
 
 const createConversation = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.findOne({senderId : req.account.id, receiverId : req.params.id});
-    if(conversation){
-      res.status(201).json({checkConversation : 1,message:"cuộc trò chuyện đã tồn tại"});
-    }else if (!conversation && req.account.id != req.params.id ) {
+    const conversation = await Conversation.findOne({
+      senderId: req.account.id,
+      receiverId: req.params.id,
+    });
+    if (conversation) {
+      res
+        .status(201)
+        .json({ checkConversation: 1, message: "cuộc trò chuyện đã tồn tại" });
+    } else if (!conversation && req.account.id != req.params.id) {
       const newConversation = new Conversation({
         senderId: req.account.id,
         receiverId: req.params.id,
@@ -39,19 +44,26 @@ const getConversationByTwoUsers = asyncHandler(async (req, res) => {
 
 const getConversationsById = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.find({receiverId :req.params.id} );
+    const conversation = await Conversation.find({ receiverId: req.params.id });
     res.status(200).json(conversation);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-
-const getCurrentConversations = asyncHandler(async(req,res)=>{
-  try{
-    const conversation = await Conversation.find({senderId : req.account.id});
-    res.status(200).json(conversation);
-  }catch(err){
+const getCurrentConversations = asyncHandler(async (req, res) => {
+  try {
+    const conversation = await Conversation.find({ senderId: req.account.id });
+    const reciverIdList = conversation.map((receiverid) => ({
+      _id: receiverid._id,
+    }));
+    const findReceiver = await Account.find(reciverIdList._id);
+    const reciverList = findReceiver.map((receiver) => ({
+      _id: receiver._id,
+      fullname: receiver.fullname,
+    }));
+    res.status(200).json(reciverList);
+  } catch (err) {
     res.status(500).json(err);
   }
 });
