@@ -80,7 +80,14 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
       id: result._id,
       fullname: result.fullname,
     }));
-    res.status(200).json(results);
+
+    const finalResults = conversations.map((conver,index)=>({
+      conversationId : conver._id,
+      receiverId : results[index].id,
+      fullname : results[index].fullname
+    }))
+    // res.status(201).json({conversations,results});
+    res.status(200).json(finalResults);
   } catch (err) {
     res.status(201).json("Không có cuộc hội thoại");
   }
