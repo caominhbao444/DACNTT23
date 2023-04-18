@@ -60,16 +60,16 @@ const getConversationsById = asyncHandler(async (req, res) => {
 const getCurrentConversations = asyncHandler(async (req, res) => {
   try {
     const conversation = await Conversation.find({ senderId: req.account.id });
-    // const conversationId = conversation.map((conver) => ({
-    //   _id: conver._id,
-    // }));
+    const conversationId = conversation.map((conver) => ({
+      _id: conver._id,
+    }));
     const findReceiver = await Account.find(conversation.receiverId);
     const reciverList = findReceiver.map((receiver) => ({
       _id: receiver._id,
       fullname: receiver.fullname,
     }));
-    // res.status(200).json({conversationId,reciverList});
-    res.status(200).json(reciverList);
+    res.status(200).json({conversationId,reciverList});
+
   } catch (err) {
     res.status(201).json("Không có cuộc hội thoại");
   }
