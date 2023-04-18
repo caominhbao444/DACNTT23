@@ -4,21 +4,27 @@ const Account = require("../models/accountModel");
 
 const createConversation = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.findOne({
-      senderId: req.account.id,
-      receiverId: req.params.id,
-    });
-    if (conversation) {
-      res
-        .status(201)
-        .json({ checkConversation: 1, message: "cuộc trò chuyện đã tồn tại" });
-    } else if (!conversation && req.account.id != req.params.id) {
-      const newConversation = new Conversation({
-        senderId: req.account.id,
+    const account = await Account.findOne(req.account);
+    if (account) {
+      const conversation = await Conversation.findOne({
+        senderId: account._id,
         receiverId: req.params.id,
       });
-      const savedConversation = await newConversation.save();
-      res.status(200).json(savedConversation);
+      if (conversation) {
+        res.status(201).json({
+          checkConversation: 1,
+          message: "cuộc trò chuyện đã tồn tại",
+        });
+      } else if (!conversation && account._id != req.params.id) {
+        const newConversation = new Conversation({
+          senderId: account._id,
+          receiverId: req.params.id,
+        });
+        const savedConversation = await newConversation.save();
+        res.status(200).json(savedConversation);
+      }
+    } else {
+      res.status(404).json("Account Not Found");
     }
   } catch (err) {
     res.status(500).json(err);
@@ -44,14 +50,16 @@ const getConversationByTwoUsers = asyncHandler(async (req, res) => {
 
 const getConversationsById = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.findOne({receiverId : req.params.id});
+    const conversation = await Conversation.findOne({
+      receiverId: req.params.id,
+    });
 
-    const findAccount = await Account.find({_id : conversation.receiverId})
-      const reciverList = findAccount.map((receiver) =>({
-        _id : receiver._id,
-        fullname: receiver.fullname
-      }))
-      res.status(200).json(reciverList)
+    const findAccount = await Account.find({ _id: conversation.receiverId });
+    const reciverList = findAccount.map((receiver) => ({
+      _id: receiver._id,
+      fullname: receiver.fullname,
+    }));
+    res.status(200).json(reciverList);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -59,24 +67,56 @@ const getConversationsById = asyncHandler(async (req, res) => {
 
 const getCurrentConversations = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.find({ senderId: req.account.id });
-    const findReceiver = await Account.find(conversation.receiverId);
-    const receiverList = findReceiver.map((receiver) => ({
-      _id: receiver._id,
-      fullname: receiver.fullname,
+    const account = await Account.findOne(req.account);
+    const conversations = await Conversation.find({
+      senderId: account._id,
+    }).select("receiverId");
+    const receiverIds = conversations.map(
+      (conversation) => conversation.receiverId
+    );
+    const receivers = await Account.find({ _id: { $in: receiverIds } });
+  
+    const results = receivers.map((result) => ({
+      id: result._id,
+      fullname: result.fullname,
     }));
-    res.status(200).json(receiverList)
-
+    res.status(200).json(results);
   } catch (err) {
     res.status(201).json("Không có cuộc hội thoại");
   }
 });
 
 const testc = asyncHandler(async (req, res) => {
-  const conversation = await Conversation.find({ senderId: req.account.id });
-  const findReceiver = await Account.find(conversation.receiverId);
+  // try {
+  //   const account = await Account.findOne(req.account);
+  //   if (account) {
+  //     const conversation = await Conversation.find({ senderId: account._id });
+  //     const findReceiver = await Account.find(conversation.receiverId);
+  //     const receiverList = findReceiver.map((receiver) => ({
+  //       _id: receiver._id,
+  //       fullname: receiver.fullname,
+  //     }));
+  //     res.status(200).json(receiverList);
+  //   } else {
+  //     res.status(404).json("Account Not Found");
+  //   }
+  // } catch (err) {
+  //   res.status(201).json("Không có cuộc hội thoại");
+  // }
+  const account = await Account.findOne(req.account);
+  const conversations = await Conversation.find({
+    senderId: account._id,
+  }).select("receiverId");
+  const receiverIds = conversations.map(
+    (conversation) => conversation.receiverId
+  );
+  const receivers = await Account.find({ _id: { $in: receiverIds } });
 
-  res.status(200).json(findReceiver);
+  const results = receivers.map((result) => ({
+    id: result._id,
+    fullname: result.fullname,
+  }));
+  res.status(200).json(results);
 });
 
 module.exports = {

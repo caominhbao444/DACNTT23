@@ -5,7 +5,7 @@ const Account = require("../models/accountModel")
 
 const createMessage = asyncHandler(async (req, res) => {
   try {
-    const account = await Account.findOne({accountId : req.account.id})
+    const account = await Account.findOne(req.account);
     if(account){
       const conversation = await Conversation.findOne({receiverId :req.params.id});
       if (conversation) {
