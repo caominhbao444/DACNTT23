@@ -4,7 +4,7 @@ const Conversation = require("../models/conversationModel");
 
 const createMessage = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.findById(req.params.id);
+    const conversation = await Conversation.findOne({receiverId :req.params.id});
     if (conversation) {
       const message = new Message({
         conversationId: conversation._id,
@@ -36,7 +36,8 @@ const getMessage = asyncHandler(async (req, res) => {
 });
 
 const testm = asyncHandler(async (req, res) => {
-  res.status(200).json("OK");
+  const conversation = await Conversation.findOne({receiverId :req.params.id});
+  res.status(200).json(conversation);
 });
 
 module.exports = { createMessage, getMessage, testm };
