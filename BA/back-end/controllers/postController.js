@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Post = require("../models/postModel");
+const Account = require("../models/accountModel");
 
 const getPosts = asyncHandler(async (req, res) => {
   try {
@@ -13,6 +14,7 @@ const getPosts = asyncHandler(async (req, res) => {
 const getCurrentPosts = asyncHandler(async (req, res) => {
   try {
     const post = await Post.find({ accountId: req.account.id });
+    const findAccount = await 
     res.json(post);
   } catch (err) {
     res.status(500).json(err);
