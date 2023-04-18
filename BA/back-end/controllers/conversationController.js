@@ -50,16 +50,27 @@ const getConversationByTwoUsers = asyncHandler(async (req, res) => {
 
 const getConversationsById = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.findOne({
+    const account = await Account.findOne(req.account);
+    const conversations = await Conversation.find({
+      senderId: account._id,
       receiverId: req.params.id,
     });
 
-    const findAccount = await Account.find({ _id: conversation.receiverId });
-    const reciverList = findAccount.map((receiver) => ({
-      _id: receiver._id,
+    const conversationList = conversations.map((conver) => conver._id);
+
+    const findAccount = await Account.find({
+      _id: { $in: conversations.map((conver) => conver.receiverId) },
+    });
+    const receiverList = findAccount.map((receiver) => ({
+      receiverId: receiver._id,
       fullname: receiver.fullname,
     }));
-    res.status(200).json(reciverList);
+    const results = conversationList.map((conver, index) => ({
+      conversationId: conver,
+      receiverId: receiverList[index].receiverId,
+      fullname: receiverList[index].fullname,
+    }));
+    res.status(200).json(results);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -75,18 +86,17 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
       (conversation) => conversation.receiverId
     );
     const receivers = await Account.find({ _id: { $in: receiverIds } });
-  
+
     const results = receivers.map((result) => ({
       id: result._id,
       fullname: result.fullname,
     }));
 
-    const finalResults = conversations.map((conver,index)=>({
-      conversationId : conver._id,
-      receiverId : results[index].id,
-      fullname : results[index].fullname
-    }))
-    // res.status(201).json({conversations,results});
+    const finalResults = conversations.map((conver, index) => ({
+      conversationId: conver._id,
+      receiverId: results[index].id,
+      fullname: results[index].fullname,
+    }));
     res.status(200).json(finalResults);
   } catch (err) {
     res.status(201).json("Không có cuộc hội thoại");
