@@ -54,15 +54,15 @@ const getConversationsById = asyncHandler(async (req, res) => {
 const getCurrentConversations = asyncHandler(async (req, res) => {
   try {
     const conversation = await Conversation.find({ senderId: req.account.id });
-    const reciverIdList = conversation.map((receiverid) => ({
-      _id: receiverid._id,
+    const conversationId = conversation.map((conver) => ({
+      _id: conver._id,
     }));
-    const findReceiver = await Account.find(reciverIdList._id);
+    const findReceiver = await Account.find(conversation.receiverId);
     const reciverList = findReceiver.map((receiver) => ({
       _id: receiver._id,
       fullname: receiver.fullname,
     }));
-    res.status(200).json(reciverList);
+    res.status(200).json({conversationId,reciverList});
   } catch (err) {
     res.status(500).json(err);
   }
