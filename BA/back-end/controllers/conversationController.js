@@ -44,10 +44,14 @@ const getConversationByTwoUsers = asyncHandler(async (req, res) => {
 
 const getConversationsById = asyncHandler(async (req, res) => {
   try {
-    const conversation = await Conversation.find({ receiverId: req.params.id });
+    const conversation = await Conversation.findOne({receiverId : req.params.id});
 
-    const findReceiver = await Account.findOne(conversation.receiverId);
-    res.status(200).json({_id : findReceiver._id , fullname : findReceiver.fullname});
+    const findAccount = await Account.find({_id : conversation.receiverId})
+      const reciverList = findAccount.map((receiver) =>({
+        _id : receiver._id,
+        fullname: receiver.fullname
+      }))
+      res.status(200).json(reciverList)
   } catch (err) {
     res.status(500).json(err);
   }
@@ -72,7 +76,13 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
 });
 
 const testc = asyncHandler(async (req, res) => {
-  res.status(200).json("OK");
+  const conversation = await Conversation.find({ senderId: req.account.id });
+  // const conversationId = conversation.map((conver) => ({
+  //   _id: conver._id,
+  // }));
+  const findReceiver = await Account.find(conversation.receiverId);
+
+  res.status(200).json(findReceiver);
 });
 
 module.exports = {
