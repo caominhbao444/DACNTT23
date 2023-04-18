@@ -7,20 +7,14 @@ const createMessage = asyncHandler(async (req, res) => {
   try {
     const account = await Account.findOne(req.account);
     if(account){
-      const conversation = await Conversation.findOne({receiverId :req.params.id});
-      if (conversation) {
         const message = new Message({
-          conversationId: conversation._id,
+          conversationId: req.params.id,
           senderId: account._id,
           fullname : account.fullname,
           text: req.body.text,
         });
         const savedMessage = await message.save();
         res.status(200).json(savedMessage);
-      } else {
-        res.status(403);
-        throw new Error("cant create message");
-      }
     }else{
       res.status(404).json("Account Not Found")
     }
@@ -52,8 +46,10 @@ const getMessage = asyncHandler(async (req, res) => {
 
 const testm = asyncHandler(async (req, res) => {
 
-  const message = await Message.find({conversationId :req.params.id});
-  res.status(200).json(message);
+  const messages = await Conversation.find({ receiverId: req.params.id });
+  const conversationIds = messages.map(message => message._id);
+
+  res.status(200).json(conversationIds);
 
 });
 

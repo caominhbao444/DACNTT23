@@ -104,36 +104,13 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
 });
 
 const testc = asyncHandler(async (req, res) => {
-  // try {
-  //   const account = await Account.findOne(req.account);
-  //   if (account) {
-  //     const conversation = await Conversation.find({ senderId: account._id });
-  //     const findReceiver = await Account.find(conversation.receiverId);
-  //     const receiverList = findReceiver.map((receiver) => ({
-  //       _id: receiver._id,
-  //       fullname: receiver.fullname,
-  //     }));
-  //     res.status(200).json(receiverList);
-  //   } else {
-  //     res.status(404).json("Account Not Found");
-  //   }
-  // } catch (err) {
-  //   res.status(201).json("Không có cuộc hội thoại");
-  // }
   const account = await Account.findOne(req.account);
   const conversations = await Conversation.find({
     senderId: account._id,
-  }).select("receiverId");
-  const receiverIds = conversations.map(
-    (conversation) => conversation.receiverId
-  );
-  const receivers = await Account.find({ _id: { $in: receiverIds } });
+  });
+const conversationIds = conversations.map(conversation => ({ id: conversation._id }));
 
-  const results = receivers.map((result) => ({
-    id: result._id,
-    fullname: result.fullname,
-  }));
-  res.status(200).json(results);
+  res.status(200).json(conversations);
 });
 
 module.exports = {

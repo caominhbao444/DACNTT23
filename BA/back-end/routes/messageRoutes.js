@@ -12,7 +12,7 @@ router.use(validateToken);
 
 router.route("/test/:id").get(testm);
 
-//đây là đường dẫn post tạo tin nhắn
+//đây là đường dẫn post tạo tin nhắn params là conversationId, không còn là receiverId nghe
 router.route("/:id").post(createMessage);
 
 //đây là đừng dẫn get tất cả tin nhắn trong cuộc trò chuyện
