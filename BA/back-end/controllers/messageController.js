@@ -11,8 +11,8 @@ const createMessage = asyncHandler(async (req, res) => {
       if (conversation) {
         const message = new Message({
           conversationId: conversation._id,
-          senderId: req.account.id,
-          fullname : req.account.fullname,
+          senderId: account._id,
+          fullname : account.fullname,
           text: req.body.text,
         });
         const savedMessage = await message.save();
