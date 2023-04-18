@@ -26,8 +26,9 @@ const createMessage = asyncHandler(async (req, res) => {
 
 const getMessage = asyncHandler(async (req, res) => {
   try {
+    const conversation = await Conversation.findOne({receiverId :req.params.id});
     const messages = await Message.find({
-      conversationId: req.params.conversationId,
+      conversationId: conversation._id,
     });
     res.status(200).json(messages);
   } catch (err) {

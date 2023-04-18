@@ -14,7 +14,7 @@ router.route("/test/:id").get(testm);
 
 router.route("/:id").post(createMessage);
 
-router.route("/:conversationId").get(getMessage);
+router.route("/:id").get(getMessage);
 
 
 module.exports = router;
