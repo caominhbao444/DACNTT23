@@ -45,7 +45,9 @@ const getConversationByTwoUsers = asyncHandler(async (req, res) => {
 const getConversationsById = asyncHandler(async (req, res) => {
   try {
     const conversation = await Conversation.find({ receiverId: req.params.id });
-    res.status(200).json(conversation);
+
+    const findReceiver = await Account.findOne(conversation.receiverId);
+    res.status(200).json({_id : findReceiver._id , fullname : findReceiver.fullname});
   } catch (err) {
     res.status(500).json(err);
   }
