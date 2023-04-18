@@ -10,6 +10,10 @@ const messageSchema = mongoose.Schema(
       required:[true],
       ref:"Account"
     },
+    fullname :{
+      type : String,
+      required:[true]
+    },
     text: {
       type: String,
       required:[true]

@@ -12,6 +12,7 @@ const createMessage = asyncHandler(async (req, res) => {
         const message = new Message({
           conversationId: conversation._id,
           senderId: req.account.id,
+          fullname : req.account.fullname,
           text: req.body.text,
         });
         const savedMessage = await message.save();
@@ -38,25 +39,18 @@ const getMessage = asyncHandler(async (req, res) => {
       const messages = await Message.find({
         conversationId: conversation._id,
       });
-      const findAccount = await Account.findOne(messages.senderId)
-      const list = messages.map((message) =>({
-        senderId : findAccount._id,
-        fullname : findAccount.fullname,
-        text : message.text
-      }))
-      res.status(200).json(list)
+      res.status(200).json(messages);
     }else{
       res.status(404).json("Account Not Found")
     }
-    
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
 const testm = asyncHandler(async (req, res) => {
- 
-  res.status(200).json("OK");
+  const conversation = await Conversation.findOne({receiverId :req.params.id});
+  res.status(200).json(conversation);
 });
 
 module.exports = { createMessage, getMessage, testm };
