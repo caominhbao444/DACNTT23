@@ -10,11 +10,7 @@ const corsOptions = require("./config/corsOptions");
 const app = express();
 
 const httpServer = http.Server(app);
-const io = require("socket.io")(httpServer,{
-  cors:{
-    origin:"http://localhost:3000",
-  }
-});
+
 
 connectDb();
 
@@ -36,7 +32,11 @@ const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 //socket code under here
-
+const io = require("socket.io")(httpServer,{
+  cors:{
+    origin:"http://localhost:3000",
+  }
+});
 io.on("connection", (socket) => {
   console.log("a user connected. \t "+ socket.id);
   
