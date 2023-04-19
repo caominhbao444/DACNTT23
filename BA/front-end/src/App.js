@@ -8,6 +8,8 @@ import Loading from "./pages/Loading/Loading";
 import SignupDetails from "./pages/Signup/SignupDetails";
 import PrivateComponents from "./components/PrivateComponents/PrivateComponents";
 import Friends from "./pages/Friends/Friends";
+import { useEffect } from "react";
+const { location } = window;
 function App() {
   return (
     <div className="App">
@@ -16,7 +18,7 @@ function App() {
           <Route element={<PrivateComponents />}>
             <Route path="/home" element={<Home />} />
             <Route path="/profile/:userID" element={<Profile />} />
-            <Route path="/message" element={<Message />} />
+            <Route path="/message/:userID?" element={<Message />} />
             <Route path="/friends" element={<Friends />} />
           </Route>
           <Route path="/" element={<Login />} />

@@ -13,9 +13,11 @@ import {
   CallApiUser,
   CallApiUserID,
   CallApiAllUsers,
+  CallApiFriends,
 } from "../../features/userSlice";
 function Friends() {
   const [listPeople, setListPeople] = useState("");
+  const [inputFullName, setInputFullName] = useState("");
   // const handleRequestFriend = (e) => {
   //   e.preventDefault();
   //   axios
@@ -25,13 +27,13 @@ function Friends() {
   //     });
   // };
   const dispatch = useDispatch();
-  const { userInforId, userInfor, allUserInfor } = useSelector(
+  const { userInforId, userInfor, allUserInfor, listFriends } = useSelector(
     (state) => state.user
   );
   let { userID } = useParams();
-  console.log("userid", userInforId._id);
-  console.log("usercurrent", userInfor._id);
+
   console.log("allusers", allUserInfor);
+  console.log("list friends", listFriends);
   const authToken = localStorage.getItem("authToken");
   useEffect(() => {
     dispatch(
@@ -46,9 +48,12 @@ function Friends() {
     dispatch(
       CallApiAllUsers({ headers: { authorization: `Bearer ${authToken}` } })
     );
+    dispatch(
+      CallApiFriends({ headers: { authorization: `Bearer ${authToken}` } })
+    );
   }, []);
-  console.log(listPeople);
-  if (!userInforId && !userInfor && !allUserInfor) {
+
+  if (!userInforId && !userInfor && !allUserInfor && !listFriends) {
     return <Loading />;
   }
   return (
@@ -59,7 +64,7 @@ function Friends() {
           style={{
             width: "100%",
             height: "auto",
-            backgroundColor: "red",
+            backgroundColor: "#f0f0f0",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -103,8 +108,8 @@ function Friends() {
               }}
               className="container-listFriends"
             >
-              {listPeople &&
-                listPeople.map((people, index) => {
+              {listFriends &&
+                listFriends.map((people, index) => {
                   return <FriendCard key={index} people={people} />;
                 })}
             </div>
@@ -140,13 +145,19 @@ function Friends() {
                 borderWidth: "1px",
                 paddingLeft: "10px",
               }}
+              placeholder="Nhap ten can tim"
+              value={inputFullName}
+              onChange={(e) => {
+                setInputFullName(e.target.value);
+              }}
             ></input>
             <div
               style={{
                 marginTop: "10px",
-                height: "100%",
+                maxHeight: "300px",
                 width: "80%",
                 padding: "10px",
+                overflowY: "scroll",
                 borderRadius: "10px",
                 display: "flex",
                 flexDirection: "column",
@@ -156,63 +167,81 @@ function Friends() {
               }}
               className="container-listFriends"
             >
-              {/* {listPeople &&
-                listPeople.map((people, index) => {
-                  return <FriendCard key={index} people={people} />;
-                })} */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-around",
-                  alignItems: "center",
-                  width: "100%",
-                  backgroundColor: "red",
-                }}
-                className="card-item"
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    gap: "10px",
-                  }}
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
-                    className="img-src"
-                    alt=""
-                    style={{
-                      height: "40px",
-                      width: "40px",
-                      borderRadius: "50%",
-                      overflow: "hidden",
-                    }}
-                  />
-                  <span style={{ fontWeight: "bold" }}></span>
-                  {/* <button onClick={handleRequestFriend}>Theo doi</button> */}
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "10px",
-                  }}
-                >
-                  <Link
-                    to={`/profile/${1}`}
-                    className="button_chat"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <span>Profile</span>
-                    <ion-icon
-                      name="accessibility-outline"
-                      style={{ display: "inline-block" }}
-                    ></ion-icon>
-                  </Link>
-                </div>
-              </div>
+              {inputFullName.trim() === ""
+                ? null
+                : allUserInfor &&
+                  allUserInfor
+                    .filter((people1) => {
+                      return people1.fullname.toLocaleLowerCase() === "" ? (
+                        <>
+                          <p>Not founds</p>
+                        </>
+                      ) : (
+                        people1.fullname
+                          .toLowerCase()
+                          .includes(inputFullName.trim())
+                      );
+                    })
+                    .map((people, index) => {
+                      return (
+                        <>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              width: "100%",
+                            }}
+                            className="card-item"
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-start",
+                                alignItems: "center",
+                                gap: "10px",
+                              }}
+                            >
+                              <img
+                                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                                className="img-src"
+                                alt=""
+                                style={{
+                                  height: "40px",
+                                  width: "40px",
+                                  borderRadius: "50%",
+                                  overflow: "hidden",
+                                }}
+                              />
+                              <span style={{ fontWeight: "bold" }}>
+                                {people.fullname}
+                              </span>
+                              {/* <button onClick={handleRequestFriend}>Theo doi</button> */}
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                gap: "10px",
+                              }}
+                            >
+                              <Link
+                                to={`/profile/${people._id}`}
+                                className="button_chat"
+                                style={{ textDecoration: "none" }}
+                              >
+                                <span>Profile</span>
+                                <ion-icon
+                                  name="accessibility-outline"
+                                  style={{ display: "inline-block" }}
+                                ></ion-icon>
+                              </Link>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })}
             </div>
           </section>
         </section>
@@ -238,6 +267,9 @@ const FriendsPage = styled.section`
     gap: 10px;
     color: white;
     font-weight: bold;
+  }
+  .container-listFriends::-webkit-scrollbar {
+    display: none;
   }
 `;
 export default Friends;
