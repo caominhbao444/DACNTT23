@@ -82,11 +82,14 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
     const conversations = await Conversation.find({
       $or: [{ senderId: account._id }, { receiverId: account._id }],
     });
-    const userIds = conversations.map((conver) => {
-      return conver.senderId === account._id ? conver.receiverId : conver.senderId;
-    });
+  
+    const userIds = conversations
+      .map((conver) => [conver.senderId, conver.receiverId])
+      .flat()
+      .filter((id) => id.toString() !== account._id.toString());
+    
     const users = await Account.find({ _id: { $in: userIds } });
-
+    
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
@@ -97,22 +100,38 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
       fullname: results[index].fullname,
     }));
     res.status(200).json(finalResults);
-   
   } catch (err) {
-    res.status(201).json("Không có cuộc hội thoại");
+    res.status(500).json(err);
   }
 });
 
 const testc = asyncHandler(async (req, res) => {
-  const account = await Account.findOne(req.account);
-  const conversations = await Conversation.find({
-    senderId: account._id,
-  });
-  const conversationIds = conversations.map((conversation) => ({
-    id: conversation._id,
-  }));
-
-  res.status(200).json(conversations);
+  try {
+    const account = await Account.findOne(req.account);
+    const conversations = await Conversation.find({
+      $or: [{ senderId: account._id }, { receiverId: account._id }],
+    });
+  
+    const userIds = conversations
+      .map((conver) => [conver.senderId, conver.receiverId])
+      .flat()
+      .filter((id) => id.toString() !== account._id.toString());
+    
+    const users = await Account.find({ _id: { $in: userIds } });
+    
+    const results = users.map((result) => ({
+      id: result._id,
+      fullname: result.fullname,
+    }));
+    const finalResults = conversations.map((conver, index) => ({
+      conversationId: conver._id,
+      userId: results[index].id,
+      fullname: results[index].fullname,
+    }));
+    res.status(200).json(finalResults);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = {
