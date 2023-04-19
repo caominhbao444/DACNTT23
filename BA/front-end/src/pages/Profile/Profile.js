@@ -6,34 +6,32 @@ import Loading from "../../pages/Loading/Loading";
 import Navbar from "../../components/Navbar/Navbar";
 import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
-import SideBar from "../../components/SideBar/SideBar";
 import AvatarGroup from "@mui/material/AvatarGroup";
-import RequestFriends from "../../components/RequestFriends/RequestFriends";
-import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   CallApiUser,
   CallApiUserID,
   CallApiAllUsers,
+  CallApiCheckFriends,
 } from "../../features/userSlice";
 import { useParams } from "react-router";
+import axios from "axios";
 function Profile() {
   let { userID } = useParams();
-  const [friends, setFriends] = useState("1");
+  const [textContentButton, setTextContentButton] = useState("Theo dõi");
+  const [check, setcheck] = useState(true);
   const Readmore = (e) => {
     return e.slice(0, 100);
   };
   const dispatch = useDispatch();
   const authToken = localStorage.getItem("authToken");
-  const { userInforId, userInfor, allUserInfor } = useSelector(
+  const { userInforId, userInfor, allUserInfor, checkFriends } = useSelector(
     (state) => state.user
   );
-  console.log("userid", userInforId._id);
-  console.log("usercurrent", userInfor._id);
-  console.log("allusers", allUserInfor);
-  // if (userInforId._id !== userInfor._id) {
-  //   setFriends("");
-  // }
+  // console.log("userid", userInforId._id);
+  // console.log("usercurrent", userInfor.account._id);
+  // console.log("allusers", allUserInfor);
+
   useEffect(() => {
     dispatch(
       CallApiUserID({
@@ -42,19 +40,38 @@ function Profile() {
       })
     );
     dispatch(
-      CallApiUser({ headers: { authorization: `Bearer ${authToken}` } })
+      CallApiCheckFriends({
+        headers: { authorization: `Bearer ${authToken}` },
+        userID,
+      })
     );
-    dispatch(
-      CallApiAllUsers({ headers: { authorization: `Bearer ${authToken}` } })
-    );
-  }, []);
-  const check = () => {
-    return userInforId._id === userInfor._id;
+    // dispatch(
+    //   CallApiUser({ headers: { authorization: `Bearer ${authToken}` } })
+    // );
+    // dispatch(
+    //   CallApiAllUsers({ headers: { authorization: `Bearer ${authToken}` } })
+    // );
+  }, [userID, authToken, dispatch]);
+  const handleFollower = async () => {
+    const headers = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    axios
+      .post(`http://localhost:5001/api/accounts/follow/${userID}`, null, {
+        headers: headers,
+      })
+      .then((response) => {
+        console.log(response.data);
+        setTextContentButton("Ban be");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-  console.log(check());
-  if (!userInforId && !userInfor) {
+  if (!userInforId && !userInfor && !userID && !checkFriends) {
     return <Loading />;
   }
+
   return (
     <>
       <Navbar />
@@ -92,10 +109,10 @@ function Profile() {
               }}
             >
               <span style={{ fontWeight: "bold", fontSize: "20px" }}>
-                {userInforId.username}
+                {userInforId.fullname}
               </span>
               <span style={{ color: "GrayText", fontSize: "13px" }}>
-                1.1K bạn bè
+                1.1k bạn bè
               </span>
               <AvatarGroup
                 max={4}
@@ -132,7 +149,24 @@ function Profile() {
               </AvatarGroup>
             </div>
             <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {check() ? (
+              {checkFriends.check === 0 ? (
+                <>
+                  <button
+                    onClick={handleFollower}
+                    style={{
+                      padding: "10px 20px",
+                      border: "none",
+                      color: "white",
+                      fontWeight: "bold",
+                      borderRadius: "10px",
+                      backgroundColor: "#58A168",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {textContentButton}
+                  </button>
+                </>
+              ) : checkFriends.check === 1 ? (
                 <>
                   <button
                     style={{
@@ -149,21 +183,7 @@ function Profile() {
                   </button>
                 </>
               ) : (
-                <>
-                  <button
-                    style={{
-                      padding: "10px 20px",
-                      border: "none",
-                      color: "white",
-                      fontWeight: "bold",
-                      borderRadius: "10px",
-                      backgroundColor: "#58A168",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Theo dõi
-                  </button>
-                </>
+                <></>
               )}
             </div>
           </div>

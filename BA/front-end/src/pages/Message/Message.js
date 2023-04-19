@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import styled from "styled-components";
 import { Grid } from "@mui/material";
@@ -7,24 +7,132 @@ import MessageItem from "../../components/MessageItem/MessageItem";
 import Conversation from "../../components/Conversation/Conversation";
 import ChatStatus from "../../components/ChatStatus/ChatStatus";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  CallApiUser,
+  CallApiUserID,
+  CallApiAllUsers,
+  CallApiCheckFriends,
+  CallGetInforConversation,
+  CallGetAllConversation,
+  CallPostMessage,
+  CallGetMessage,
+} from "../../features/userSlice";
+import { useParams, useNavigate } from "react-router-dom";
+import Loading from "../Loading/Loading";
 function Message() {
-  const [isOut, setIsOut] = useState("our");
+  const [newID, setNewID] = useState("1");
+  let { userID } = useParams();
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  const {
+    userInforId,
+    userInfor,
+    allUserInfor,
+    listFriends,
+    getConversation,
+    getAllConversations,
+    postMessage,
+    getMessage,
+  } = useSelector((state) => state.user);
+  const authToken = localStorage.getItem("authToken");
+  const [isOur, setIsOur] = useState("our");
+  const [conversationID, setConversationID] = useState("");
   const [messageContent, setMessageContent] = useState("");
-  const [currentChat, setCurrentChat] = useState("1");
+  const [currentChat, setCurrentChat] = useState("");
+  const [allmess, setAllMess] = useState("");
+  const [userCurrent, setUserCurrent] = useState("");
+  const [allConversations, setAllConversations] = useState([]);
   const [listOnline, setListOnline] = useState("");
   const [listChat, setListChat] = useState("1");
   const [bao, setBao] = useState("bao");
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // axios.post("http://localhost:5001/api/conversations/", {
-    //   members: {
-    //     senderId: messageContent,
-    //     receiverId: "1",
-    //   },
+
+  if (!userID) {
+    userID = newID;
+  }
+
+  useEffect(() => {
+    dispatch(
+      CallGetAllConversation({
+        headers: { authorization: `Bearer ${authToken}` },
+      })
+    ).then((response) => {
+      setAllConversations(response.payload);
+    });
+    dispatch(
+      CallApiUser({
+        headers: { authorization: `Bearer ${authToken}` },
+      })
+    ).then((response) => {
+      setUserCurrent(response.payload.account._id);
+    });
+  }, []);
+  console.log(userCurrent);
+  useEffect(() => {
+    console.log(userID);
+    dispatch(
+      CallGetInforConversation({
+        headers: { authorization: `Bearer ${authToken}` },
+        userID,
+      })
+    ).then((response) => {
+      setConversationID(response.payload[0].conversationId);
+    });
+    // dispatch(
+    //   CallGetMessage({
+    //     headers: { authorization: `Bearer ${authToken}` },
+    //     conversationID,
+    //   })
+    // ).then((response) => {
+    //   setAllMess(response.payload);
     // });
-    alert(messageContent);
+  }, [userID]);
+  useEffect(() => {
+    if (conversationID) {
+      dispatch(
+        CallGetMessage({
+          headers: { authorization: `Bearer ${authToken}` },
+          conversationID,
+        })
+      ).then((response) => {
+        setAllMess(response.payload);
+      });
+    }
+  }, [conversationID]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    dispatch(
+      CallPostMessage({
+        headers: { authorization: `Bearer ${authToken}` },
+        conversationID,
+        text: messageContent,
+      })
+    ).then((response) => {
+      console.log(response);
+    });
   };
 
+  if (
+    !userInforId &&
+    !userInfor &&
+    !allUserInfor &&
+    !listFriends &&
+    !getConversation &&
+    !getAllConversations &&
+    !getMessage
+  ) {
+    return <Loading />;
+  }
+  // ================================================================
+  console.log("All Message", allmess);
+  console.log("User dang login", userCurrent);
+  console.log("All conversations", allConversations);
+  console.log("Current Chat", currentChat);
+  console.log("getConversation", getConversation);
+  console.log("conversation id :", getConversation);
+  // ================================================================
   return (
     <>
       <Navbar />
@@ -77,13 +185,108 @@ function Message() {
                   }}
                   className="scrollBarofLeft"
                 >
-                  {listChat ? (
+                  {!allConversations ? (
                     <>
-                      <Conversation />
+                      <p>Không có cuộc hội thoại</p>
+                    </>
+                  ) : (
+                    allConversations.map((item, index) => {
+                      return (
+                        <>
+                          <div
+                            key={index}
+                            onClick={() => {
+                              setNewID(item.id);
+                              if (userID) {
+                                userID = item.id;
+                                setConversationID(item.conversationId);
+                                navigate(`/message/${userID}`);
+                              }
+                            }}
+                            className="message-item"
+                            style={{
+                              textDecoration: "none",
+                              color: "black",
+                              display: "flex",
+                              justifyContent: "flex-start",
+                              alignItems: "center",
+                              gap: "5px",
+                              cursor: "pointer",
+                              width: "100%",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            <img
+                              src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                              className="img-src"
+                              alt=""
+                              style={{
+                                height: "40px",
+                                width: "40px",
+                                borderRadius: "50%",
+                                overflow: "hidden",
+                              }}
+                            />
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "flex-start",
+                              }}
+                            >
+                              <span style={{ fontWeight: "bold" }}>
+                                {item.fullname}
+                              </span>
+                              <span>Hôm nay ăn gì</span>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })
+                  )}
+                  {/* {allConversations ? (
+                    <>
+                      <div
+                        to="/"
+                        className="message-item"
+                        style={{
+                          textDecoration: "none",
+                          color: "black",
+                          display: "flex",
+                          justifyContent: "flex-start",
+                          alignItems: "center",
+                          gap: "5px",
+                          cursor: "pointer",
+                          width: "100%",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        <img
+                          src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                          className="img-src"
+                          alt=""
+                          style={{
+                            height: "40px",
+                            width: "40px",
+                            borderRadius: "50%",
+                            overflow: "hidden",
+                          }}
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+                          <span>Hôm nay ăn gì</span>
+                        </div>
+                      </div>
                     </>
                   ) : (
                     <p>Không có cuộc hội thoại</p>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -123,7 +326,7 @@ function Message() {
                   alignItems: "flex-start",
                 }}
               >
-                {currentChat ? (
+                {getConversation[0] ? (
                   <>
                     <div
                       style={{
@@ -154,11 +357,13 @@ function Message() {
                           justifyContent: "center",
                         }}
                       >
-                        <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+                        <span style={{ fontWeight: "bold" }}>
+                          {getConversation[0].fullname}
+                          {/* {currentChat.fullname} */}
+                        </span>
                         <span style={{}}>Đang hoạt động</span>
                       </div>
                     </div>
-
                     <div
                       style={{
                         height: "100%",
@@ -173,9 +378,23 @@ function Message() {
                       }}
                       className="message-area"
                     >
-                      <MessageItem />
-                      <MessageItem />
-                      <MessageItem isOut={isOut} />
+                      {allmess &&
+                        allmess
+                          .slice()
+                          .reverse()
+                          .map((mess, index) => {
+                            return (
+                              <>
+                                <MessageItem
+                                  key={allmess.length - index}
+                                  name={mess.fullname}
+                                  sender={mess.senderId}
+                                  content={mess.text}
+                                  userCurrent={userCurrent}
+                                />
+                              </>
+                            );
+                          })}
                     </div>
                     <div
                       style={{
@@ -204,7 +423,6 @@ function Message() {
                       ></input>
                       <button
                         onClick={handleSubmit}
-                        type="submit"
                         style={{
                           position: "absolute",
                           top: "5px",

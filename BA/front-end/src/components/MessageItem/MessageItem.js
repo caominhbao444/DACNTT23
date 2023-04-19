@@ -1,10 +1,46 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  CallApiUser,
+  CallApiUserID,
+  CallApiAllUsers,
+  CallApiCheckFriends,
+  CallGetInforConversation,
+  CallGetAllConversation,
+  CallPostMessage,
+  CallGetMessage,
+} from "../../features/userSlice";
+import { useParams, useNavigate } from "react-router-dom";
+import Loading from "../../pages/Loading/Loading";
 function MessageItem(props) {
-  console.log(props.isOut);
+  const {
+    userInforId,
+    userInfor,
+    allUserInfor,
+    listFriends,
+    getConversation,
+    getAllConversations,
+    postMessage,
+    getMessage,
+  } = useSelector((state) => state.user);
+  const authToken = localStorage.getItem("authToken");
+  const [userCurrent, setUserCurrent] = useState("");
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(
+      CallApiUser({
+        headers: { authorization: `Bearer ${authToken}` },
+      })
+    ).then((response) => {
+      setUserCurrent(response.payload.account._id);
+    });
+  }, []);
+  console.log(userCurrent);
+
+  if (!props) return <Loading />;
   return (
     <>
-      {props.isOut === "our" ? (
+      {props.sender === props.userCurrent ? (
         <>
           <div
             style={{
@@ -36,21 +72,20 @@ function MessageItem(props) {
             <div
               style={{
                 display: "flex",
-
                 flexDirection: "column",
                 justifyContent: "flex-start",
                 alignItems: "flex-end",
                 width: "100%",
               }}
             >
-              <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+              <span style={{ fontWeight: "bold" }}>{props.name}</span>
               <span
                 style={{
                   display: "block",
                   textAlign: "justify",
                 }}
               >
-                Đi ăn gì không
+                {props.content}
               </span>
             </div>
           </div>
@@ -64,6 +99,7 @@ function MessageItem(props) {
               justifyContent: "flex-start",
               alignItems: "flex-start",
               width: "80%",
+
               marginRight: "20%",
               border: "1px solid gray",
               height: "auto",
@@ -92,14 +128,14 @@ function MessageItem(props) {
                 width: "100%",
               }}
             >
-              <span style={{ fontWeight: "bold" }}>Huỳnh Chánh</span>
+              <span style={{ fontWeight: "bold" }}>{props.name}</span>
               <span
                 style={{
                   display: "block",
                   textAlign: "justify",
                 }}
               >
-                Đi tui bao
+                {props.content}
               </span>
             </div>
           </div>

@@ -11,14 +11,14 @@ function SideBar() {
   const authToken = localStorage.getItem("authToken");
   const { userInfor, isLoading } = useSelector((state) => state.user);
   // const [isFriends, setIsFriends] = useState(true);
-  console.log(userInfor);
+  console.log(userInfor.account);
   useEffect(() => {
     dispatch(
       CallApiUser({ headers: { authorization: `Bearer ${authToken}` } })
     );
   }, []);
 
-  if (isLoading) {
+  if (!userInfor.account) {
     return <Loading />;
   }
   return (
@@ -59,7 +59,7 @@ function SideBar() {
               />
             </div>
             <div className="details" style={{ boxSizing: "border-box" }}>
-              <h4>{userInfor.username}</h4>
+              <h4>{userInfor.account.fullname}</h4>
             </div>
           </Link>
           <div
@@ -97,7 +97,7 @@ function SideBar() {
               </Grid>
             </Link>
             <Link
-              to={`/profile/${userInfor._id}`}
+              to={`/profile/${userInfor.account._id}`}
               className="sidebar-item"
               style={{
                 textDecoration: "none",

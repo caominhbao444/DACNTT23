@@ -4,19 +4,57 @@ import Loading from "../../pages/Loading/Loading";
 import { COLORS } from "../../assets/Color";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router";
+import {
+  CallApiUser,
+  CallApiUserID,
+  CallApiAllUsers,
+  CallApiFriends,
+  CallConversation,
+  CallGetInforConversation,
+} from "../../features/userSlice";
 function FriendCard(props) {
-  const handleChatOpen = () => {
-    console.log(props.people._id);
+  const dispatch = useDispatch();
+  const { userInforId, userInfor, allUserInfor, listFriends, conversation } =
+    useSelector((state) => state.user);
+  const authToken = localStorage.getItem("authToken");
+  const navigate = useNavigate();
+  const handleChatOpen = async () => {
+    let userID = props.people._id;
+    const headers = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    console.log(userID);
+    axios
+      .post(`http://localhost:5001/api/conversations/${userID}`, null, {
+        headers: headers,
+      })
+      .then((response) => {
+        console.log(response.data);
+        navigate(`/message/${userID}`);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-  const handleProfileOpen = () => {
-    alert(props.people._id);
-  };
+
+  if (
+    !userInforId &&
+    !userInfor &&
+    !allUserInfor &&
+    !listFriends &&
+    !conversation
+  ) {
+    return <Loading />;
+  }
+
   return (
     <CardFriend
       style={{
         display: "flex",
-        justifyContent: "space-around",
         alignItems: "center",
+        justifyContent: "center",
         width: "100%",
       }}
       className="card-item"
@@ -25,8 +63,10 @@ function FriendCard(props) {
         style={{
           display: "flex",
           justifyContent: "flex-start",
+          paddingLeft: "10px",
           alignItems: "center",
           gap: "10px",
+          width: "50%",
         }}
       >
         <img
@@ -40,24 +80,28 @@ function FriendCard(props) {
             overflow: "hidden",
           }}
         />
-        <span style={{ fontWeight: "bold" }}>{props.people.username}</span>
+        <span style={{ fontWeight: "bold" }}>{props.people.fullname}</span>
         {/* <button onClick={handleRequestFriend}>Theo doi</button> */}
       </div>
       <div
         style={{
           display: "flex",
           justifyContent: "center",
-          alignItems: "center",
+          width: "50%",
           gap: "10px",
         }}
       >
-        <Link to="" className="button_chat" style={{ textDecoration: "none" }}>
+        <button
+          onClick={handleChatOpen}
+          className="button_chat"
+          style={{ textDecoration: "none" }}
+        >
           <span>Chat</span>
           <ion-icon
             name="navigate-outline"
             style={{ display: "inline-block" }}
           ></ion-icon>
-        </Link>
+        </button>
         <Link
           to={`/profile/${props.people._id}`}
           className="button_chat"

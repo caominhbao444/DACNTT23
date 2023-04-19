@@ -11,7 +11,7 @@ function PrivateComponents() {
       navigate("/");
     } else {
       axios
-        .get("http://localhost:5001/api/users/current", {
+        .get("http://localhost:5001/api/accounts/current", {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
