@@ -10,7 +10,11 @@ const corsOptions = require("./config/corsOptions");
 const app = express();
 
 const httpServer = http.Server(app);
-const io = require("socket.io")(httpServer);
+const io = require("socket.io")(httpServer,{
+  cors:{
+    origin:"http://localhost:3000",
+  }
+});
 
 connectDb();
 
