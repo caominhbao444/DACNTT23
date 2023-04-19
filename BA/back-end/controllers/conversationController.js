@@ -80,24 +80,24 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
   try {
     const account = await Account.findOne(req.account);
     const conversations = await Conversation.find({
-      senderId: account._id,
-    }).select("receiverId");
-    const receiverIds = conversations.map(
-      (conversation) => conversation.receiverId
-    );
-    const receivers = await Account.find({ _id: { $in: receiverIds } });
+      $or: [{ senderId: account._id }, { receiverId: account._id }],
+    });
+    const userIds = conversations.map((conver) => {
+      return conver.senderId === account._id ? conver.receiverId : conver.senderId;
+    });
+    const users = await Account.find({ _id: { $in: userIds } });
 
-    const results = receivers.map((result) => ({
+    const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
     }));
-
     const finalResults = conversations.map((conver, index) => ({
       conversationId: conver._id,
-      receiverId: results[index].id,
+      userId: results[index].id,
       fullname: results[index].fullname,
     }));
     res.status(200).json(finalResults);
+   
   } catch (err) {
     res.status(201).json("Không có cuộc hội thoại");
   }
@@ -108,7 +108,9 @@ const testc = asyncHandler(async (req, res) => {
   const conversations = await Conversation.find({
     senderId: account._id,
   });
-const conversationIds = conversations.map(conversation => ({ id: conversation._id }));
+  const conversationIds = conversations.map((conversation) => ({
+    id: conversation._id,
+  }));
 
   res.status(200).json(conversations);
 });
