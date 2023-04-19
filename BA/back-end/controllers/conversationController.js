@@ -50,28 +50,33 @@ const getConversationByTwoUsers = asyncHandler(async (req, res) => {
 
 const getConversationsById = asyncHandler(async (req, res) => {
   try {
-    const account = await Account.findOne(req.account);
     const conversations = await Conversation.find({
       $or: [
-        { senderId: account._id, receiverId: req.params.id },
-        { senderId: req.params.id, receiverId: account._id },
+        { senderId: req.account.id, receiverId: req.params.id },
+        { senderId: req.params.id, receiverId: req.account.id },
       ],
     });
 
-    const userIds = conversations
-      .map((conver) => [conver.senderId, conver.receiverId])
-      .flat()
-      .filter((id) => id.toString() !== account._id.toString());
-
+    const userIds = conversations.map((conver) => {
+      if (conver.senderId === req.account.id) {
+        return conver.receiverId;
+      } else if (conver.receiverId === req.account.id) {
+        return conver.senderId;
+      }
+    });
     const users = await Account.find({ _id: { $in: userIds } });
-
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
     }));
-    const finalResults = conversations.map((conver, index) => ({
+
+    const conversationsList = conversations.map((conver) => ({
       conversationId: conver._id,
-      userId: results[index].id,
+    }));
+
+    const finalResults = conversationsList.map((conver, index) => ({
+      conversationId: conver.conversationId,
+      id: results[index].id,
       fullname: results[index].fullname,
     }));
     res.status(200).json(finalResults);
@@ -82,25 +87,30 @@ const getConversationsById = asyncHandler(async (req, res) => {
 
 const getCurrentConversations = asyncHandler(async (req, res) => {
   try {
-    const account = await Account.findOne(req.account);
     const conversations = await Conversation.find({
-      $or: [{ senderId: account._id }, { receiverId: account._id }],
+      $or: [{ senderId: req.account.id }, { receiverId: req.account.id }],
     });
 
-    const userIds = conversations
-      .map((conver) => [conver.senderId, conver.receiverId])
-      .flat()
-      .filter((id) => id.toString() !== account._id.toString());
-
+    const userIds = conversations.map((conver) => {
+      if (conver.senderId === req.account.id) {
+        return conver.receiverId;
+      } else if (conver.receiverId === req.account.id) {
+        return conver.senderId;
+      }
+    });
     const users = await Account.find({ _id: { $in: userIds } });
-
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
     }));
-    const finalResults = conversations.map((conver, index) => ({
+
+    const conversationsList = conversations.map((conver) => ({
       conversationId: conver._id,
-      userId: results[index].id,
+    }));
+
+    const finalResults = conversationsList.map((conver, index) => ({
+      conversationId: conver.conversationId,
+      id: results[index].id,
       fullname: results[index].fullname,
     }));
     res.status(200).json(finalResults);
@@ -111,25 +121,30 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
 
 const testc = asyncHandler(async (req, res) => {
   try {
-    const account = await Account.findOne(req.account);
     const conversations = await Conversation.find({
-      $or: [{ senderId: account._id }, { receiverId: account._id }],
+      $or: [{ senderId: req.account.id }, { receiverId: req.account.id }],
     });
 
-    const userIds = conversations
-      .map((conver) => [conver.senderId, conver.receiverId])
-      .flat()
-      .filter((id) => id.toString() !== account._id.toString());
-
+    const userIds = conversations.map((conver) => {
+      if (conver.senderId === req.account.id) {
+        return conver.receiverId;
+      } else if (conver.receiverId === req.account.id) {
+        return conver.senderId;
+      }
+    });
     const users = await Account.find({ _id: { $in: userIds } });
-
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
     }));
-    const finalResults = conversations.map((conver, index) => ({
+
+    const conversationsList = conversations.map((conver) => ({
       conversationId: conver._id,
-      userId: results[index].id,
+    }));
+
+    const finalResults = conversationsList.map((conver, index) => ({
+      conversationId: conver.conversationId,
+      id: results[index].id,
       fullname: results[index].fullname,
     }));
     res.status(200).json(finalResults);
