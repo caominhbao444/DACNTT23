@@ -4,8 +4,29 @@ const Account = require("../models/accountModel");
 
 const getPosts = asyncHandler(async (req, res) => {
   try {
-    const post = await Post.find();
-    res.json(post);
+    const posts = await Post.find();
+    const postsList = posts.map((p) => ({
+      postId : p._id,
+      desc : p.desc
+    }));
+
+    const accountIds = posts.map((p) => p.accountId);
+    const users = await Account.find({ _id: { $in: accountIds } });
+
+    const results = users.map((result) => ({
+      id: result._id,
+      fullname: result.fullname,
+    }));
+
+    const finalResults = postsList.map((p, index) => ({
+      postId: p.postId,
+      desc: p.desc,
+      id: results[index].id,
+      fullname: results[index].fullname,
+    }));
+
+    res.status(200).json(finalResults);
+
   } catch (err) {
     res.status(500).json(err);
   }
@@ -13,8 +34,7 @@ const getPosts = asyncHandler(async (req, res) => {
 
 const getCurrentPosts = asyncHandler(async (req, res) => {
   try {
-    const post = await Post.find({ accountId: req.account.id });
-    const findAccount = await 
+    const post = await Post.find(req.account);
     res.json(post);
   } catch (err) {
     res.status(500).json(err);

@@ -3,9 +3,8 @@ const mongoose = require("mongoose");
 const postSchema = mongoose.Schema(
   {
     accountId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref:"Account"
+      type:String,
+      required:[true]
     },
     desc: {
       type: String,

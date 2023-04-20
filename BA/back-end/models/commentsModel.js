@@ -6,9 +6,8 @@ const commentsSchema = mongoose.Schema({
     required:[true]
   },
   senderId:{
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     required:[true],
-    ref:"Account"
   },
   content: {
     type: String,

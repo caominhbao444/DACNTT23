@@ -4,9 +4,8 @@ const Comments = require("../models/commentsModel");
 
 const createComments = asyncHandler(async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
     const newComments = new Comments({
-      postId: post._id,
+      postId: req.params.id,
       senderId: req.account.id,
       content: req.body.content,
     });
@@ -22,7 +21,11 @@ const getCommentsPost = asyncHandler(async (req, res) => {
     const comments = await Comments.find({
       postId: req.params.id,
     });
-    res.status(200).json(comments);
+    const commentsList = comments.map((cmt)=> ({
+      senderId : cmt.senderId,
+      content: cmt.content
+    }))
+    res.status(200).json(commentsList);
   } catch (err) {
     res.status(500).json(err);
   }
