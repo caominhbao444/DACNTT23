@@ -6,8 +6,8 @@ const getPosts = asyncHandler(async (req, res) => {
   try {
     const posts = await Post.find();
     const postsList = posts.map((p) => ({
-      postId : p._id,
-      desc : p.desc
+      postId: p._id,
+      desc: p.desc,
     }));
 
     const accountIds = posts.map((p) => p.accountId);
@@ -26,7 +26,6 @@ const getPosts = asyncHandler(async (req, res) => {
     }));
 
     res.status(200).json(finalResults);
-
   } catch (err) {
     res.status(500).json(err);
   }
@@ -34,8 +33,28 @@ const getPosts = asyncHandler(async (req, res) => {
 
 const getCurrentPosts = asyncHandler(async (req, res) => {
   try {
-    const post = await Post.find(req.account);
-    res.json(post);
+    const posts = await Post.find({accountId:req.account.id});
+    const postsList = posts.map((p) => ({
+      postId: p._id,
+      desc: p.desc,
+    }));
+
+    const accountIds = posts.map((p) => p.accountId);
+    const users = await Account.find({ _id: { $in: accountIds } });
+
+    const results = users.map((result) => ({
+      id: result._id,
+      fullname: result.fullname,
+    }));
+
+    const finalResults = postsList.map((p, index) => ({
+      postId: p.postId,
+      desc: p.desc,
+      id: results[index].id,
+      fullname: results[index].fullname,
+    }));
+
+    res.status(200).json(finalResults);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -56,8 +75,34 @@ const createPost = asyncHandler(async (req, res) => {
 });
 
 const getPostById = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  res.status(200).json(post);
+  try {
+    const posts = await Post.find({_id:req.params.id});
+
+    const postsList = posts.map((p) => ({
+     postId: p._id,
+     desc: p.desc,
+    }));
+    
+    const accountIds = posts.map((p) => p.accountId);
+    const users = await Account.find({ _id: accountIds });
+    
+    const results = users.map((result) => ({
+      id: result._id,
+      fullname: result.fullname,
+    }));
+    
+    const finalResults = postsList.map((p, index) => ({
+      postId: p.postId,
+      desc: p.desc,
+      id: results[index].id,
+      fullname: results[index].fullname,
+    }));
+    res.status(200).json(finalResults);
+      
+      
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 const updatePost = asyncHandler(async (req, res) => {
