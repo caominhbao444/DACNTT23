@@ -7,7 +7,7 @@ const Account = require("../models/accountModel");
 //@route POST /api/accounts/register
 //@access public
 const register = asyncHandler(async (req, res) => {
-  const { fullname, email, password, phone, city, from, education } = req.body;
+  const { fullname, email, password, phone, city, from, education,img } = req.body;
   if (
     !fullname ||
     !email ||
@@ -15,7 +15,8 @@ const register = asyncHandler(async (req, res) => {
     !phone ||
     !city ||
     !from ||
-    !education
+    !education ||
+    !img
   ) {
     res.status(400);
     throw new Error("All fields are mandatory!");
@@ -37,6 +38,7 @@ const register = asyncHandler(async (req, res) => {
     city,
     from,
     education,
+    img
   });
 
   console.log(`Account created ${account}`);
@@ -213,6 +215,7 @@ const friendsAccount = asyncHandler(async (req, res) => {
     const friendList = friends.map((friend) => ({
       _id: friend._id,
       fullname: friend.fullname,
+      img : friend.img
     }));
     res.status(200).json(friendList);
   } catch (error) {

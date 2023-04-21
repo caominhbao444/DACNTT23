@@ -23,6 +23,7 @@ const createUser = asyncHandler(async (req, res) => {
     username: req.account.username,
     email: req.account.email,
     accountId: req.account.id,
+    img:req.body.img
   });
   try {
     const savedUser = await newUser.save();
@@ -143,6 +144,7 @@ const friendsUser = asyncHandler(async (req, res) => {
     const friendList = friends.map((friend) => ({
       _id: friend._id,
       username: friend.username,
+      img:friend.img
     }));
     res.status(200).json(friendList);
   } catch (error) {

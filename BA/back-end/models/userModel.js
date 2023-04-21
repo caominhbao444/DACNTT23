@@ -39,6 +39,9 @@ const userSchema = mongoose.Schema(
       type: Array,
       default: [],
     },
+    img:{
+      type:String
+    }
   },
   {
     timestamps: true,
