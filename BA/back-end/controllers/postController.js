@@ -8,12 +8,13 @@ const getPosts = asyncHandler(async (req, res) => {
     const postsList = posts.map((p) => ({
       postId: p._id,
       desc: p.desc,
+      like:p.like,
+      img:p.img
     }));
 
     const accountIds = posts.map((p) => p.accountId);
-    const users = await Account.find({ _id: { $in: accountIds } });
 
-    const results = users.map((result) => ({
+    const results = accountIds.map((result) => ({
       id: result._id,
       fullname: result.fullname,
     }));
@@ -21,6 +22,8 @@ const getPosts = asyncHandler(async (req, res) => {
     const finalResults = postsList.map((p, index) => ({
       postId: p.postId,
       desc: p.desc,
+      like:p.like,
+      img:p.img,
       id: results[index].id,
       fullname: results[index].fullname,
     }));
@@ -37,12 +40,12 @@ const getCurrentPosts = asyncHandler(async (req, res) => {
     const postsList = posts.map((p) => ({
       postId: p._id,
       desc: p.desc,
+      like:p.like,
+      img:p.img
     }));
 
     const accountIds = posts.map((p) => p.accountId);
-    const users = await Account.find({ _id: { $in: accountIds } });
-
-    const results = users.map((result) => ({
+    const results = accountIds.map((result) => ({
       id: result._id,
       fullname: result.fullname,
     }));
@@ -50,10 +53,11 @@ const getCurrentPosts = asyncHandler(async (req, res) => {
     const finalResults = postsList.map((p, index) => ({
       postId: p.postId,
       desc: p.desc,
+      like:p.like,
+      img:p.img,
       id: results[index].id,
       fullname: results[index].fullname,
     }));
-
     res.status(200).json(finalResults);
   } catch (err) {
     res.status(500).json(err);
@@ -65,6 +69,7 @@ const createPost = asyncHandler(async (req, res) => {
     const newPost = new Post({
       accountId: req.account.id,
       desc: req.body.desc,
+      img: req.body.img
     });
     const savePost = await newPost.save();
     res.status(200).json(savePost);
@@ -81,12 +86,12 @@ const getPostById = asyncHandler(async (req, res) => {
     const postsList = posts.map((p) => ({
      postId: p._id,
      desc: p.desc,
+      like:p.like,
+      img:p.img
     }));
     
     const accountIds = posts.map((p) => p.accountId);
-    const users = await Account.find({ _id: accountIds });
-    
-    const results = users.map((result) => ({
+    const results = accountIds.map((result) => ({
       id: result._id,
       fullname: result.fullname,
     }));
@@ -94,6 +99,8 @@ const getPostById = asyncHandler(async (req, res) => {
     const finalResults = postsList.map((p, index) => ({
       postId: p.postId,
       desc: p.desc,
+      like:p.like,
+      img:p.img,
       id: results[index].id,
       fullname: results[index].fullname,
     }));
