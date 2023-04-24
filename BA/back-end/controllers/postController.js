@@ -5,29 +5,28 @@ const Account = require("../models/accountModel");
 const getPosts = asyncHandler(async (req, res) => {
   try {
     const posts = await Post.find();
+    const accountIds = posts.map((p) => p.accountId);
+    
+    const users = await Account.find({ _id: { $in: accountIds } });
+    
     const postsList = posts.map((p) => ({
       postId: p._id,
       desc: p.desc,
-      like:p.like,
-      img:p.img
+      like: p.like,
+      img: p.img,
     }));
-
-    const accountIds = posts.map((p) => p.accountId);
-
-    const results = accountIds.map((result) => ({
-      id: result._id,
-      fullname: result.fullname,
-    }));
-
+    
+    const inforUser = posts.map((p) => users.find((u) => u._id.toString() === p.accountId.toString()));
+    
     const finalResults = postsList.map((p, index) => ({
       postId: p.postId,
       desc: p.desc,
-      like:p.like,
-      img:p.img,
-      id: results[index].id,
-      fullname: results[index].fullname,
+      like: p.like,
+      img: p.img,
+      id: inforUser[index]._id,
+      fullname: inforUser[index].fullname,
     }));
-
+    
     res.status(200).json(finalResults);
   } catch (err) {
     res.status(500).json(err);
@@ -36,28 +35,29 @@ const getPosts = asyncHandler(async (req, res) => {
 
 const getCurrentPosts = asyncHandler(async (req, res) => {
   try {
-    const posts = await Post.find({accountId:req.account.id});
+    const posts = await Post.find({ accountId: req.account.id });
+    const accountIds = posts.map((p) => p.accountId);
+    
+    const users = await Account.find({ _id: { $in: accountIds } });
+    
     const postsList = posts.map((p) => ({
       postId: p._id,
       desc: p.desc,
-      like:p.like,
-      img:p.img
+      like: p.like,
+      img: p.img,
     }));
-
-    const accountIds = posts.map((p) => p.accountId);
-    const results = accountIds.map((result) => ({
-      id: result._id,
-      fullname: result.fullname,
-    }));
-
+    
+    const inforUser = posts.map((p) => users.find((u) => u._id.toString() === p.accountId.toString()));
+    
     const finalResults = postsList.map((p, index) => ({
       postId: p.postId,
       desc: p.desc,
-      like:p.like,
-      img:p.img,
-      id: results[index].id,
-      fullname: results[index].fullname,
+      like: p.like,
+      img: p.img,
+      id: inforUser[index]._id,
+      fullname: inforUser[index].fullname,
     }));
+    
     res.status(200).json(finalResults);
   } catch (err) {
     res.status(500).json(err);
@@ -69,7 +69,7 @@ const createPost = asyncHandler(async (req, res) => {
     const newPost = new Post({
       accountId: req.account.id,
       desc: req.body.desc,
-      img: req.body.img
+      img: req.body.img,
     });
     const savePost = await newPost.save();
     res.status(200).json(savePost);
@@ -81,32 +81,31 @@ const createPost = asyncHandler(async (req, res) => {
 
 const getPostById = asyncHandler(async (req, res) => {
   try {
-    const posts = await Post.find({_id:req.params.id});
+    const posts = await Post.find({ _id: req.params.id });
 
+    const accountIds = posts.map((p) => p.accountId);
+    
+    const users = await Account.find({ _id: { $in: accountIds } });
+    
     const postsList = posts.map((p) => ({
-     postId: p._id,
-     desc: p.desc,
-      like:p.like,
-      img:p.img
+      postId: p._id,
+      desc: p.desc,
+      like: p.like,
+      img: p.img,
     }));
     
-    const accountIds = posts.map((p) => p.accountId);
-    const results = accountIds.map((result) => ({
-      id: result._id,
-      fullname: result.fullname,
-    }));
+    const inforUser = posts.map((p) => users.find((u) => u._id.toString() === p.accountId.toString()));
     
     const finalResults = postsList.map((p, index) => ({
       postId: p.postId,
       desc: p.desc,
-      like:p.like,
-      img:p.img,
-      id: results[index].id,
-      fullname: results[index].fullname,
+      like: p.like,
+      img: p.img,
+      id: inforUser[index]._id,
+      fullname: inforUser[index].fullname,
     }));
+    
     res.status(200).json(finalResults);
-      
-      
   } catch (err) {
     res.status(500).json(err);
   }
