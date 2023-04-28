@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import { Outlet, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
@@ -15,11 +15,19 @@ import InputBase from "@mui/material/InputBase";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
+
+import { useDispatch, useSelector } from "react-redux";
+import { CallApiUser } from "../../features/userSlice";
+import Loading from "../../pages/Loading/Loading";
 import AdbIcon from "@mui/icons-material/Adb";
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Friends", "Logout"];
+
 function Navbar() {
   let navigate = useNavigate();
+  const dispatch = useDispatch();
+  const authToken = localStorage.getItem("authToken");
+  const { userInfor, isLoading } = useSelector((state) => state.user);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const srcAva =
@@ -35,6 +43,15 @@ function Navbar() {
   function handleLogout() {
     localStorage.removeItem("authToken");
     navigate("/");
+  }
+  useEffect(() => {
+    dispatch(
+      CallApiUser({ headers: { authorization: `Bearer ${authToken}` } })
+    );
+  }, []);
+
+  if (!userInfor.account) {
+    return <Loading />;
   }
   return (
     <AppBar position="static" style={{ backgroundColor: "#58A168" }}>
@@ -94,11 +111,10 @@ function Navbar() {
           </Box> */}
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src={srcAva} />
-              </IconButton>
-            </Tooltip>
+            <IconButton onClick={handleMenu} sx={{ p: 0 }}>
+              <Avatar alt="Remy Sharp" src={userInfor.account.img} />
+            </IconButton>
+
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"

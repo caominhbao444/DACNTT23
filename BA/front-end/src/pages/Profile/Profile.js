@@ -71,7 +71,7 @@ function Profile() {
   if (!userInforId && !userInfor && !userID && !checkFriends) {
     return <Loading />;
   }
-
+  console.log(userInforId);
   return (
     <>
       <Navbar />
@@ -94,7 +94,7 @@ function Profile() {
             }}
           >
             <img
-              src="https://images.unsplash.com/photo-1681111957389-ea67d854d70f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=60"
+              src={userInforId.img}
               width={100}
               height={100}
               alt=""
@@ -481,7 +481,7 @@ function Profile() {
                 <Grid container style={{ width: "100%" }}>
                   <Grid item xs={1} md={1}>
                     <img
-                      src="https://images.unsplash.com/photo-1681111957389-ea67d854d70f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=60"
+                      src={userInforId.img}
                       width={50}
                       height={50}
                       alt=""
@@ -531,6 +531,8 @@ function Profile() {
                 <p style={{ fontWeight: "bold" }}>Bài viết</p>
               </div>
               {/* Post item */}
+
+              {/* ================================================ */}
               <div
                 style={{
                   backgroundColor: "white",
@@ -551,7 +553,7 @@ function Profile() {
                   }}
                 >
                   <img
-                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                    src={userInforId.img}
                     className="img-src"
                     alt=""
                     style={{
@@ -562,7 +564,9 @@ function Profile() {
                     }}
                   />
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
+                    <span style={{ fontWeight: "bold" }}>
+                      {userInforId.fullname}
+                    </span>
                     <span>10 phút trước</span>
                   </div>
                 </div>
@@ -667,142 +671,7 @@ function Profile() {
                   </p>
                 </div>
               </div>
-              <div
-                style={{
-                  backgroundColor: "white",
-                  padding: "10px 20px",
-                  borderRadius: "10px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
-                }}
-              >
-                <div
-                  className="img-container"
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    gap: "10px",
-                  }}
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
-                    className="img-src"
-                    alt=""
-                    style={{
-                      height: "40px",
-                      width: "40px",
-                      borderRadius: "50%",
-                      overflow: "hidden",
-                    }}
-                  />
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
-                    <span>10 phút trước</span>
-                  </div>
-                </div>
-                <img
-                  className="img-src"
-                  alt=""
-                  style={{
-                    height: "400px",
-                    width: "100%",
-                    objectFit: "cover",
-                    overflow: "hidden",
-                  }}
-                  src="https://images.unsplash.com/photo-1543269664-7eef42226a21?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDl8fHBlb3BsZXxlbnwwfDB8MHx8&auto=format&fit=crop&w=600&q=60"
-                ></img>
-                <div
-                  className="emotions"
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    gap: "10px",
-                    height: "40px",
-                  }}
-                >
-                  <ion-icon
-                    style={{
-                      cursor: "pointer",
-                      color: "red",
-                      height: "30px",
-                      width: "30px",
-                    }}
-                    name="heart"
-                  ></ion-icon>
-                  <ion-icon
-                    style={{
-                      cursor: "pointer",
-                      height: "30px",
-                      width: "30px",
-                    }}
-                    name="chatbubble-outline"
-                  ></ion-icon>
-                  <ion-icon
-                    style={{
-                      cursor: "pointer",
-                      color: "",
-                      height: "30px",
-                      width: "30px",
-                    }}
-                    name="share-social-outline"
-                  ></ion-icon>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    gap: "5px",
-                  }}
-                >
-                  <Stack direction="row" spacing={-1}>
-                    <Avatar
-                      style={{
-                        height: "30px",
-                        width: "30px",
-                        fontSize: "15px",
-                      }}
-                      alt="Remy Sharp"
-                      src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
-                    />
-                    <Avatar
-                      style={{
-                        height: "30px",
-                        width: "30px",
-                        fontSize: "15px",
-                      }}
-                      alt="Travis Howard"
-                      src="https://images.unsplash.com/photo-1639149888905-fb39731f2e6c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHVzZXJ8ZW58MHx8MHx8&auto=format&fit=crop&w=600&q=60"
-                    />
-                    <Avatar
-                      style={{
-                        height: "30px",
-                        width: "30px",
-                        fontSize: "15px",
-                      }}
-                      alt="Cindy Baker"
-                      src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
-                    />
-                  </Stack>
-                  <span>Được thích bởi Tiến Minh and 2,200 người khác</span>
-                </div>
-                <div style={{ marginTop: "" }}>
-                  <p>
-                    <span style={{ marginRight: "10px", fontWeight: "bold" }}>
-                      Minh Bảo
-                    </span>
-                    <span>
-                      {Readmore(
-                        "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
-                      )}
-                      ...
-                    </span>
-                  </p>
-                </div>
-              </div>
+              {/* ================================================================================================================================ */}
             </div>
           </Grid>
         </Grid>

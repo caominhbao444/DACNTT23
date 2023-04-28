@@ -38,7 +38,8 @@ function SideBar() {
             to="/home"
             className="profile-component"
             style={{
-              textAlign: "center",
+              alignItems: "center",
+              justifyContent: "center",
               textDecoration: "none",
               color: "black",
               backgroundColor: "white",
@@ -53,9 +54,10 @@ function SideBar() {
             <div className="profile-photo">
               {/* <img src="https://images.unsplash.com/photo-1680726621439-85ee92b6eeb5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyOHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=60" /> */}
               <img
-                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                src={userInfor.account.img}
                 className="img-src"
                 alt=""
+                style={{ width: "60px", height: "60px" }}
               />
             </div>
             <div className="details" style={{ boxSizing: "border-box" }}>

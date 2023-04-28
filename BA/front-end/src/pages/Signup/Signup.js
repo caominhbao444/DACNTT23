@@ -4,7 +4,7 @@ import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useFormik } from "formik";
+import { Field, useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import {
@@ -26,6 +26,10 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassWord] = useState("");
   const [fullname, setFullName] = useState("");
+  const [img, setImg] = useState("");
+  const [Urlimg, setUrlimg] = useState(
+    "https://images.unsplash.com/photo-1517849845537-4d257902454a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZG9nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
+  );
   const [passwordConfirm, setPasswordCofirm] = useState("");
   // const onSubmit = async (values) => {
   //   const { fullname, email, password, phone, city, from, education } = values;
@@ -50,19 +54,30 @@ function Signup() {
   //       console.error(error.response.data);
   //     });
   // };
+  const uploadImage = () => {
+    const formData = new FormData();
+    formData.append("file", img);
+    formData.append("upload_preset", "pzoe2lzh");
+    axios
+      .post("https://api.cloudinary.com/v1_1/djhhzmcps/image/upload", formData)
+      .then((response) => {
+        setUrlimg(response.data.url);
+      });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const onSubmit = async (values) => {
-    const { fullname, email, password, phone, education, city, from } = values;
     try {
       await axios
         .post("http://localhost:5001/api/accounts/register", {
           fullname: fullname,
           email: email,
           password: password,
-          phone: phone,
+          phone: numberPhone,
           city: city,
-          from: from,
+          from: country,
           education: education,
+          img: Urlimg,
         })
         .then((response) => {
           console.log(response.data);
@@ -76,7 +91,6 @@ function Signup() {
       console.log("Error...");
     }
   };
-
   const handleEmailInput = (e) => setEmail(e.target.value);
   const handlePwdInput = (e) => setPassWord(e.target.value);
   const handleFullName = (e) => setFullName(e.target.value);
@@ -85,536 +99,47 @@ function Signup() {
   const handleCountryInput = (e) => setCountry(e.target.value);
   const handleEducationInput = (e) => setEducation(e.target.value);
   const handleNumber = (e) => setNumberPhone(e.target.value);
-  const formik = useFormik({
-    initialValues: {
-      fullname: "",
-      email: "",
-      password: "",
-      passwordConfirm: "",
-      phone: "",
-      education: "",
-      city: "",
-      from: "",
-    },
-    validationSchema: Yup.object({
-      fullname: Yup.string()
-        .required("Bắt buộc")
-        .min(4, "Tên của bạn phải ít nhất 4 kí tự"),
-      email: Yup.string()
-        .required("Bắt buộc")
-        .matches(
-          /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-          "Nhập địa chỉ email của bạn"
-        ),
-      password: Yup.string()
-        .required("Required")
-        .matches(
-          /^[A-Za-z]\w{7,14}$/,
-          "Mật khẩu của bạn phải nhiều hơn 7 ký tự "
-        ),
-      passwordConfirm: Yup.string()
-        .required("Required")
-        .oneOf([Yup.ref("password"), null], "Password must be matched"),
-    }),
-    onSubmit,
-  });
+
   return (
     <SignupPage>
-      {/* <Grid
-        container
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Grid
-          style={{
-            backgroundColor: "#FFFFFF",
-            padding: "32px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            borderRadius: "10px",
-          }}
-          item
-          xs={8}
-          md={5}
-        >
-          <h2 style={{ fontWeight: "bold" }}>Đăng ký</h2>
-          <form
-            onSubmit={handleSubmit}
-            class="form"
-            style={{
-              padding: "0 32px 32px 32px",
-              width: "70%",
-            }}
-          >
-            <div class="input-group">
-              <label className="label-input" for="fullname">
-                Họ và tên
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  position: "relative",
-                  width: "100%",
-                  marginTop: "2px",
-                }}
-              >
-                <ion-icon
-                  style={{
-                    position: "absolute",
-                    top: "2px",
-                    left: "5px",
-                    width: "24px",
-                    height: "24px",
-                  }}
-                  name="person-outline"
-                ></ion-icon>
-                <input
-                  onChange={handleFullName}
-                  value={fullname}
-                  type="text"
-                  name="fullname"
-                  id="fullname"
-                  placeholder="Cao Minh Bao"
-                />
-              </div>
-            </div>
-            <div class="input-group">
-              <label className="label-input" for="email">
-                Email
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  position: "relative",
-                  width: "100%",
-
-                  marginTop: "2px",
-                }}
-              >
-                <svg
-                  style={{ position: "absolute", top: "2px", left: "5px" }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  height="24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon"
-                >
-                  <path
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M7 8.5L9.94202 10.2394C11.6572 11.2535 12.3428 11.2535 14.058 10.2394L17 8.5"
-                  ></path>
-                  <path
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z"
-                  ></path>
-                </svg>
-                <input
-                  onChange={handleEmailInput}
-                  value={email}
-                  type="text"
-                  name="email"
-                  id="email"
-                  placeholder="minhbao@gmail.com"
-                />
-              </div>
-            </div>
-            <div class="input-group">
-              <label className="label-input" for="username">
-                Trường học
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  position: "relative",
-                  width: "100%",
-
-                  marginTop: "2px",
-                }}
-              >
-                <svg
-                  style={{ position: "absolute", top: "2px", left: "5px" }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  height="24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon"
-                >
-                  <path
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M7 8.5L9.94202 10.2394C11.6572 11.2535 12.3428 11.2535 14.058 10.2394L17 8.5"
-                  ></path>
-                  <path
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z"
-                  ></path>
-                </svg>
-                <input
-                  onChange={handleEducationInput}
-                  value={education}
-                  type="text"
-                  name="education"
-                  id="education"
-                  placeholder="minhbao@gmail.com"
-                />
-              </div>
-            </div>
-            <div class="input-group">
-              <label className="label-input" for="username">
-                Sô điện thoại
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  position: "relative",
-                  width: "100%",
-
-                  marginTop: "2px",
-                }}
-              >
-                <svg
-                  style={{ position: "absolute", top: "2px", left: "5px" }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  height="24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon"
-                >
-                  <path
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M7 8.5L9.94202 10.2394C11.6572 11.2535 12.3428 11.2535 14.058 10.2394L17 8.5"
-                  ></path>
-                  <path
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z"
-                  ></path>
-                </svg>
-                <input
-                  onChange={handleNumber}
-                  value={numberPhone}
-                  type="text"
-                  name="numberPhone"
-                  id="numberPhone"
-                  placeholder="minhbao@gmail.com"
-                />
-              </div>
-            </div>
-            <div class="input-group">
-              <label className="label-input" for="city">
-                Thành phố
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  position: "relative",
-                  width: "100%",
-
-                  marginTop: "2px",
-                }}
-              >
-                <svg
-                  style={{ position: "absolute", top: "2px", left: "5px" }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  height="24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon"
-                >
-                  <path
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M7 8.5L9.94202 10.2394C11.6572 11.2535 12.3428 11.2535 14.058 10.2394L17 8.5"
-                  ></path>
-                  <path
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z"
-                  ></path>
-                </svg>
-                <input
-                  onChange={handleCityInput}
-                  value={city}
-                  type="text"
-                  name="city"
-                  id="city"
-                  placeholder="minhbao@gmail.com"
-                />
-              </div>
-            </div>
-            <div class="input-group">
-              <label className="label-input" for="country">
-                Quốc gia
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  position: "relative",
-                  width: "100%",
-
-                  marginTop: "2px",
-                }}
-              >
-                <svg
-                  style={{ position: "absolute", top: "2px", left: "5px" }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  height="24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon"
-                >
-                  <path
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M7 8.5L9.94202 10.2394C11.6572 11.2535 12.3428 11.2535 14.058 10.2394L17 8.5"
-                  ></path>
-                  <path
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    stroke="#141B34"
-                    d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z"
-                  ></path>
-                </svg>
-                <input
-                  onChange={handleCountryInput}
-                  value={country}
-                  type="text"
-                  name="country"
-                  id="country"
-                  placeholder="minhbao@gmail.com"
-                />
-              </div>
-            </div>
-            <div class="input-group">
-              <label className="label-input" for="password">
-                Mật khẩu
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  position: "relative",
-                  width: "100%",
-                  marginTop: "2px",
-                }}
-              >
-                <ion-icon
-                  style={{
-                    position: "absolute",
-                    top: "2px",
-                    left: "5px",
-                    width: "24px",
-                    height: "24px",
-                  }}
-                  name="lock-closed-outline"
-                ></ion-icon>
-                <input
-                  onChange={handlePwdInput}
-                  value={password}
-                  type="password"
-                  name="password"
-                  id="password"
-                  placeholder="Mật khẩu"
-                />
-                <span
-                  className="eyes"
-                  onClick={() => {
-                    var x = document.getElementById("password");
-                    var y = document.getElementById("hide1");
-                    var z = document.getElementById("hide2");
-                    if (x.type === "password") {
-                      x.type = "text";
-                      y.style.display = "block";
-                      z.style.display = "none";
-                    } else {
-                      x.type = "password";
-                      y.style.display = "none";
-                      z.style.display = "block";
-                    }
-                  }}
-                >
-                  <ion-icon id="hide1" name="eye-outline"></ion-icon>
-                  <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
-                </span>
-              </div>
-            </div>
-            <div class="input-group">
-              <label className="label-input" for="passwordConfirm">
-                Nhập lại mật khẩu
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  position: "relative",
-                  width: "100%",
-                  marginTop: "2px",
-                }}
-              >
-                <ion-icon
-                  style={{
-                    position: "absolute",
-                    top: "2px",
-                    left: "5px",
-                    width: "24px",
-                    height: "24px",
-                  }}
-                  name="lock-closed-outline"
-                ></ion-icon>
-                <input
-                  type="password"
-                  name="passwordConfirm"
-                  id="passwordConfirm"
-                  placeholder="Nhập lại mật khẩu"
-                  value={passwordConfirm}
-                  onChange={handlePasswordConfirm}
-                />
-                <span
-                  className="eyes"
-                  onClick={() => {
-                    var x = document.getElementById("passwordConfirm");
-                    var y = document.getElementById("hide12");
-                    var z = document.getElementById("hide22");
-                    if (x.type === "password") {
-                      x.type = "text";
-                      y.style.display = "block";
-                      z.style.display = "none";
-                    } else {
-                      x.type = "password";
-                      y.style.display = "none";
-                      z.style.display = "block";
-                    }
-                  }}
-                >
-                  <ion-icon id="hide12" name="eye-outline"></ion-icon>
-                  <ion-icon id="hide22" name="eye-off-outline"></ion-icon>
-                </span>
-              </div>
-            </div>
-            <div
-              style={{
-                marginTop: "10px",
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
-              <button
-                style={{ backgroundColor: COLORS.mainColor }}
-                class="sign"
-              >
-                Đăng ký
-              </button>
-            </div>
-          </form>
-        </Grid>
-      </Grid> */}
-      {/* <h1>Sign up</h1>
-      <FormGroup className="formStyle">
-        <FormControl>
-          <OutlinedInput
-            id="my-input"
-            aria-describedby="my-helper-text"
-            label="Email"
-          />
-          <InputLabel>Full Name</InputLabel>
-        </FormControl>
-        <FormControl>
-          <OutlinedInput
-            id="my-input"
-            aria-describedby="my-helper-text"
-            label="Email"
-          />
-          <InputLabel>Email</InputLabel>
-        </FormControl>
-        <FormControl>
-          <OutlinedInput
-            id="my-input"
-            aria-describedby="my-helper-text"
-            label=""
-          />
-          <InputLabel>Phonenumber</InputLabel>
-        </FormControl>
-        <FormControl>
-          <OutlinedInput
-            id="my-input"
-            aria-describedby="my-helper-text"
-            label="Email"
-          />
-          <InputLabel>Full Name</InputLabel>
-        </FormControl>
-        <FormControl>
-          <OutlinedInput
-            id="my-input"
-            aria-describedby="my-helper-text"
-            label="Email"
-          />
-          <InputLabel>Full Name</InputLabel>
-        </FormControl>
-        <FormControl>
-          <OutlinedInput
-            id="my-input"
-            aria-describedby="my-helper-text"
-            label="Email"
-          />
-          <InputLabel>Full Name</InputLabel>
-        </FormControl>
-        <FormControl>
-          <OutlinedInput
-            id="my-input"
-            aria-describedby="my-helper-text"
-            label="Email"
-          />
-          <InputLabel>Full Name</InputLabel>
-        </FormControl>
-        <Button>Send</Button>
-      </FormGroup> */}
       <div className="container" style={{ backgroundColor: "ButtonFace" }}>
         <h2>Đăng ký</h2>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <img
+            src={`${Urlimg}`}
+            alt=""
+            width="80px"
+            height="80px"
+            style={{
+              objectFit: "cover",
+              objectPosition: "center",
+              borderRadius: "50%",
+            }}
+          />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <input
+              type="file"
+              onChange={(e) => {
+                setImg(e.target.files[0]);
+              }}
+            />
+            <button onClick={uploadImage}>Dang anh</button>
+          </div>
+        </div>
         <form
-          onSubmit={formik.handleSubmit}
+          onSubmit={handleSubmit}
           style={{ display: "flex", flexDirection: "column", gap: "10px" }}
         >
           <Grid container style={{ backgroundColor: "", minHeight: "50vh" }}>
@@ -626,8 +151,8 @@ function Signup() {
                   </label>
                   <input
                     type="text"
-                    value={formik.values.fullname}
-                    onChange={formik.handleChange}
+                    value={fullname}
+                    onChange={handleFullName}
                     name="fullname"
                     placeholder="Nhập họ và tên của bạn"
                     id="fullname"
@@ -641,9 +166,6 @@ function Signup() {
                       outline: "none",
                     }}
                   />
-                  {formik.errors.fullname && (
-                    <span className="error">{formik.errors.fullname}*</span>
-                  )}
                 </div>
                 <div className="inputGroup">
                   <label className="label-input" for="email">
@@ -652,8 +174,8 @@ function Signup() {
                   <input
                     required
                     type="text"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
+                    value={email}
+                    onChange={handleEmailInput}
                     name="email"
                     id="email"
                     placeholder="Nhập email của bạn"
@@ -666,9 +188,6 @@ function Signup() {
                       outline: "none",
                     }}
                   />
-                  {formik.errors.email && (
-                    <span className="error">{formik.errors.email}*</span>
-                  )}
                 </div>
                 <div className="inputGroup">
                   <label className="label-input" for="password">
@@ -686,8 +205,8 @@ function Signup() {
                       type="password"
                       name="password"
                       id="password"
-                      value={formik.values.password}
-                      onChange={formik.handleChange}
+                      value={password}
+                      onChange={handlePwdInput}
                       style={{
                         boxSizing: "border-box",
                         height: "100%",
@@ -717,9 +236,6 @@ function Signup() {
                       <ion-icon id="hide1" name="eye-outline"></ion-icon>
                       <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
                     </span>
-                    {formik.errors.password && (
-                      <span className="error">{formik.errors.password}*</span>
-                    )}
                   </div>
                 </div>
                 <div className="inputGroup">
@@ -737,8 +253,8 @@ function Signup() {
                       type="password"
                       name="passwordConfirm"
                       id="passwordConfirm"
-                      value={formik.values.passwordConfirm}
-                      onChange={formik.handleChange}
+                      value={passwordConfirm}
+                      onChange={handlePasswordConfirm}
                       style={{
                         boxSizing: "border-box",
                         height: "100%",
@@ -768,25 +284,20 @@ function Signup() {
                       <ion-icon id="hide1" name="eye-outline"></ion-icon>
                       <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
                     </span>
-                    {formik.errors.passwordConfirm && (
-                      <span className="error">
-                        {formik.errors.passwordConfirm}*
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>
             </Grid>
             <Grid item xs={6} md={6}>
-              <div className="containerItem">
-                <div className="inputGroup">
+              <div className="containerItem1">
+                <div className="inputGroup1">
                   <label className="label-input" for="phone">
                     Số điện thoại
                   </label>
                   <input
                     type="text"
-                    value={formik.values.phone}
-                    onChange={formik.handleChange}
+                    value={numberPhone}
+                    onChange={handleNumber}
                     name="phone"
                     id="phone"
                     style={{
@@ -799,14 +310,14 @@ function Signup() {
                     }}
                   />
                 </div>
-                <div className="inputGroup">
+                <div className="inputGroup1">
                   <label className="label-input" for="education">
                     Học vấn
                   </label>
                   <input
                     type="text"
-                    value={formik.values.education}
-                    onChange={formik.handleChange}
+                    value={education}
+                    onChange={handleEducationInput}
                     name="education"
                     id="education"
                     style={{
@@ -827,8 +338,8 @@ function Signup() {
                     type="text"
                     name="city"
                     id="city"
-                    value={formik.values.city}
-                    onChange={formik.handleChange}
+                    value={city}
+                    onChange={handleCityInput}
                     style={{
                       boxSizing: "border-box",
                       height: "100%",
@@ -844,8 +355,8 @@ function Signup() {
                     Quốc gia
                   </label>
                   <input
-                    value={formik.values.from}
-                    onChange={formik.handleChange}
+                    value={country}
+                    onChange={handleCountryInput}
                     type="text"
                     name="from"
                     id="from"
@@ -969,68 +480,38 @@ const SignupPage = styled.section`
     padding-left: 10px;
     padding-top: 20px;
   }
+  .containerItem1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    height: 100%;
+    box-sizing: border-box;
+    padding-right: 10px;
+    padding-top: 20px;
+  }
   .inputGroup {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px;
+  }
+  .inputGroup1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     gap: 5px;
     padding: 5px;
   }
   .label-input {
+    width: 80%;
     cursor: pointer;
     font-weight: 400;
   }
-  ${
-    "" /* .input-group {
-    width: 100%;
-    box-sizing: border-box;
-    border-bottom: 1px solid black;
-    margin-bottom: 10px;
-    padding-bottom: 2px;
-  }
-  .label-input {
-    cursor: pointer;
-  }
-  input {
-    width: 100%;
-    padding: 5px 5px 5px 40px;
-    height: 100%;
 
-    width: 100%;
-    box-sizing: border-box;
-    border: none;
-    outline: none;
-  }
-  input:focus {
-    border-color: none;
-  }
-  .forgot {
-    width: 100%;
-    text-align: right;
-    padding: 0.5em 0;
-  }
-  .sign {
-    padding: 1em 1em;
-    cursor: pointer;
-    width: 100%;
-    border: none;
-    font-weight: bold;
-    color: white;
-  }
-  .eyes {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    cursor: pointer;
-  }
-  #hide12 {
-    display: none;
-  }
-  #hide1 {
-    display: none;
-  } */
-  };
   .eyes {
     position: absolute;
     right: 5px;
