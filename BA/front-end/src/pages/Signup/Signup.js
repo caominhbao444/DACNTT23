@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Field, useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import Swal from "sweetalert2";
 import {
   Button,
   FormControl,
@@ -18,7 +19,6 @@ import {
 } from "@mui/material";
 
 function Signup() {
-  const history = useNavigate();
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [education, setEducation] = useState("");
@@ -26,6 +26,7 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassWord] = useState("");
   const [fullname, setFullName] = useState("");
+  const navigate = useNavigate();
   const [img, setImg] = useState("");
   const [Urlimg, setUrlimg] = useState(
     "https://images.unsplash.com/photo-1517849845537-4d257902454a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZG9nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
@@ -54,16 +55,7 @@ function Signup() {
   //       console.error(error.response.data);
   //     });
   // };
-  const uploadImage = () => {
-    const formData = new FormData();
-    formData.append("file", img);
-    formData.append("upload_preset", "pzoe2lzh");
-    axios
-      .post("https://api.cloudinary.com/v1_1/djhhzmcps/image/upload", formData)
-      .then((response) => {
-        setUrlimg(response.data.url);
-      });
-  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -80,9 +72,18 @@ function Signup() {
           img: Urlimg,
         })
         .then((response) => {
-          console.log(response.data);
           localStorage.setItem("authToken", response.data.accessToken);
-          window.location.href = "/";
+          Swal.fire({
+            title: "Thành công!",
+            text: "Bạn đăng ký thành công!",
+            icon: "success",
+            confirmButtonColor: `${COLORS.main}`,
+            confirmButtonText: "Tiếp tục",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/");
+            }
+          });
         })
         .catch((err) => {
           if (err && err.response) console.log("Error", err);
@@ -100,6 +101,39 @@ function Signup() {
   const handleEducationInput = (e) => setEducation(e.target.value);
   const handleNumber = (e) => setNumberPhone(e.target.value);
 
+  const upLoad = async () => {
+    const { value: file } = await Swal.fire({
+      title: "Chọn ảnh đại diện",
+      input: "file",
+      inputAttributes: {
+        accept: "image/*",
+        "aria-label": "Upload your profile picture",
+      },
+    });
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "pzoe2lzh");
+        axios
+          .post(
+            "https://api.cloudinary.com/v1_1/djhhzmcps/image/upload",
+            formData
+          )
+          .then((response) => {
+            Swal.fire({
+              title: "Ảnh của bạn đã được đăng",
+              imageUrl: response.data.url,
+              imageAlt: "The uploaded picture",
+            });
+            setUrlimg(response.data.url);
+          });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   return (
     <SignupPage>
       <div className="container" style={{ backgroundColor: "ButtonFace" }}>
@@ -109,6 +143,7 @@ function Signup() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            gap: "20px",
           }}
         >
           <img
@@ -129,13 +164,9 @@ function Signup() {
               alignItems: "center",
             }}
           >
-            <input
-              type="file"
-              onChange={(e) => {
-                setImg(e.target.files[0]);
-              }}
-            />
-            <button onClick={uploadImage}>Dang anh</button>
+            <button onClick={upLoad} className="btn_upload">
+              Chọn ảnh
+            </button>
           </div>
         </div>
         <form
@@ -151,6 +182,7 @@ function Signup() {
                   </label>
                   <input
                     type="text"
+                    autoComplete="off"
                     value={fullname}
                     onChange={handleFullName}
                     name="fullname"
@@ -174,6 +206,7 @@ function Signup() {
                   <input
                     required
                     type="text"
+                    autoComplete="off"
                     value={email}
                     onChange={handleEmailInput}
                     name="email"
@@ -204,6 +237,7 @@ function Signup() {
                       required
                       type="password"
                       name="password"
+                      autoComplete="off"
                       id="password"
                       value={password}
                       onChange={handlePwdInput}
@@ -372,6 +406,7 @@ function Signup() {
                 </div>
               </div>
             </Grid>
+            <Grid></Grid>
           </Grid>
           <div
             style={{
@@ -382,30 +417,29 @@ function Signup() {
           >
             <button
               type="submit"
-              style={{ padding: "5px 10px", backgroundColor: "" }}
-              className="buttonSend"
+              className="btn_upload"
+              style={{ width: "90%" }}
             >
               Đăng ký
             </button>
           </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "50%",
+              marginLeft: "50%",
+              gap: "5px",
+              padding: "10px",
+            }}
+          >
+            <span>Bạn đã có tài khoản?</span>
+            <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+              Đăng nhập
+            </Link>
+          </div>
         </form>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "50%",
-            marginLeft: "50%",
-            gap: "5px",
-            marginTop: "10px",
-            paddingRight: "10px",
-          }}
-        >
-          <span>Do you have account?</span>
-          <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-            Login
-          </Link>
-        </div>
       </div>
     </SignupPage>
   );
@@ -430,7 +464,7 @@ const SignupPage = styled.section`
   }
   box-sizing: border-box;
   padding: 20px 0;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -523,6 +557,20 @@ const SignupPage = styled.section`
   }
   #hide1 {
     display: none;
+  }
+  .btn_upload {
+    background-color: #0000ff;
+    color: white;
+    cursor: pointer;
+    outline: none;
+    padding: 5px 10px;
+    border: 1px solid #0000ff;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .btn_upload:hover {
+    color: #0000ff;
+    background-color: white;
   }
 `;
 export default Signup;
