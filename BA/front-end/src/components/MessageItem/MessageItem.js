@@ -35,7 +35,7 @@ function MessageItem(props) {
       setUserCurrent(response.payload.account._id);
     });
   }, []);
-  console.log(userCurrent);
+  // console.log(userCurrent);
 
   if (!props) return <Loading />;
   return (

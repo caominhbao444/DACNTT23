@@ -38,6 +38,7 @@ function Message() {
   } = useSelector((state) => state.user);
   const authToken = localStorage.getItem("authToken");
   const [isOur, setIsOur] = useState("our");
+  const [seconds, setSeconds] = useState(0);
   const [conversationID, setConversationID] = useState("");
   const [messageContent, setMessageContent] = useState("");
   const [currentChat, setCurrentChat] = useState("");
@@ -68,9 +69,9 @@ function Message() {
       setUserCurrent(response.payload.account._id);
     });
   }, []);
-  console.log(userCurrent);
+  // console.log(userCurrent);
   useEffect(() => {
-    console.log(userID);
+    // console.log(userID);
     dispatch(
       CallGetInforConversation({
         headers: { authorization: `Bearer ${authToken}` },
@@ -88,18 +89,6 @@ function Message() {
     //   setAllMess(response.payload);
     // });
   }, [userID]);
-  useEffect(() => {
-    if (conversationID) {
-      dispatch(
-        CallGetMessage({
-          headers: { authorization: `Bearer ${authToken}` },
-          conversationID,
-        })
-      ).then((response) => {
-        setAllMess(response.payload);
-      });
-    }
-  }, [conversationID]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -110,10 +99,48 @@ function Message() {
         text: messageContent,
       })
     ).then((response) => {
-      console.log(response);
+      setMessageContent("");
+      setConversationID(response.payload.conversationId);
     });
   };
 
+  useEffect(() => {
+    if (conversationID) {
+      // const intervalId = setInterval(() => {
+      //   setSeconds((seconds) => seconds + 1);
+      //   dispatch(
+      //     CallGetMessage({
+      //       headers: { authorization: `Bearer ${authToken}` },
+      //       conversationID,
+      //     })
+      //   ).then((response) => {
+      //     setAllMess(response.payload);
+      //   });
+      // }, 500);
+
+      // return () => clearInterval(intervalId);
+      dispatch(
+        CallGetMessage({
+          headers: { authorization: `Bearer ${authToken}` },
+          conversationID,
+        })
+      ).then((response) => {
+        setAllMess(response.payload);
+      });
+    }
+  }, [conversationID]);
+  useEffect(() => {
+    if (postMessage) {
+      dispatch(
+        CallGetMessage({
+          headers: { authorization: `Bearer ${authToken}` },
+          conversationID: postMessage.conversationId,
+        })
+      ).then((response) => {
+        setAllMess(response.payload);
+      });
+    }
+  }, [postMessage]);
   if (
     !userInforId &&
     !userInfor &&
@@ -121,17 +148,21 @@ function Message() {
     !listFriends &&
     !getConversation &&
     !getAllConversations &&
-    !getMessage
+    !getMessage &&
+    !postMessage
   ) {
     return <Loading />;
   }
+
   // ================================================================
-  console.log("All Message", allmess);
-  console.log("User dang login", userCurrent);
-  console.log("All conversations", allConversations);
-  console.log("Current Chat", currentChat);
-  console.log("getConversation", getConversation);
-  console.log("conversation id :", getConversation);
+  // console.log("All Message", allmess);
+  console.log("Nhan tin nhan", getMessage);
+  console.log("Gui tin nhan", postMessage);
+  // console.log("User dang login", userCurrent);
+  // console.log("All conversations", allConversations);
+  // console.log("Current Chat", currentChat);
+  // console.log("getConversation", getConversation);
+  // console.log("conversation id :", getConversation);
   // ================================================================
   return (
     <>
@@ -378,15 +409,15 @@ function Message() {
                       }}
                       className="message-area"
                     >
-                      {allmess &&
-                        allmess
+                      {getMessage &&
+                        getMessage
                           .slice()
                           .reverse()
                           .map((mess, index) => {
                             return (
                               <>
                                 <MessageItem
-                                  key={allmess.length - index}
+                                  key={getMessage.length - index}
                                   name={mess.fullname}
                                   sender={mess.senderId}
                                   content={mess.text}
