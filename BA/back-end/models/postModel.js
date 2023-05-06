@@ -17,9 +17,15 @@ const postSchema = mongoose.Schema(
     img:{
       type:String,
       required:[true]
+    },
+    createdAt:{
+      type:String,
+    },
+    updatedAt:{
+      type:String,
     }
-  },
-  { timestamps: true }
+  }
+
 );
 
 module.exports = mongoose.model("Post", postSchema);

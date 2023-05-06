@@ -8,8 +8,10 @@ const {
 const validateToken = require("../middleware/validateTokenHandler");
 router.use(validateToken);
 
+//tạo comment
 router.route("/:id").post(createComments);
 
+//lấy hết comments của bài post
 router.route("/:id").get(getCommentsPost);
 
 module.exports = router;

@@ -13,8 +13,11 @@ const validateToken = require("../middleware/validateTokenHandler");
 router.use(validateToken);
 
 
-router.route("/current").get(getCurrentPosts);
 router.route("/").get(getPosts).post(createPost);
-router.route("/:id").get(getPostById).put(updatePost).delete(deletePost);
+
+router.route("/current").get(getCurrentPosts);
+
+// userId / id bài post nhé
+router.route("/:accountId/:id").get(getPostById).put(updatePost).delete(deletePost);
 
 module.exports = router;

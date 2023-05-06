@@ -47,11 +47,14 @@ const accountSchema = mongoose.Schema(
     img:{
       type:String,
       required:[true]
+    },
+    createdAt:{
+      type:String,
+    },
+    updatedAt:{
+      type:String,
     }
   },
-  {
-    timestamps: true,
-  }
 );
 
 module.exports = Account = mongoose.model("Account", accountSchema);

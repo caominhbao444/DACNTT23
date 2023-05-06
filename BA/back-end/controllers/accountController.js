@@ -2,6 +2,8 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Account = require("../models/accountModel");
+const moment = require("moment-timezone");
+
 
 //@desc Register a account
 //@route POST /api/accounts/register
@@ -38,7 +40,8 @@ const register = asyncHandler(async (req, res) => {
     city,
     from,
     education,
-    img
+    img,
+    createdAt: moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss'),
   });
 
   console.log(`Account created ${account}`);

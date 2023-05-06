@@ -2,6 +2,8 @@ const asyncHandler = require("express-async-handler");
 const Message = require("../models/messageModel");
 const Conversation = require("../models/conversationModel");
 const Account = require("../models/accountModel");
+const moment = require("moment-timezone");
+
 
 const createMessage = asyncHandler(async (req, res) => {
   try {
@@ -10,6 +12,7 @@ const createMessage = asyncHandler(async (req, res) => {
       senderId: req.account.id,
       fullname: req.account.fullname,
       text: req.body.text,
+      createdAt: moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss'),
     });
     const savedMessage = await message.save();
     res.status(200).json(savedMessage);
