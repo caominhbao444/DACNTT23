@@ -36,51 +36,84 @@ const io = require("socket.io")(httpServer, {
     origin: "http://localhost:3000",
   },
 });
-let users = [];
+// let users = [];
 
-const addUser = (userId, username, socketId) => {
-  !users.some((user) => user.userId === userId) &&
-    users.push({ userId, username, socketId });
-};
+// const addUser = (userId, username, socketId) => {
+//   !users.some((user) => user.userId === userId) &&
+//     users.push({ userId, username, socketId });
+// };
 
-const removeUser = (socketId) => {
-  users = users.filter((user) => user.socketId !== socketId);
-};
+// const removeUser = (socketId) => {
+//   users = users.filter((user) => user.socketId !== socketId);
+// };
 
-const getUser = (userId) => {
-  return users.find((user) => user.userId === userId);
-};
+// const getUser = (userId) => {
+//   return users.find((user) => user.userId === userId);
+// };
 
-io.on("connection", (socket) => {
-  console.log("a user connected. \t " + socket.id);
+// io.on("connection", (socket) => {
+//   console.log("a user connected. \t " + socket.id);
 
-  //take userId, username, and socketId from user
-  socket.on("addUser", ({ userId, username }) => {
-    addUser(userId, username, socket.id);
-    io.emit("getUsers", users);
-  });
+//   //take userId, username, and socketId from user
+//   socket.on("addUser", ({ userId, username }) => {
+//     addUser(userId, username, socket.id);
+//     io.emit("getUsers", users);
+//   });
 
-  socket.on("join-room", ({ username, room }) => {
-    socket.join(room);
-    socket.emit("message", {
-      text: `${username}, welcome to room ${room}.`,
-    });
-  });
+//   socket.on("join-room", ({ username, room }) => {
+//     socket.join(room);
+//     socket.emit("message", {
+//       text: `${username}, welcome to room ${room}.`,
+//     });
+//   });
   
-  //send and get message
-  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-    const user = getUser(receiverId);
-    io.to(user.socketId).emit("getMessage", {
-      senderId,
-      username: getUser(senderId).username,
-      text,
+//   //send and get message
+//   socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+//     const user = getUser(receiverId);
+//     io.to(user.socketId).emit("getMessage", {
+//       senderId,
+//       username: getUser(senderId).username,
+//       text,
+//     });
+//   });
+
+//   //when disconnect
+//   socket.on("disconnect", () => {
+//     console.log("a user disconnected!");
+//     removeUser(socket.id);
+//     io.emit("getUsers", users);
+//   });
+  
+  /////////////////////////
+  io.on("connection", (socket) => {
+    console.log("Connected to socket.io");
+    socket.on("setup", (userData) => {
+      socket.join(userData._id);
+      socket.emit("connected");
+    });
+  
+    socket.on("join chat", (room) => {
+      socket.join(room);
+      console.log("User Joined Room: " + room);
+    });
+    socket.on("typing", (room) => socket.in(room).emit("typing"));
+    socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+  
+    socket.on("new message", (newMessageRecieved) => {
+      var chat = newMessageRecieved.chat;
+  
+      if (!chat.users) return console.log("chat.users not defined");
+  
+      chat.users.forEach((user) => {
+        if (user._id == newMessageRecieved.sender._id) return;
+  
+        socket.in(user._id).emit("message recieved", newMessageRecieved);
+      });
+    });
+  
+    socket.off("setup", () => {
+      console.log("USER DISCONNECTED");
+      socket.leave(userData._id);
     });
   });
-
-  //when disconnect
-  socket.on("disconnect", () => {
-    console.log("a user disconnected!");
-    removeUser(socket.id);
-    io.emit("getUsers", users);
-  });
-});
+// });
