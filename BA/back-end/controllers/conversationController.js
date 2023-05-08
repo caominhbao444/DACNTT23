@@ -61,6 +61,7 @@ const getConversationsById = asyncHandler(async (req, res) => {
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
+      img:result.img
     }));
 
     const conversationsList = conversations.map((conver) => ({
@@ -71,6 +72,7 @@ const getConversationsById = asyncHandler(async (req, res) => {
       conversationId: conver.conversationId,
       id: results[index].id,
       fullname: results[index].fullname,
+      img:results[index].img
     }));
     res.status(200).json(finalResults);
   } catch (err) {
@@ -107,7 +109,6 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
       id: results[index].id,
       fullname: results[index].fullname,
       img:results[index].img
-
     }));
     res.status(200).json(finalResults);
   } catch (err) {
