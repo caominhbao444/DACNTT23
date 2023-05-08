@@ -4,12 +4,10 @@ const Account = require("../models/accountModel");
 
 const createConversation = asyncHandler(async (req, res) => {
   try {
-      const conversation = await Conversation.findOne({
-        senderId: req.account.id,
-        receiverId: req.params.id,
-      });
-      if (conversation) {
-        res.status(201).json({
+      const conversation = await Conversation.find()
+      
+      if (conversation.some((c) => c.senderId === req.account.id && c.receiverId === req.params.id || c.senderId === req.params.id && c.receiverId === req.account.id)) {
+        res.status(403).json({
           checkConversation: 1,
           message: "cuộc trò chuyện đã tồn tại",
         });
@@ -63,6 +61,7 @@ const getConversationsById = asyncHandler(async (req, res) => {
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
+      img:result.img
     }));
 
     const conversationsList = conversations.map((conver) => ({
@@ -73,6 +72,7 @@ const getConversationsById = asyncHandler(async (req, res) => {
       conversationId: conver.conversationId,
       id: results[index].id,
       fullname: results[index].fullname,
+      img:results[index].img
     }));
     res.status(200).json(finalResults);
   } catch (err) {
@@ -97,6 +97,7 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
+      img:result.img
     }));
 
     const conversationsList = conversations.map((conver) => ({
@@ -107,6 +108,7 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
       conversationId: conver.conversationId,
       id: results[index].id,
       fullname: results[index].fullname,
+      img:results[index].img
     }));
     res.status(200).json(finalResults);
   } catch (err) {
@@ -131,6 +133,7 @@ const testc = asyncHandler(async (req, res) => {
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
+      img:result.img
     }));
 
     const conversationsList = conversations.map((conver) => ({
@@ -141,6 +144,7 @@ const testc = asyncHandler(async (req, res) => {
       conversationId: conver.conversationId,
       id: results[index].id,
       fullname: results[index].fullname,
+      img:results[index].img
     }));
     res.status(200).json(finalResults);
   } catch (err) {

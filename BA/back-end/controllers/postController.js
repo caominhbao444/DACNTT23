@@ -171,8 +171,16 @@ const deletePost = asyncHandler(async (req, res) => {
 });
 
 const testPost = asyncHandler(async(req,res)=>{
-  const posts = await Post.find({accountId : req.params.accountId});
-  res.status(200).json(posts);
+  const posts = await Post.find({_id : req.params.id});
+  const postsList = posts.map((p) => ({
+    postId: p._id,
+    desc: p.desc,
+    like: p.like,
+    img: p.img,
+    createdAt:p.createdAt,
+    time: moment().tz('Asia/Ho_Chi_Minh').diff(moment(p.createdAt), 'hours') + ' giờ ' + moment().tz('Asia/Ho_Chi_Minh').diff(moment(p.createdAt), 'minutes') % 60 + ' phút'
+  }));
+  res.status(200).json(postsList);
 });
 
 module.exports = {

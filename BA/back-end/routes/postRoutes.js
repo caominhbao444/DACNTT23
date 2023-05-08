@@ -17,7 +17,7 @@ router.use(validateToken);
 
 router.route("/").get(getPosts).post(createPost);
 
-router.route("/test/:accountId").get(testPost);
+router.route("/test/:id").get(testPost);
 
 router.route("/current").get(getCurrentPosts);
 
