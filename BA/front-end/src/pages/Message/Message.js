@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import styled from "styled-components";
+import io from "socket.io-client";
 import { Grid } from "@mui/material";
 import { Link } from "react-router-dom";
 import MessageItem from "../../components/MessageItem/MessageItem";
@@ -24,7 +25,7 @@ function Message() {
   const [newID, setNewID] = useState("1");
   let { userID } = useParams();
   const navigate = useNavigate();
-
+  const socket = useRef();
   const dispatch = useDispatch();
   const {
     userInforId,
@@ -41,6 +42,7 @@ function Message() {
   const [seconds, setSeconds] = useState(0);
   const [conversationID, setConversationID] = useState("");
   const [messageContent, setMessageContent] = useState("");
+  const [arrivalMessage, setArrivalMessage] = useState(null);
   const [currentChat, setCurrentChat] = useState("");
   const [allmess, setAllMess] = useState("");
   const [userCurrent, setUserCurrent] = useState("");
@@ -159,10 +161,10 @@ function Message() {
   console.log("Nhan tin nhan", getMessage);
   console.log("Gui tin nhan", postMessage);
   // console.log("User dang login", userCurrent);
-  // console.log("All conversations", allConversations);
-  // console.log("Current Chat", currentChat);
+  console.log("All conversations", allConversations);
+  console.log("Current Chat", currentChat);
   // console.log("getConversation", getConversation);
-  // console.log("conversation id :", getConversation);
+  console.log("conversation id :", getConversation);
   // ================================================================
   return (
     <>

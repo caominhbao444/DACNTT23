@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
+import { vi } from "date-fns/locale";
 import Navbar from "../../components/Navbar/Navbar";
+import { formatDistance } from "date-fns";
 import Loading from "../../pages/Loading/Loading";
 import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
+import { Link, useNavigate } from "react-router-dom";
 import withReactContent from "sweetalert2-react-content";
 import io from "socket.io-client";
 import SideBar from "../../components/SideBar/SideBar";
@@ -14,18 +17,21 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { CallApiUser } from "../../features/userSlice";
-import { CallApiAllPosts } from "../../features/postSlice";
+import { CallApiAllPosts, CallApiCreatePost } from "../../features/postSlice";
+import { CircularProgress } from "@mui/material";
 const socket = io("http://localhost:5001");
 const MySwal = withReactContent(Swal);
 function Home() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const authToken = localStorage.getItem("authToken");
   const { userInfor } = useSelector((state) => state.user);
-  const { listPosts } = useSelector((state) => state.post);
+  const { listPosts, postCreate } = useSelector((state) => state.post);
   const [data, setData] = useState([]);
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState(null);
   const [textValue, setTextValue] = useState("");
+  const [showComments, setShowComments] = useState([]);
   const [textCommentValue, setTextCommentValue] = useState("");
   useEffect(() => {
     dispatch(
@@ -66,296 +72,318 @@ function Home() {
       }
     }
   }, [userInfor]);
-  if (!userInfor && !listPosts) {
-    return <Loading />;
-  }
-
+  // if (!userInfor && !listPosts && !SideBar) {
+  //   return <Loading />;
+  // }
+  const [comments, setComments] = useState("");
+  const daybefore = (time) => {
+    const date = new Date(time);
+    const timeDifference = formatDistance(date, new Date(), {
+      addSuffix: true,
+      locale: vi,
+    });
+    const capitalizedTimeDifference =
+      timeDifference.charAt(0).toUpperCase() + timeDifference.slice(1);
+    return capitalizedTimeDifference;
+  };
+  const handleShowComments = (postId) => {
+    const newShowComments = [...showComments];
+    newShowComments[postId] = !newShowComments[postId];
+    setShowComments(newShowComments);
+  };
   console.log(userInfor);
-
   return (
     <>
       <Navbar />
-      <HomePage style={{ backgroundColor: "#FFD4D8", position: "relative" }}>
-        <Grid container style={{ padding: "0" }}>
-          {/* Left */}
-          <SideBar />
-          {/* Main */}
-          <Grid item xs={6} md={6} style={{}}>
-            <section
-              className="main-component"
-              style={{
-                padding: "20px 0",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                width: "100%",
-                gap: "20px",
-                boxSizing: "border-box",
-              }}
-            >
-              {listPosts &&
-                listPosts
-                  .slice()
-                  .reverse()
-                  .map((post, index) => {
-                    return (
-                      <section
-                        key={index}
-                        className="main-post-item"
-                        style={{
-                          backgroundColor: "white",
-                          width: "100%",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        <div
-                          style={{
-                            padding: "20px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            gap: "10px",
-                          }}
-                        >
-                          <div
-                            className="img-container"
+      {!userInfor && !listPosts ? (
+        <CircularProgress />
+      ) : (
+        <>
+          <HomePage
+            style={{ backgroundColor: "#FFD4D8", position: "relative" }}
+          >
+            <Grid container style={{ padding: "0" }}>
+              {/* Left */}
+              <SideBar />
+              {/* Main */}
+              <Grid item xs={8} md={8} style={{}}>
+                <section
+                  className="main-component"
+                  style={{
+                    padding: "20px 0",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                    gap: "20px",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  {listPosts &&
+                    listPosts
+                      .slice()
+                      .reverse()
+                      .map((post, index) => {
+                        return (
+                          <section
+                            key={index}
+                            className="main-post-item"
                             style={{
-                              display: "flex",
-                              justifyContent: "flex-start",
-                              alignItems: "center",
-                              gap: "10px",
+                              backgroundColor: "white",
+                              width: "100%",
+                              borderRadius: "10px",
                             }}
                           >
-                            <img
-                              src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
-                              className="img-src"
-                              alt=""
-                              style={{
-                                height: "40px",
-                                width: "40px",
-                                borderRadius: "50%",
-                                overflow: "hidden",
-                              }}
-                            />
                             <div
                               style={{
+                                padding: "20px",
                                 display: "flex",
                                 flexDirection: "column",
+                                justifyContent: "center",
+                                gap: "10px",
                               }}
                             >
-                              <span style={{ fontWeight: "bold" }}>
-                                {post.fullname}
-                              </span>
-                              <span>10 phút trước</span>
-                            </div>
-                          </div>
-                          <img
-                            className="img-src"
-                            alt=""
-                            style={{
-                              height: "400px",
-                              width: "100%",
-                              objectFit: "cover",
-                              overflow: "hidden",
-                            }}
-                            src={post.img}
-                          ></img>
-                          <div style={{ width: "100%" }}>{post.desc}</div>
-                          <div
-                            className="emotions"
-                            style={{
-                              display: "flex",
-                              justifyContent: "flex-start",
-                              alignItems: "center",
-                              gap: "10px",
-                              height: "40px",
-                            }}
-                          >
-                            <ion-icon
-                              style={{
-                                cursor: "pointer",
-                                color: "red",
-                                height: "30px",
-                                width: "30px",
-                              }}
-                              name="heart"
-                            ></ion-icon>
-                            <ion-icon
-                              style={{
-                                cursor: "pointer",
-                                height: "30px",
-                                width: "30px",
-                              }}
-                              name="chatbubble-outline"
-                            ></ion-icon>
-                            <ion-icon
-                              style={{
-                                cursor: "pointer",
-                                color: "",
-                                height: "30px",
-                                width: "30px",
-                              }}
-                              name="share-social-outline"
-                            ></ion-icon>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "flex-start",
-                              gap: "5px",
-                            }}
-                          >
-                            {/* <Stack direction="row" spacing={-1}>
-                      <Avatar
-                        style={{
-                          height: "30px",
-                          width: "30px",
-                          fontSize: "15px",
-                        }}
-                        alt="Remy Sharp"
-                        src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
-                      />
-                      <Avatar
-                        style={{
-                          height: "30px",
-                          width: "30px",
-                          fontSize: "15px",
-                        }}
-                        alt="Travis Howard"
-                        src="https://images.unsplash.com/photo-1639149888905-fb39731f2e6c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHVzZXJ8ZW58MHx8MHx8&auto=format&fit=crop&w=600&q=60"
-                      />
-                      <Avatar
-                        style={{
-                          height: "30px",
-                          width: "30px",
-                          fontSize: "15px",
-                        }}
-                        alt="Cindy Baker"
-                        src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=600&q=60"
-                      />
-                    </Stack> */}
-                            <span>
-                              Được thích bởi Tiến Minh and 2,200 người khác
-                            </span>
-                          </div>
-                          <section
-                            className="containerComment"
-                            style={{
-                              width: "100%",
-                              position: "relative",
-                            }}
-                          >
-                            <img
-                              src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
-                              className="img-src"
-                              alt=""
-                              style={{
-                                height: "40px",
-                                width: "40px",
-                                borderRadius: "50%",
-                                overflow: "hidden",
-                                position: "absolute",
-                                left: "20px",
-                                top: "15px",
-                              }}
-                            />
-                            <textarea
-                              key={index}
-                              id="textComment"
-                              value={textCommentValue}
-                              onChange={handleTextComment}
-                            ></textarea>
-                            <button
-                              onClick={handleComment}
-                              type="button"
-                              style={{
-                                position: "absolute",
-                                right: "20px",
-                                top: "20px",
-                                padding: "5px 10px",
-                                borderRadius: "10px",
-                                // backgroundColor: COLORS.mainColor,
-                                backgroundColor: "#FC3208",
-                                color: "white",
-                                fontWeight: "bold",
-                                border: "none",
-                                boxSizing: "border-box",
-                                cursor: "pointer",
-                              }}
-                            >
-                              Đăng
-                            </button>
-                          </section>
-                          <div style={{}}>
-                            <div style={{ height: "100%", width: "100%" }}>
+                              <div
+                                className="img-container"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "flex-start",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() =>
+                                  navigate(`/profile/${post.account._id}`)
+                                }
+                              >
+                                <img
+                                  src={post.account.img}
+                                  className="img-src"
+                                  alt=""
+                                  style={{
+                                    height: "40px",
+                                    width: "40px",
+                                    borderRadius: "50%",
+                                    overflow: "hidden",
+                                    cursor: "pointer",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      fontWeight: "bold",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    {post.account.fullname}
+                                  </span>
+                                  <span>{daybefore(post.createdAt)}</span>
+                                </div>
+                              </div>
+                              <img
+                                className="img-src"
+                                alt=""
+                                style={{
+                                  height: "400px",
+                                  width: "100%",
+                                  objectFit: "cover",
+                                  objectPosition: "center",
+                                }}
+                                src={post.img}
+                              ></img>
+                              <div style={{ width: "100%" }}>{post.desc}</div>
+                              <div
+                                className="emotions"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "flex-start",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  height: "40px",
+                                }}
+                              >
+                                <ion-icon
+                                  style={{
+                                    cursor: "pointer",
+                                    color: "red",
+                                    height: "30px",
+                                    width: "30px",
+                                  }}
+                                  name="heart"
+                                ></ion-icon>
+                                <ion-icon
+                                  onClick={() => handleShowComments(index)}
+                                  style={{
+                                    cursor: "pointer",
+                                    height: "30px",
+                                    width: "30px",
+                                  }}
+                                  name="chatbubble-outline"
+                                ></ion-icon>
+                                <ion-icon
+                                  style={{
+                                    cursor: "pointer",
+                                    color: "",
+                                    height: "30px",
+                                    width: "30px",
+                                  }}
+                                  name="share-social-outline"
+                                ></ion-icon>
+                              </div>
                               <div
                                 style={{
-                                  display: "block",
-                                  marginRight: "10px",
-                                  fontWeight: "bold",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "flex-start",
+                                  gap: "5px",
                                 }}
                               >
-                                Minh Bảo
-                                <span style={{ marginLeft: "10px" }}>
-                                  {Readmore(
-                                    "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
-                                  )}
-                                  ...
+                                <span>
+                                  Được thích bởi Tiến Minh and 2,200 người khác
                                 </span>
                               </div>
-                            </div>
-                          </div>
-                          <div
-                            style={{
-                              width: "100%",
-                              padding: "0",
-                            }}
-                          >
-                            <span
-                              style={{
-                                display: "inline-block",
-                                fontWeight: "bold",
-                                marginRight: "5px",
-                              }}
-                            >
-                              Minh Baro
-                            </span>
-                            <span>
-                              {Readmore(
-                                "Proident eiusmod quiProident eiusmod quiProident eiusmod quiProident eiusmod quiProident eiusmod qui s veniam eiusmod ad eu deserunt laborum excepteur dolore voluptate et. Laboris laborum  eiusmod aliquip sint cupidatat anim voluptate est commodo"
+                              {showComments[index] && (
+                                <>
+                                  <section
+                                    className="containerComment"
+                                    style={{
+                                      width: "100%",
+                                      position: "relative",
+                                    }}
+                                  >
+                                    <img
+                                      src={userInfor.account.img}
+                                      className="img-src"
+                                      alt=""
+                                      style={{
+                                        height: "40px",
+                                        width: "40px",
+                                        borderRadius: "50%",
+                                        overflow: "hidden",
+                                        position: "absolute",
+                                        left: "20px",
+                                        top: "15px",
+                                      }}
+                                    />
+                                    {/* <textarea
+                                  key={index}
+                                  id="textComment"
+                                  value={textCommentValue}
+                                  onChange={handleTextComment}
+                                ></textarea> */}
+                                    <textarea
+                                      key={index}
+                                      id={"textComment"}
+                                      value={comments[index]}
+                                      onChange={(e) => {
+                                        const newComments = [...comments];
+                                        newComments[index] = e.target.value;
+                                        setComments(newComments);
+                                      }}
+                                    ></textarea>
+                                    <button
+                                      onClick={() => {
+                                        alert(comments[index]);
+                                      }}
+                                      type="button"
+                                      style={{
+                                        position: "absolute",
+                                        right: "20px",
+                                        top: "20px",
+                                        padding: "5px 10px",
+                                        borderRadius: "10px",
+                                        // backgroundColor: COLORS.mainColor,
+                                        backgroundColor: "#FC3208",
+                                        color: "white",
+                                        fontWeight: "bold",
+                                        border: "none",
+                                        boxSizing: "border-box",
+                                        cursor: "pointer",
+                                      }}
+                                    >
+                                      Đăng
+                                    </button>
+                                  </section>
+                                  <div style={{}}>
+                                    <div
+                                      style={{ height: "100%", width: "100%" }}
+                                    >
+                                      <div
+                                        style={{
+                                          display: "block",
+                                          marginRight: "10px",
+                                          fontWeight: "bold",
+                                        }}
+                                      >
+                                        Minh Bảo
+                                        <span style={{ marginLeft: "10px" }}>
+                                          {Readmore(
+                                            "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
+                                          )}
+                                          ...
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style={{
+                                      width: "100%",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    <span
+                                      style={{
+                                        display: "inline-block",
+                                        fontWeight: "bold",
+                                        marginRight: "5px",
+                                      }}
+                                    >
+                                      Minh Baro
+                                    </span>
+                                    <span>
+                                      {Readmore(
+                                        "Proident eiusmod quiProident eiusmod quiProident eiusmod quiProident eiusmod quiProident eiusmod qui s veniam eiusmod ad eu deserunt laborum excepteur dolore voluptate et. Laboris laborum  eiusmod aliquip sint cupidatat anim voluptate est commodo"
+                                      )}
+                                      ...
+                                    </span>
+                                  </div>
+                                  <div style={{}}>
+                                    <div style={{ height: "100%" }}>
+                                      <span
+                                        style={{
+                                          marginRight: "10px",
+                                          fontWeight: "bold",
+                                        }}
+                                      >
+                                        Minh Bảo
+                                      </span>
+                                      <span>
+                                        {Readmore(
+                                          "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
+                                        )}
+                                        ...
+                                      </span>
+                                    </div>
+                                  </div>
+                                </>
                               )}
-                              ...
-                            </span>
-                          </div>
-                          <div style={{}}>
-                            <div style={{ height: "100%" }}>
-                              <span
-                                style={{
-                                  marginRight: "10px",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                Minh Bảo
-                              </span>
-                              <span>
-                                {Readmore(
-                                  "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
-                                )}
-                                ...
-                              </span>
                             </div>
-                          </div>
-                        </div>
-                      </section>
-                    );
-                  })}
-            </section>
-          </Grid>
-          {/* Right */}
-          <RequestFriends />
-        </Grid>
-      </HomePage>
+                          </section>
+                        );
+                      })}
+                </section>
+              </Grid>
+              {/* Right */}
+              {/* <RequestFriends /> */}
+            </Grid>
+          </HomePage>
+        </>
+      )}
     </>
   );
 }
