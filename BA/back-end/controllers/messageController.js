@@ -7,10 +7,12 @@ const moment = require("moment-timezone");
 
 const createMessage = asyncHandler(async (req, res) => {
   try {
+    const account = await Account.findOne(req.account);
     const message = new Message({
       conversationId: req.params.id,
-      senderId: req.account.id,
-      fullname: req.account.fullname,
+      senderId: account.id,
+      fullname: account.fullname,
+      img:account.img,
       text: req.body.text,
       createdAt: moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss'),
     });
@@ -42,10 +44,10 @@ const getMessage = asyncHandler(async (req, res) => {
 });
 
 const testm = asyncHandler(async (req, res) => {
-  const messages = await Conversation.find({ receiverId: req.params.id });
-  const conversationIds = messages.map((message) => message._id);
-
-  res.status(200).json(conversationIds);
+  // const messages = await Conversation.find({ receiverId: req.params.id });
+  // const conversationIds = messages.map((message) => message._id);
+  const account = await Account.findOne(req.account);
+  res.status(200).json(account);
 });
 
 module.exports = { createMessage, getMessage, testm };

@@ -57,7 +57,7 @@ const getCommentsAllPost = asyncHandler(async (req, res) => {
     createdAt: p.createdAt,
     userId: inforUser[index]._id,
     fullname: inforUser[index].fullname,
-    userimg: inforUser[index].img,
+    userImg: inforUser[index].img,
   }));
   const postComments = [];
   for (const postId of postIds) {
