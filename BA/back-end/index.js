@@ -60,7 +60,7 @@ io.on("connection", (socket) => {
     io.emit("getUsers", users);
   });
 
-  socket.on("join", ({ username, room }) => {
+  socket.on("join-room", ({ username, room }) => {
     socket.join(room);
     socket.emit("message", {
       text: `${username}, welcome to room ${room}.`,
