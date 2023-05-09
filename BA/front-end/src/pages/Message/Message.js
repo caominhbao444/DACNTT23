@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import styled from "styled-components";
 import io from "socket.io-client";
-import { Grid } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
 import MessageItem from "../../components/MessageItem/MessageItem";
 import Conversation from "../../components/Conversation/Conversation";
@@ -21,11 +21,13 @@ import {
 } from "../../features/userSlice";
 import { useParams, useNavigate } from "react-router-dom";
 import Loading from "../Loading/Loading";
+
+const ENDPOINT = "http://localhost:5001"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+var socket, selectedChatCompare;
 function Message() {
   const [newID, setNewID] = useState("1");
   let { userID } = useParams();
   const navigate = useNavigate();
-  const socket = useRef();
   const dispatch = useDispatch();
   const {
     userInforId,
@@ -39,6 +41,7 @@ function Message() {
   } = useSelector((state) => state.user);
   const authToken = localStorage.getItem("authToken");
   const [isOur, setIsOur] = useState("our");
+  const [socketConnected, setSocketConnected] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [conversationID, setConversationID] = useState("");
   const [messageContent, setMessageContent] = useState("");
@@ -49,6 +52,8 @@ function Message() {
   const [allConversations, setAllConversations] = useState([]);
   const [listOnline, setListOnline] = useState("");
   const [listChat, setListChat] = useState("1");
+
+  const [messageList, setMessageList] = useState([]);
   const [bao, setBao] = useState("bao");
 
   if (!userID) {
@@ -63,6 +68,9 @@ function Message() {
     ).then((response) => {
       setAllConversations(response.payload);
     });
+  }, []);
+
+  useEffect(() => {
     dispatch(
       CallApiUser({
         headers: { authorization: `Bearer ${authToken}` },
@@ -71,9 +79,22 @@ function Message() {
       setUserCurrent(response.payload.account._id);
     });
   }, []);
-  // console.log(userCurrent);
+
   useEffect(() => {
-    // console.log(userID);
+    socket = io(ENDPOINT);
+    socket.emit("setup", userID);
+
+    socket.on("new message", (data) => {
+      console.log(`New message: ${data.message}`);
+      setAllMess((prevMessages) => [...prevMessages, data]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [userID]);
+
+  useEffect(() => {
     dispatch(
       CallGetInforConversation({
         headers: { authorization: `Bearer ${authToken}` },
@@ -82,45 +103,10 @@ function Message() {
     ).then((response) => {
       setConversationID(response.payload[0].conversationId);
     });
-    // dispatch(
-    //   CallGetMessage({
-    //     headers: { authorization: `Bearer ${authToken}` },
-    //     conversationID,
-    //   })
-    // ).then((response) => {
-    //   setAllMess(response.payload);
-    // });
   }, [userID]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    dispatch(
-      CallPostMessage({
-        headers: { authorization: `Bearer ${authToken}` },
-        conversationID,
-        text: messageContent,
-      })
-    ).then((response) => {
-      setMessageContent("");
-      setConversationID(response.payload.conversationId);
-    });
-  };
 
   useEffect(() => {
     if (conversationID) {
-      // const intervalId = setInterval(() => {
-      //   setSeconds((seconds) => seconds + 1);
-      //   dispatch(
-      //     CallGetMessage({
-      //       headers: { authorization: `Bearer ${authToken}` },
-      //       conversationID,
-      //     })
-      //   ).then((response) => {
-      //     setAllMess(response.payload);
-      //   });
-      // }, 500);
-
-      // return () => clearInterval(intervalId);
       dispatch(
         CallGetMessage({
           headers: { authorization: `Bearer ${authToken}` },
@@ -129,8 +115,37 @@ function Message() {
       ).then((response) => {
         setAllMess(response.payload);
       });
+      socket.emit("join chat", conversationID);
     }
   }, [conversationID]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await dispatch(
+      CallPostMessage({
+        headers: { authorization: `Bearer ${authToken}` },
+        conversationID,
+        text: messageContent,
+      })
+    );
+    console.log(response.payload);
+    socket.emit("new message", {
+      text: response.payload.text,
+      fullname: response.payload.fullname,
+      room: response.payload.conversationId,
+      img: response.payload.img,
+    });
+    setMessageContent("");
+    dispatch(
+      CallGetMessage({
+        headers: { authorization: `Bearer ${authToken}` },
+        conversationID: response.payload.conversationId,
+      })
+    ).then((response) => {
+      setAllMess(response.payload);
+    });
+  };
+
   useEffect(() => {
     if (postMessage) {
       dispatch(
@@ -142,7 +157,7 @@ function Message() {
         setAllMess(response.payload);
       });
     }
-  }, [postMessage]);
+  }, [postMessage, authToken]);
   if (
     !userInforId &&
     !userInfor &&
@@ -158,13 +173,13 @@ function Message() {
 
   // ================================================================
   // console.log("All Message", allmess);
-  console.log("Nhan tin nhan", getMessage);
-  console.log("Gui tin nhan", postMessage);
-  // console.log("User dang login", userCurrent);
-  console.log("All conversations", allConversations);
-  console.log("Current Chat", currentChat);
-  // console.log("getConversation", getConversation);
-  console.log("conversation id :", getConversation);
+  // console.log("Nhan tin nhan", getMessage);
+  // console.log("Gui tin nhan", postMessage);
+  // // console.log("User dang login", userCurrent);
+  // console.log("All conversations", allConversations);
+  // console.log("Current Chat", currentChat);
+  // // console.log("getConversation", getConversation);
+  // console.log("conversation id :", getConversation);
   // ================================================================
   return (
     <>
@@ -250,7 +265,7 @@ function Message() {
                             }}
                           >
                             <img
-                              src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                              src={item.img}
                               className="img-src"
                               alt=""
                               style={{
@@ -373,7 +388,7 @@ function Message() {
                       }}
                     >
                       <img
-                        src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                        src={getConversation[0].img}
                         className="img-src"
                         alt=""
                         style={{
@@ -411,23 +426,32 @@ function Message() {
                       }}
                       className="message-area"
                     >
-                      {getMessage &&
-                        getMessage
-                          .slice()
-                          .reverse()
-                          .map((mess, index) => {
-                            return (
-                              <>
-                                <MessageItem
-                                  key={getMessage.length - index}
-                                  name={mess.fullname}
-                                  sender={mess.senderId}
-                                  content={mess.text}
-                                  userCurrent={userCurrent}
-                                />
-                              </>
-                            );
-                          })}
+                      {!getMessage ? (
+                        <CircularProgress
+                          style={{ height: "100%", width: "100%" }}
+                        />
+                      ) : (
+                        <>
+                          {allmess &&
+                            allmess
+                              .slice()
+                              .reverse()
+                              .map((mess, index) => {
+                                return (
+                                  <>
+                                    <MessageItem
+                                      key={getMessage.length - index}
+                                      name={mess.fullname}
+                                      sender={mess.senderId}
+                                      content={mess.text}
+                                      userCurrent={userCurrent}
+                                      img={mess.img}
+                                    />
+                                  </>
+                                );
+                              })}
+                        </>
+                      )}
                     </div>
                     <div
                       style={{

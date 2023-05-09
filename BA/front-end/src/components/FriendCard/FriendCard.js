@@ -31,11 +31,14 @@ function FriendCard(props) {
         headers: headers,
       })
       .then((response) => {
-        console.log(response.data);
         navigate(`/message/${userID}`);
       })
       .catch((error) => {
-        console.log(error);
+        if (error.response && error.response.status === 403) {
+          navigate(`/message/${userID}`);
+        } else {
+          console.log(error);
+        }
       });
   };
 

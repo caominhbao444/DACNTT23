@@ -19,7 +19,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { CallApiUser } from "../../features/userSlice";
 import { CallApiAllPosts, CallApiCreatePost } from "../../features/postSlice";
 import { CircularProgress } from "@mui/material";
-const socket = io("http://localhost:5001");
 const MySwal = withReactContent(Swal);
 function Home() {
   const navigate = useNavigate();
@@ -94,11 +93,11 @@ function Home() {
   console.log(userInfor);
   return (
     <>
-      <Navbar />
       {!userInfor && !listPosts ? (
         <CircularProgress />
       ) : (
         <>
+          <Navbar />
           <HomePage
             style={{ backgroundColor: "#FFD4D8", position: "relative" }}
           >

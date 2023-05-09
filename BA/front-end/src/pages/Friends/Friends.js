@@ -56,6 +56,7 @@ function Friends() {
   if (!userInforId && !userInfor && !allUserInfor && !listFriends) {
     return <Loading />;
   }
+  console.log(listFriends);
   return (
     <>
       <Navbar />

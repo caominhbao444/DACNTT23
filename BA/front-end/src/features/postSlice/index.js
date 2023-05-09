@@ -15,7 +15,7 @@ export const CallApiAllPosts = createAsyncThunk(
   async function ({ headers }) {
     try {
       const apiAllPostsResponse = await axios.get(
-        `http://localhost:5001/api/posts/`,
+        `http://localhost:5001/api/posts/all`,
         {
           headers: {
             Authorization: headers.authorization,
