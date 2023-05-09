@@ -34,7 +34,7 @@ httpServer.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 const io = require("socket.io")(httpServer, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
   },
 });
 // let users = [];
