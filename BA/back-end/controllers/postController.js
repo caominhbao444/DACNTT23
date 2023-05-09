@@ -193,20 +193,27 @@ const likePost = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Post not found");
   }
-  const likedByUser = post.likes.some((like) => like.accountId == req.account.id);
+  const likedByUser = post.likes.some(
+    (like) => like.accountId == req.account.id
+  );
   if (likedByUser) {
-    await post.updateOne(
-      { $pull: { likes: { accountId: req.account.id , fullname : req.account.fullname} } }
-    );
-    console.log("NOT OK!!!");
+    await post.updateOne({
+      $pull: {
+        likes: { accountId: req.account.id, fullname: req.account.fullname },
+      },
+    });
+    console.log("DisLike !!!");
   } else {
-    await post.updateOne(
-      { $push: { likes: { accountId: req.account.id , fullname : req.account.fullname} } }
-    );
-    console.log("OK !!!");
-    }
-    const updatedPost = await Post.findById(req.params.id);
-    res.status(200).json(updatedPost);
+    await post.updateOne({
+      $push: {
+        likes: { accountId: req.account.id, fullname: req.account.fullname },
+      },
+    });
+    console.log("Like !!!");
+  }
+  const updatedPost = await Post.findById(req.params.id);
+  const numLikes = updatedPost.likes.length;
+  res.status(200).json({ postId : updatedPost._id,likes: updatedPost.likes, numLikes });
 });
 
 module.exports = {
