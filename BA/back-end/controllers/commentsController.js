@@ -1,8 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const Post = require("../models/postModel");
+const Account = require("../models/accountModel");
 const Comments = require("../models/commentsModel");
 const moment = require("moment-timezone");
-const { post } = require("../routes/userRoutes");
 
 const createComments = asyncHandler(async (req, res) => {
   try {
@@ -61,10 +61,54 @@ const getCommentsAllPost = asyncHandler(async (req, res) => {
   }));
   const postComments = [];
   for (const postId of postIds) {
-    const postCommentList = commentList.filter((c) => c.postId.toString() === postId.toString());
+    const postCommentList = commentList.filter(
+      (c) => c.postId.toString() === postId.toString()
+    );
     postComments.push({ postId, postComments: postCommentList });
   }
   res.status(200).json(postComments);
 });
 
-module.exports = { createComments, getCommentsPost, getCommentsAllPost };
+const updateComments = asyncHandler(async (req, res) => {
+  const account = await Account.findOne(req.account);
+  const checkComment = await Comments.findById(req.params.id);
+
+  const checkAccount = await Account.findOne(req.params.accountId);
+
+  const checkPost = await Post.findOne(req.params.postId);
+
+  if(checkAccount && checkPost){
+    if (checkComment.senderId != account._id) {
+      res.status(403).json("Không được phép chỉnh sửa");
+    } else {
+      const comment = await Comments.findByIdAndUpdate(
+        req.params.id,
+        {
+          content: req.body.content,
+          updatedAt: moment()
+            .tz("Asia/Ho_Chi_Minh")
+            .format("YYYY-MM-DD HH:mm:ss"),
+        },
+        {
+          new: true,
+        }
+      );
+      if (!comment) {
+        res.status(404).json("Không tìm thấy bình luận");
+      } else {
+        res.status(201).json(comment);
+      }
+    }
+  }else{
+    res.status(404).json("không tìm thấy bài viết chứa bình luận")
+  }
+
+  
+});
+
+module.exports = {
+  createComments,
+  getCommentsPost,
+  getCommentsAllPost,
+  updateComments,
+};

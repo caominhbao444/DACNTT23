@@ -16,15 +16,15 @@ const validateToken = require("../middleware/validateTokenHandler");
 router.use(validateToken);
 
 
-router.route("/").get(getPosts).post(createPost);
+router.route("/all").get(getPosts).post(createPost);
 
-router.route("/test/:id").get(testPost);
+router.route("/:accountId").get(getAllPostUser);
 
 router.route("/current").get(getCurrentPosts);
 
-router.route("/like/:id").post(likePost);
+router.route("/test/:id").get(testPost);
 
-router.route("/:accountId").get(getAllPostUser);
+router.route("/like/:id").post(likePost);
 
 // userId / id bài post nhé
 router.route("/:accountId/:id").get(getPostById).put(updatePost).delete(deletePost);

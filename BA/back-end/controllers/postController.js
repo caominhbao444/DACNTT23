@@ -13,9 +13,11 @@ const getPosts = asyncHandler(async (req, res) => {
     const postsList = posts.map((p) => ({
       postId: p._id,
       desc: p.desc,
-      like: p.like,
+      like: p.likes,
+      numLike: p.likes.length,
       img: p.img,
       createdAt: p.createdAt,
+      updatedAt : p.updatedAt,
       account: users.find((u) => u._id.toString() === p.accountId.toString()),
     }));
 
@@ -28,6 +30,7 @@ const getPosts = asyncHandler(async (req, res) => {
 const getCurrentPosts = asyncHandler(async (req, res) => {
   try {
     const posts = await Post.find({ accountId: req.account.id });
+
     const accountIds = posts.map((p) => p.accountId);
 
     const users = await Account.find({ _id: { $in: accountIds } });
@@ -35,9 +38,11 @@ const getCurrentPosts = asyncHandler(async (req, res) => {
     const postsList = posts.map((p) => ({
       postId: p._id,
       desc: p.desc,
-      like: p.like,
+      like: p.likes,
+      numLike: p.likes.length,
       img: p.img,
       createdAt: p.createdAt,
+      updatedAt: p.updatedAt
     }));
 
     const inforUser = posts.map((p) =>
@@ -48,8 +53,10 @@ const getCurrentPosts = asyncHandler(async (req, res) => {
       postId: p.postId,
       desc: p.desc,
       like: p.like,
+      numlike: p.numLike,
       img: p.img,
       createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
       id: inforUser[index]._id,
       fullname: inforUser[index].fullname,
       userimg: inforUser[index].img,
@@ -88,8 +95,11 @@ const getPostById = asyncHandler(async (req, res) => {
     const postsList = posts.map((p) => ({
       postId: p._id,
       desc: p.desc,
-      like: p.like,
+      like: p.likes,
+      numLike: p.likes.length,
       img: p.img,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt
     }));
 
     const inforUser = posts.map((p) =>
@@ -100,8 +110,10 @@ const getPostById = asyncHandler(async (req, res) => {
       postId: p.postId,
       desc: p.desc,
       like: p.like,
+      numLike: p.numLike,
       img: p.img,
-      createdAt: moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
       id: inforUser[index]._id,
       fullname: inforUser[index].fullname,
       userimg: inforUser[index].img,
@@ -124,9 +136,10 @@ const getAllPostUser = asyncHandler(async (req, res) => {
     const postsList = posts.map((p) => ({
       postId: p._id,
       desc: p.desc,
-      like: p.like,
+      like: p.likes,
       img: p.img,
       createdAt: p.createdAt,
+      updatedAt : p.updatedAt
     }));
 
     const inforUser = posts.map((p) =>
@@ -136,9 +149,10 @@ const getAllPostUser = asyncHandler(async (req, res) => {
     const finalResults = postsList.map((p, index) => ({
       postId: p.postId,
       desc: p.desc,
-      like: p.like,
+      like: p.likes,
       img: p.img,
       createdAt: p.createdAt,
+      updatedAt : p.updatedAt,
       id: inforUser[index]._id,
       fullname: inforUser[index].fullname,
       userimg: inforUser[index].img,
@@ -151,7 +165,28 @@ const getAllPostUser = asyncHandler(async (req, res) => {
 });
 
 const updatePost = asyncHandler(async (req, res) => {
-  res.json({ message: "update Post" });
+const account = await Account.findOne(req.account);
+const checkPost = await Post.findById(req.params.id);
+if (checkPost.accountId != account._id) {
+  res.status(403).json("Không được phép chỉnh sửa");
+} else {
+  const post = await Post.findByIdAndUpdate(
+    req.params.id,
+    {
+      desc: req.body.desc,
+      img:req.body.img,
+      updatedAt: moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
+    },
+    {
+      new: true,
+    }
+  );
+  if (!post) {
+    res.status(404).json("Không tìm thấy bài viết");
+  } else {
+    res.status(201).json(post);
+  }
+}
 });
 
 const deletePost = asyncHandler(async (req, res) => {
@@ -167,24 +202,6 @@ const deletePost = asyncHandler(async (req, res) => {
   } catch (err) {
     res.status(500).json(err);
   }
-});
-
-const testPost = asyncHandler(async (req, res) => {
-  const posts = await Post.find({ _id: req.params.id });
-  const postsList = posts.map((p) => ({
-    postId: p._id,
-    desc: p.desc,
-    like: p.like,
-    img: p.img,
-    createdAt: p.createdAt,
-    time:
-      moment().tz("Asia/Ho_Chi_Minh").diff(moment(p.createdAt), "hours") +
-      " giờ " +
-      (moment().tz("Asia/Ho_Chi_Minh").diff(moment(p.createdAt), "minutes") %
-        60) +
-      " phút",
-  }));
-  res.status(200).json(postsList);
 });
 
 const likePost = asyncHandler(async (req, res) => {
@@ -213,7 +230,28 @@ const likePost = asyncHandler(async (req, res) => {
   }
   const updatedPost = await Post.findById(req.params.id);
   const numLikes = updatedPost.likes.length;
-  res.status(200).json({ postId : updatedPost._id,likes: updatedPost.likes, numLikes });
+  res
+    .status(200)
+    .json({ postId: updatedPost._id, likes: updatedPost.likes, numLikes });
+});
+
+const testPost = asyncHandler(async (req, res) => {
+  const posts = await Post.find({ _id: req.params.id });
+  const postsList = posts.map((p) => ({
+    postId: p._id,
+    desc: p.desc,
+    like: p.like,
+    img: p.img,
+    createdAt: p.createdAt,
+    updatedAt : p.updatedAt,
+    time:
+      moment().tz("Asia/Ho_Chi_Minh").diff(moment(p.createdAt), "hours") +
+      " giờ " +
+      (moment().tz("Asia/Ho_Chi_Minh").diff(moment(p.createdAt), "minutes") %
+        60) +
+      " phút",
+  }));
+  res.status(200).json(postsList);
 });
 
 module.exports = {

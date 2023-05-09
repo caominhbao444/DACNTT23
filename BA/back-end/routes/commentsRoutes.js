@@ -5,18 +5,23 @@ const {
   createComments,
   getCommentsPost,
   getCommentsAllPost,
+  updateComments,
 } = require("../controllers//commentsController");
 const validateToken = require("../middleware/validateTokenHandler");
 const { route } = require("./userRoutes");
 router.use(validateToken);
 
-//tạo comment
+//tạo comment , id của post
 router.route("/:id").post(createComments);
 
 //lấy tất cả comments của tất cả bài post
 router.route("/").get(getCommentsAllPost);
 
-//lấy hết comments của bài post
+//lấy hết comments của bài post , id của post
 router.route("/:id").get(getCommentsPost);
+
+//accountId, postId , id của comment
+router.route("/accountId/:postId/:id").put(updateComments);
+
 
 module.exports = router;

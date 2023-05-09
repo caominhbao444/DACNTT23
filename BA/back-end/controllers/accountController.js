@@ -210,7 +210,6 @@ const friendsAccount = asyncHandler(async (req, res) => {
   //   });
   //   res.status(200).json(friendList);
   // });
-
   try {
     const account = await Account.findOne(req.account).lean();
     const friendIds = account.followings;

@@ -3,24 +3,25 @@ const Conversation = require("../models/conversationModel");
 const Account = require("../models/accountModel");
 
 const createConversation = asyncHandler(async (req, res) => {
-  try {
-      const conversation = await Conversation.find()
-      
-      if (conversation.some((c) => c.senderId === req.account.id && c.receiverId === req.params.id || c.senderId === req.params.id && c.receiverId === req.account.id)) {
-        res.status(403).json({
-          checkConversation: 1,
-          message: "cuộc trò chuyện đã tồn tại",
-        });
-      } else if (!conversation && req.account.id != req.params.id) {
-        const newConversation = new Conversation({
-          senderId: req.account.id,
-          receiverId: req.params.id,
-        });
-        const savedConversation = await newConversation.save();
-        res.status(200).json(savedConversation);
-      }
-  } catch (err) {
-    res.status(500).json(err);
+  const conversations = await Conversation.find({
+    $or: [
+      { senderId: req.account.id, receiverId: req.params.id },
+      { senderId: req.params.id, receiverId: req.account.id },
+    ],
+  });
+  
+  if (conversations.length > 0) {
+    res.status(403).json({
+      checkConversation: 1,
+      message: "cuộc trò chuyện đã tồn tại",
+    });
+  } else if (req.account.id !== req.params.id) {
+    const newConversation = new Conversation({
+      senderId: req.account.id,
+      receiverId: req.params.id,
+    });
+    const savedConversation = await newConversation.save();
+    res.status(200).json(savedConversation);
   }
 });
 
@@ -61,7 +62,7 @@ const getConversationsById = asyncHandler(async (req, res) => {
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
-      img:result.img
+      img: result.img,
     }));
 
     const conversationsList = conversations.map((conver) => ({
@@ -72,7 +73,7 @@ const getConversationsById = asyncHandler(async (req, res) => {
       conversationId: conver.conversationId,
       id: results[index].id,
       fullname: results[index].fullname,
-      img:results[index].img
+      img: results[index].img,
     }));
     res.status(200).json(finalResults);
   } catch (err) {
@@ -97,7 +98,7 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
-      img:result.img
+      img: result.img,
     }));
 
     const conversationsList = conversations.map((conver) => ({
@@ -108,7 +109,7 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
       conversationId: conver.conversationId,
       id: results[index].id,
       fullname: results[index].fullname,
-      img:results[index].img
+      img: results[index].img,
     }));
     res.status(200).json(finalResults);
   } catch (err) {
@@ -133,7 +134,7 @@ const testc = asyncHandler(async (req, res) => {
     const results = users.map((result) => ({
       id: result._id,
       fullname: result.fullname,
-      img:result.img
+      img: result.img,
     }));
 
     const conversationsList = conversations.map((conver) => ({
@@ -144,7 +145,7 @@ const testc = asyncHandler(async (req, res) => {
       conversationId: conver.conversationId,
       id: results[index].id,
       fullname: results[index].fullname,
-      img:results[index].img
+      img: results[index].img,
     }));
     res.status(200).json(finalResults);
   } catch (err) {
