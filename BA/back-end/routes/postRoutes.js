@@ -9,6 +9,7 @@ const {
   getCurrentPosts,
   getAllPostUser,
   testPost,
+  likePost,
 } = require("../controllers/postController");
 
 const validateToken = require("../middleware/validateTokenHandler");
@@ -21,6 +22,7 @@ router.route("/test/:id").get(testPost);
 
 router.route("/current").get(getCurrentPosts);
 
+router.route("/like/:id").post(likePost);
 
 router.route("/:accountId").get(getAllPostUser);
 

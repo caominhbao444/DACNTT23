@@ -15,7 +15,7 @@ const getPosts = asyncHandler(async (req, res) => {
       desc: p.desc,
       like: p.like,
       img: p.img,
-      createdAt:p.createdAt,
+      createdAt: p.createdAt,
       account: users.find((u) => u._id.toString() === p.accountId.toString()),
     }));
 
@@ -37,7 +37,7 @@ const getCurrentPosts = asyncHandler(async (req, res) => {
       desc: p.desc,
       like: p.like,
       img: p.img,
-      createdAt:p.createdAt,
+      createdAt: p.createdAt,
     }));
 
     const inforUser = posts.map((p) =>
@@ -49,7 +49,7 @@ const getCurrentPosts = asyncHandler(async (req, res) => {
       desc: p.desc,
       like: p.like,
       img: p.img,
-      createdAt:p.createdAt,
+      createdAt: p.createdAt,
       id: inforUser[index]._id,
       fullname: inforUser[index].fullname,
       userimg: inforUser[index].img,
@@ -67,7 +67,7 @@ const createPost = asyncHandler(async (req, res) => {
       accountId: req.account.id,
       desc: req.body.desc,
       img: req.body.img,
-      createdAt: moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss'),
+      createdAt: moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
     });
     const savePost = await newPost.save();
     res.status(200).json(savePost);
@@ -101,10 +101,10 @@ const getPostById = asyncHandler(async (req, res) => {
       desc: p.desc,
       like: p.like,
       img: p.img,
-      createdAt: moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss'),
+      createdAt: moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
       id: inforUser[index]._id,
       fullname: inforUser[index].fullname,
-      userimg:inforUser[index].img
+      userimg: inforUser[index].img,
     }));
 
     res.status(200).json(finalResults);
@@ -113,10 +113,9 @@ const getPostById = asyncHandler(async (req, res) => {
   }
 });
 
-
-const getAllPostUser = asyncHandler(async(req,res)=>{
+const getAllPostUser = asyncHandler(async (req, res) => {
   try {
-    const posts = await Post.find({accountId : req.params.accountId});
+    const posts = await Post.find({ accountId: req.params.accountId });
 
     const accountIds = posts.map((p) => p.accountId);
 
@@ -127,7 +126,7 @@ const getAllPostUser = asyncHandler(async(req,res)=>{
       desc: p.desc,
       like: p.like,
       img: p.img,
-      createdAt:p.createdAt,
+      createdAt: p.createdAt,
     }));
 
     const inforUser = posts.map((p) =>
@@ -139,7 +138,7 @@ const getAllPostUser = asyncHandler(async(req,res)=>{
       desc: p.desc,
       like: p.like,
       img: p.img,
-      createdAt:p.createdAt,
+      createdAt: p.createdAt,
       id: inforUser[index]._id,
       fullname: inforUser[index].fullname,
       userimg: inforUser[index].img,
@@ -170,17 +169,44 @@ const deletePost = asyncHandler(async (req, res) => {
   }
 });
 
-const testPost = asyncHandler(async(req,res)=>{
-  const posts = await Post.find({_id : req.params.id});
+const testPost = asyncHandler(async (req, res) => {
+  const posts = await Post.find({ _id: req.params.id });
   const postsList = posts.map((p) => ({
     postId: p._id,
     desc: p.desc,
     like: p.like,
     img: p.img,
-    createdAt:p.createdAt,
-    time: moment().tz('Asia/Ho_Chi_Minh').diff(moment(p.createdAt), 'hours') + ' giờ ' + moment().tz('Asia/Ho_Chi_Minh').diff(moment(p.createdAt), 'minutes') % 60 + ' phút'
+    createdAt: p.createdAt,
+    time:
+      moment().tz("Asia/Ho_Chi_Minh").diff(moment(p.createdAt), "hours") +
+      " giờ " +
+      (moment().tz("Asia/Ho_Chi_Minh").diff(moment(p.createdAt), "minutes") %
+        60) +
+      " phút",
   }));
   res.status(200).json(postsList);
+});
+
+const likePost = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404);
+    throw new Error("Post not found");
+  }
+  const likedByUser = post.likes.some((like) => like.accountId == req.account.id);
+  if (likedByUser) {
+    await post.updateOne(
+      { $pull: { likes: { accountId: req.account.id , fullname : req.account.fullname} } }
+    );
+    console.log("NOT OK!!!");
+  } else {
+    await post.updateOne(
+      { $push: { likes: { accountId: req.account.id , fullname : req.account.fullname} } }
+    );
+    console.log("OK !!!");
+    }
+    const updatedPost = await Post.findById(req.params.id);
+    res.status(200).json(updatedPost);
 });
 
 module.exports = {
@@ -191,5 +217,6 @@ module.exports = {
   updatePost,
   deletePost,
   getAllPostUser,
-  testPost
+  testPost,
+  likePost,
 };
