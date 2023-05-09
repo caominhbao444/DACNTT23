@@ -32,6 +32,28 @@ const getCommentsPost = asyncHandler(async (req, res) => {
     _id: p._id,
     content: p.content,
     createdAt: p.createdAt,
+    updatedAt : p.updatedAt,
+    userId: inforUser[index]._id,
+    fullname: inforUser[index].fullname,
+    userimg: inforUser[index].img,
+  }));
+  res.status(200).json(commentList);
+});
+
+const getSingleCommentsPost = asyncHandler(async(req,res)=>{
+  const comments = await Comments.find({ postId: req.params.postId, _id: req.params.id });
+  const accountIds = comments.map((p) => p.senderId);
+
+  const users = await Account.find({ _id: { $in: accountIds } });
+  const inforUser = comments.map((p) =>
+    users.find((u) => u._id.toString() === p.senderId.toString())
+  );
+
+  const commentList = comments.map((p, index) => ({
+    _id: p._id,
+    content: p.content,
+    createdAt: p.createdAt,
+    updatedAt : p.updatedAt,
     userId: inforUser[index]._id,
     fullname: inforUser[index].fullname,
     userimg: inforUser[index].img,
@@ -55,6 +77,7 @@ const getCommentsAllPost = asyncHandler(async (req, res) => {
     content: p.content,
     postId: p.postId,
     createdAt: p.createdAt,
+    updatedAt : p.updatedAt,
     userId: inforUser[index]._id,
     fullname: inforUser[index].fullname,
     userImg: inforUser[index].img,
@@ -71,44 +94,38 @@ const getCommentsAllPost = asyncHandler(async (req, res) => {
 
 const updateComments = asyncHandler(async (req, res) => {
   const account = await Account.findOne(req.account);
-  const checkComment = await Comments.findById(req.params.id);
-
-  const checkAccount = await Account.findOne(req.params.accountId);
-
-  const checkPost = await Post.findOne(req.params.postId);
-
-  if(checkAccount && checkPost){
-    if (checkComment.senderId != account._id) {
-      res.status(403).json("Không được phép chỉnh sửa");
-    } else {
-      const comment = await Comments.findByIdAndUpdate(
-        req.params.id,
-        {
-          content: req.body.content,
-          updatedAt: moment()
-            .tz("Asia/Ho_Chi_Minh")
-            .format("YYYY-MM-DD HH:mm:ss"),
-        },
-        {
-          new: true,
-        }
-      );
-      if (!comment) {
-        res.status(404).json("Không tìm thấy bình luận");
-      } else {
-        res.status(201).json(comment);
-      }
-    }
+  const checkComment = await Comments.findOne({
+    _id : req.params.id,
+    postId: req.params.postId,
+  });
+  if(checkComment.senderId != account._id){
+    res.status(403).json("Không được phép chỉnh sửa");
   }else{
-    res.status(404).json("không tìm thấy bài viết chứa bình luận")
+    const comment = await Comments.findByIdAndUpdate(
+      req.params.id,
+      {
+        content: req.body.content,
+        updatedAt: moment()
+          .tz("Asia/Ho_Chi_Minh")
+          .format("YYYY-MM-DD HH:mm:ss"),
+      },
+      {
+        new: true,
+      }
+    );
+    if (!comment) {
+      res.status(404).json("Không tìm thấy bình luận");
+    } else {
+      res.status(201).json(comment);
+    }
   }
-
-  
+ 
 });
 
 module.exports = {
   createComments,
   getCommentsPost,
+  getSingleCommentsPost,
   getCommentsAllPost,
   updateComments,
 };
