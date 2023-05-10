@@ -7,6 +7,7 @@ const initialState = {
   postUserId: [],
   postComment: [],
   postNewComment: [],
+  deleteComment: [],
   postEdit: [],
   isLoading: false,
   isFailed: false,
@@ -143,6 +144,27 @@ export const CallApiPostNewComment = createAsyncThunk(
     }
   }
 );
+///CallApiDeleteComment
+//CallApiPostNewComment
+export const CallApiDeleteComment = createAsyncThunk(
+  "post/callApiDeleteComment",
+  async function ({ headers, commentId }) {
+    try {
+      const apiDeleteComment = await axios.delete(
+        `http://localhost:5001/api/comments/${commentId}`,
+
+        {
+          headers: {
+            Authorization: headers.authorization,
+          },
+        }
+      );
+      return apiDeleteComment.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 /// ======================================================
 const postSlice = createSlice({
   name: "postinfor",
@@ -204,6 +226,7 @@ const postSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message;
       })
+
       .addCase(CallApiPostNewComment.pending, (state) => {
         state.isLoading = true;
       })
@@ -212,6 +235,17 @@ const postSlice = createSlice({
         state.postNewComment = action.payload;
       })
       .addCase(CallApiPostNewComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(CallApiDeleteComment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CallApiDeleteComment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.deleteComment = action.payload;
+      })
+      .addCase(CallApiDeleteComment.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
       });

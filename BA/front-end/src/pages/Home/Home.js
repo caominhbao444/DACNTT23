@@ -18,6 +18,7 @@ import {
   CallApiCreatePost,
   CallApiEditPost,
   CallApiPostNewComment,
+  CallApiDeleteComment,
 } from "../../features/postSlice";
 import {
   CircularProgress,
@@ -41,9 +42,8 @@ function Home() {
   const authToken = localStorage.getItem("authToken");
   const [postStates, setPostStates] = useState({});
   const { userInfor } = useSelector((state) => state.user);
-  const { listPosts, postCreate, postEdit, postNewComment } = useSelector(
-    (state) => state.post
-  );
+  const { listPosts, postCreate, postEdit, postNewComment, deleteComment } =
+    useSelector((state) => state.post);
   const [data, setData] = useState([]);
   const [dialogData, setDialogData] = useState(null);
   const [listComment, setListComment] = useState([]);
@@ -132,7 +132,7 @@ function Home() {
     // setShowComments(newShowComments);
   };
   console.log(userInfor);
-  console.log(listComment);
+
   const handleOpenDialog = (postId) => {
     setOpenDialogId(postId);
   };
@@ -156,7 +156,10 @@ function Home() {
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => {
-        window.top.location.reload(); // Reload the page after clicking "OK"
+        setContent("");
+        dispatch(
+          CallApiAllPosts({ headers: { authorization: `Bearer ${authToken}` } })
+        ); // Reload the page after clicking "OK"
       });
     });
   };
@@ -164,6 +167,13 @@ function Home() {
   const check = (postOfId) => {
     if (userInfor) {
       if (userInfor.account._id === postOfId) {
+        return true;
+      } else return false;
+    }
+  };
+  const checkComment = (commentOfId) => {
+    if (userInfor) {
+      if (userInfor.account._id === commentOfId) {
         return true;
       } else return false;
     }
@@ -197,7 +207,36 @@ function Home() {
         });
     });
   };
-
+  const handleDeleteComment = (commentId, postId) => {
+    dispatch(
+      CallApiDeleteComment({
+        headers: { authorization: `Bearer ${authToken}` },
+        commentId: commentId,
+      })
+    ).then(() => {
+      const headers = {
+        Authorization: `Bearer ${authToken}`,
+      };
+      axios
+        .get(`http://localhost:5001/api/comments/${postId}`, {
+          headers: headers,
+        })
+        .then((response) => {
+          console.log(response);
+          setPostStates((prevState) => ({
+            ...prevState,
+            [postId]: {
+              ...prevState[postId],
+              listComment: response.data,
+            },
+          }));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+  };
+  console.log(listComment);
   return (
     <>
       {!userInfor && !listPosts ? (
@@ -403,12 +442,6 @@ function Home() {
                                           top: "15px",
                                         }}
                                       />
-                                      {/* <textarea
-                                  key={index}
-                                  id="textComment"
-                                  value={textCommentValue}
-                                  onChange={handleTextComment}
-                                ></textarea> */}
                                       <textarea
                                         key={index}
                                         id={"textComment"}
@@ -421,8 +454,6 @@ function Home() {
                                       ></textarea>
                                       <button
                                         onClick={() => {
-                                          // alert(comments[index]);
-                                          // alert(post.postId);
                                           handlePostNewComment(
                                             post.postId,
                                             comments[index],
@@ -452,7 +483,7 @@ function Home() {
                                           cursor: "pointer",
                                         }}
                                       >
-                                        Đăng
+                                        Bình luận
                                       </button>
                                     </section>
                                     {postStates[post.postId]?.listComment.map(
@@ -460,45 +491,85 @@ function Home() {
                                         return (
                                           <div
                                             key={index}
+                                            className="comment_item"
                                             style={{
                                               width: "100%",
-                                              padding: "0",
+                                              padding: "0 0 0 10px",
+                                              boxSizing: "border-box",
                                               display: "flex",
-                                              justifyContent: "flex-start",
+                                              justifyContent: "space-between",
                                               alignItems: "center",
+                                              cursor: "pointer",
                                             }}
                                           >
-                                            <img
-                                              alt=""
-                                              src={comment.userimg}
+                                            <div
                                               style={{
-                                                width: "20px",
-                                                height: "20px",
-                                                borderRadius: "50%",
-                                                marginRight: "5px",
-                                              }}
-                                            />
-                                            <span
-                                              onClick={() => {
-                                                navigate(
-                                                  `/profile/${comment.userId}`
-                                                );
-                                              }}
-                                              style={{
-                                                cursor: "pointer",
-                                                display: "inline-block",
-                                                fontWeight: "bold",
-                                                marginRight: "5px",
+                                                display: "flex",
+                                                justifyContent: "flex-start",
+                                                alignItems: "center",
                                               }}
                                             >
-                                              {comment.fullname
-                                                .charAt(0)
-                                                .toUpperCase() +
-                                                comment.fullname.slice(1)}
-                                            </span>
-                                            <span>
-                                              {Readmore(comment.content)}
-                                            </span>
+                                              <img
+                                                alt=""
+                                                src={comment.userimg}
+                                                style={{
+                                                  width: "20px",
+                                                  height: "20px",
+                                                  borderRadius: "50%",
+                                                  marginRight: "5px",
+                                                }}
+                                              />
+                                              <span
+                                                onClick={() => {
+                                                  navigate(
+                                                    `/profile/${comment.userId}`
+                                                  );
+                                                  window.scrollTo(0, 0);
+                                                }}
+                                                style={{
+                                                  cursor: "pointer",
+                                                  display: "inline-block",
+                                                  fontWeight: "bold",
+                                                  marginRight: "5px",
+                                                }}
+                                              >
+                                                {comment.fullname
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                                  comment.fullname.slice(1)}
+                                              </span>
+                                              <span>
+                                                {Readmore(comment.content)}
+                                              </span>
+                                            </div>
+                                            {checkComment(comment.userId) ? (
+                                              <div
+                                                style={{
+                                                  display: "flex",
+                                                  marginRight: "10px",
+                                                  gap: "10px",
+                                                  position: "relative",
+                                                }}
+                                              >
+                                                <ion-icon
+                                                  onClick={() => alert("edit")}
+                                                  name="create-outline"
+                                                  style={{ display: "block" }}
+                                                ></ion-icon>
+                                                <ion-icon
+                                                  onClick={() =>
+                                                    handleDeleteComment(
+                                                      comment._id,
+                                                      post.postId
+                                                    )
+                                                  }
+                                                  name="trash-outline"
+                                                  style={{ display: "block" }}
+                                                ></ion-icon>
+                                              </div>
+                                            ) : (
+                                              <></>
+                                            )}
                                           </div>
                                         );
                                       }
@@ -669,6 +740,10 @@ function Home() {
 const HomePage = styled.section`
   min-height: 100vh;
   width: 100%;
+  .comment_item:hover {
+    background-color: #f5f5f5;
+    margin-right: 20px;
+  }
   #myTextarea {
     width: 100%;
     height: 60px;
@@ -703,7 +778,6 @@ const HomePage = styled.section`
     }
   }
   .containerComment {
-    ${"" /* height: 50px; */}
     width: 100%;
     background-color: #f5f5f5;
     display: flex;
