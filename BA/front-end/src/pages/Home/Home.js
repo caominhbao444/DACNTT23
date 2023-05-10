@@ -106,7 +106,9 @@ function Home() {
       timeDifference.charAt(0).toUpperCase() + timeDifference.slice(1);
     return capitalizedTimeDifference;
   };
+  const [bao, setBao] = useState(false);
   const handleShowComments = (index, postId) => {
+    setBao(true);
     const headers = {
       Authorization: `Bearer ${authToken}`,
     };
@@ -172,7 +174,7 @@ function Home() {
     }
   };
   const checkComment = (commentOfId) => {
-    if (userInfor) {
+    if (bao && userInfor) {
       if (userInfor.account._id === commentOfId) {
         return true;
       } else return false;
