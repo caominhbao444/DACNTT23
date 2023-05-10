@@ -16,7 +16,9 @@ const validateToken = require("../middleware/validateTokenHandler");
 router.use(validateToken);
 
 
-router.route("/all").get(getPosts).post(createPost);
+router.route("/all").get(getPosts)
+
+router.route("/").post(createPost);
 
 router.route("/:accountId").get(getAllPostUser);
 
