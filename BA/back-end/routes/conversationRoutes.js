@@ -6,6 +6,7 @@ const {
   getConversationsById,
   getConversationByTwoUsers,
   getCurrentConversations,
+  deleteConversation,
 } = require("../controllers/conversationController");
 
 
@@ -26,6 +27,8 @@ router.route("/find/:senderId/:receiverId").get(getConversationByTwoUsers);
 
 //đây là đường dẫn post cuộc trò chuyện
 router.route("/:id").post(createConversation);
+
+router.route("/:id").delete(deleteConversation);
 
 
 module.exports = router;

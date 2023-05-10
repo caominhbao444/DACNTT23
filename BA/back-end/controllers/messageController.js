@@ -43,6 +43,21 @@ const getMessage = asyncHandler(async (req, res) => {
   res.status(200).json(message);
 });
 
+const deleteMessage = asyncHandler(async(req,res)=>{
+  try {
+    const message = await Message.findById(req.params.id);
+    if (!message) {
+      res.status(404);
+      throw new Error("Message not found");
+    }
+
+    await Message.deleteOne({ _id: req.params.id });
+    res.status(200).json(message);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 const testm = asyncHandler(async (req, res) => {
   // const messages = await Conversation.find({ receiverId: req.params.id });
   // const conversationIds = messages.map((message) => message._id);
@@ -50,4 +65,4 @@ const testm = asyncHandler(async (req, res) => {
   res.status(200).json(account);
 });
 
-module.exports = { createMessage, getMessage, testm };
+module.exports = { createMessage, getMessage, deleteMessage,testm };

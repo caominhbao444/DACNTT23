@@ -7,6 +7,7 @@ const {
   getCommentsAllPost,
   updateComments,
   getSingleCommentsPost,
+  deleteComment,
 } = require("../controllers//commentsController");
 const validateToken = require("../middleware/validateTokenHandler");
 const { route } = require("./userRoutes");
@@ -25,6 +26,8 @@ router.route("/:postId/:id").get(getSingleCommentsPost);
 
 //accountId, postId , id của comment
 router.route("/:postId/:id").put(updateComments);
+
+router.route("/:id").delete(deleteComment);
 
 
 module.exports = router;

@@ -153,10 +153,26 @@ const testc = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteConversation = asyncHandler(async(req,res)=>{
+  try {
+    const conversation = await Conversation.findById(req.params.id);
+    if (!conversation) {
+      res.status(404);
+      throw new Error("Post not found");
+    }
+
+    await Conversation.deleteOne({ _id: req.params.id });
+    res.status(200).json(conversation);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 module.exports = {
   createConversation,
   getConversationByTwoUsers,
   getConversationsById,
   getCurrentConversations,
+  deleteConversation,
   testc,
 };

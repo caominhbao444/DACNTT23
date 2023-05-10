@@ -119,7 +119,21 @@ const updateComments = asyncHandler(async (req, res) => {
       res.status(201).json(comment);
     }
   }
- 
+});
+
+const deleteComment = asyncHandler(async(req,res)=>{
+  try {
+    const comment = await Comments.findById(req.params.id);
+    if (!comment) {
+      res.status(404);
+      throw new Error("Comment not found");
+    }
+
+    await Comments.deleteOne({ _id: req.params.id });
+    res.status(200).json(comment);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = {
@@ -128,4 +142,5 @@ module.exports = {
   getSingleCommentsPost,
   getCommentsAllPost,
   updateComments,
+  deleteComment
 };

@@ -3,7 +3,8 @@ const router = express.Router();
 const{
 createMessage,
 getMessage,
-testm
+testm,
+deleteMessage
 } = require("../controllers/messageController");
 
 const validateToken = require("../middleware/validateTokenHandler");
@@ -17,6 +18,9 @@ router.route("/:id").post(createMessage);
 
 //đây là đừng dẫn get tất cả tin nhắn trong cuộc trò chuyện
 router.route("/:id").get(getMessage);
+
+
+router.route("/:id").delete(deleteMessage);
 
 
 module.exports = router;
