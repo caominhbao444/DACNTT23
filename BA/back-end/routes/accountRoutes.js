@@ -11,9 +11,11 @@ const {
   unfollowAccount,
   friendsAccount,
   checkFriends,
-  notFriendsAccount
+  notFriendsAccount,
+  updateAccount
 } = require("../controllers/accountController");
 const validateToken = require("../middleware/validateTokenHandler");
+const { route } = require("./userRoutes");
 
 const router = express.Router();
 
@@ -36,6 +38,8 @@ router.get("/notfriends",validateToken,notFriendsAccount);
 router.get("/checkfriends/:id",validateToken,checkFriends);
 
 router.get("/:id",validateToken,getAccount);
+
+router.put("/update/:id",validateToken,updateAccount);
 
 router.put("/reset/:email",validateToken,resetPassword);
 

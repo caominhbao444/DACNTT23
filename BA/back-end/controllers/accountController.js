@@ -4,12 +4,12 @@ const jwt = require("jsonwebtoken");
 const Account = require("../models/accountModel");
 const moment = require("moment-timezone");
 
-
 //@desc Register a account
 //@route POST /api/accounts/register
 //@access public
 const register = asyncHandler(async (req, res) => {
-  const { fullname, email, password, phone, city, from, education,img } = req.body;
+  const { fullname, email, password, phone, city, from, education, img } =
+    req.body;
   if (
     !fullname ||
     !email ||
@@ -41,7 +41,7 @@ const register = asyncHandler(async (req, res) => {
     from,
     education,
     img,
-    createdAt: moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss'),
+    createdAt: moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
   });
 
   console.log(`Account created ${account}`);
@@ -141,6 +141,41 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Reset password successfully" });
 });
 
+const updateAccount = asyncHandler(async (req, res) => {
+  const account = await Account.findById(req.params.id);
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  if (account._id == req.account.id) {
+    const update = await Account.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        fullname: req.body.fullname,
+        email: req.account.email,
+        password: hashedPassword,
+        phone: req.body.phone,
+        city: req.body.city,
+        from: req.body.from,
+        education: req.body.education,
+        img: req.body.img,
+        createdAt:req.account.createdAt,
+        updatedAt: moment()
+          .tz("Asia/Ho_Chi_Minh")
+          .format("YYYY-MM-DD HH:mm:ss"),
+      },
+      {
+        new: true,
+      }
+    );
+    if (!update) {
+      res.status(404);
+      throw new Error("Account không tìm thấy");
+    } else {
+      res.status(201).json(update);
+    }
+  } else {
+    res.status(403).json("không được phép chỉnh sửa");
+  }
+});
+
 const deleteAccount = asyncHandler(async (req, res) => {
   const account = await Account.findById(req.params.id);
   if (!account) {
@@ -217,7 +252,7 @@ const friendsAccount = asyncHandler(async (req, res) => {
     const friendList = friends.map((friend) => ({
       _id: friend._id,
       fullname: friend.fullname,
-      img : friend.img
+      img: friend.img,
     }));
     res.status(200).json(friendList);
   } catch (error) {
@@ -225,34 +260,35 @@ const friendsAccount = asyncHandler(async (req, res) => {
   }
 });
 
-const notFriendsAccount = asyncHandler(async(req,res)=>{
-    try {
-      const account = await Account.find();
-      const currentAccount = await Account.findOne(req.account);
-      if (!currentAccount.followings.includes(account._id)) {
-        res.status(200).json(account);
-      } else {
-        res.status(404).json("cant find friends");
-      }
-    } catch (err) {
-      res.status(500).json(err);
+const notFriendsAccount = asyncHandler(async (req, res) => {
+  try {
+    const account = await Account.find();
+    const currentAccount = await Account.findOne(req.account);
+    if (!currentAccount.followings.includes(account._id)) {
+      res.status(200).json(account);
+    } else {
+      res.status(404).json("cant find friends");
     }
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-
-const checkFriends = asyncHandler(async(req,res)=>{
+const checkFriends = asyncHandler(async (req, res) => {
   if (req.body._id !== req.params.id) {
     try {
       const account = await Account.findById(req.params.id);
       const currentAccount = await Account.findOne(req.account);
-      if (currentAccount.followings.includes(account._id) && req.params.id !== req.account.id) {
-        res.status(200).json({check : 1});
-      }else if (req.params.id === req.account.id) {
-        res.status(201).json({check : 2})
+      if (
+        currentAccount.followings.includes(account._id) &&
+        req.params.id !== req.account.id
+      ) {
+        res.status(200).json({ check: 1 });
+      } else if (req.params.id === req.account.id) {
+        res.status(201).json({ check: 2 });
+      } else {
+        res.status(202).json({ check: 0 });
       }
-      else {
-        res.status(202).json({check : 0});
-      } 
     } catch (err) {
       res.status(500).json(err);
     }
@@ -268,6 +304,7 @@ module.exports = {
   getAccount,
   currentAccount,
   resetPassword,
+  updateAccount,
   deleteAccount,
   followAccount,
   unfollowAccount,
