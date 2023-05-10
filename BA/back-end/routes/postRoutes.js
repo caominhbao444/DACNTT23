@@ -18,17 +18,21 @@ router.use(validateToken);
 
 router.route("/all").get(getPosts)
 
-router.route("/").post(createPost);
-
 router.route("/:accountId").get(getAllPostUser);
 
 router.route("/current").get(getCurrentPosts);
 
 router.route("/test/:id").get(testPost);
 
+router.route("/single/:id").get(getPostById);
+
+router.route("/").post(createPost);
+
 router.route("/like/:id").post(likePost);
 
 // userId / id bài post nhé
-router.route("/:accountId/:id").get(getPostById).put(updatePost).delete(deletePost);
+router.route("/:id").put(updatePost).delete(deletePost);
+
+
 
 module.exports = router;
