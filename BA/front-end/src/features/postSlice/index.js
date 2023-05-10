@@ -5,6 +5,8 @@ const initialState = {
   listPosts: [],
   postCreate: [],
   postUserId: [],
+  postComment: [],
+  postEdit: [],
   isLoading: false,
   isFailed: false,
 };
@@ -76,6 +78,50 @@ export const CallApiGetPostId = createAsyncThunk(
 );
 // ===============================================================
 
+//CallApiGetPostComment
+export const CallApiGetPostComment = createAsyncThunk(
+  "post/callApiGetPostComment",
+  async function ({ headers, postId }) {
+    try {
+      const apiGetPostCommentId = await axios.get(
+        `http://localhost:5001/api/comments/${postId}`,
+
+        {
+          headers: {
+            Authorization: headers.authorization,
+          },
+        }
+      );
+      return apiGetPostCommentId.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+//CallApiEditPost
+export const CallApiEditPost = createAsyncThunk(
+  "post/callApiEditPost",
+  async function ({ headers, postId, desc }) {
+    try {
+      const apiEditPost = await axios.put(
+        `http://localhost:5001/api/posts/${postId}`,
+        {
+          desc,
+        },
+        {
+          headers: {
+            Authorization: headers.authorization,
+          },
+        }
+      );
+      return apiEditPost.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+/// ======================================================
 const postSlice = createSlice({
   name: "postinfor",
   initialState,
@@ -111,6 +157,28 @@ const postSlice = createSlice({
         state.postUserId = action.payload;
       })
       .addCase(CallApiGetPostId.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(CallApiGetPostComment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CallApiGetPostComment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.postComment = action.payload;
+      })
+      .addCase(CallApiGetPostComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(CallApiEditPost.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CallApiEditPost.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.postEdit = action.payload;
+      })
+      .addCase(CallApiEditPost.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
       });

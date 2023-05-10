@@ -3,30 +3,50 @@ import styled from "styled-components";
 import { COLORS } from "../../assets/Color";
 import Grid from "@mui/material/Grid";
 import { vi } from "date-fns/locale";
+
 import Navbar from "../../components/Navbar/Navbar";
 import { formatDistance } from "date-fns";
-import Loading from "../../pages/Loading/Loading";
-import Avatar from "@mui/material/Avatar";
-import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
 import withReactContent from "sweetalert2-react-content";
-import io from "socket.io-client";
 import SideBar from "../../components/SideBar/SideBar";
-import RequestFriends from "../../components/RequestFriends/RequestFriends";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { CallApiUser } from "../../features/userSlice";
-import { CallApiAllPosts, CallApiCreatePost } from "../../features/postSlice";
-import { CircularProgress } from "@mui/material";
+import {
+  CallApiAllPosts,
+  CallApiCreatePost,
+  CallApiEditPost,
+} from "../../features/postSlice";
+import {
+  CircularProgress,
+  Box,
+  TextareaAutosize,
+  Button,
+  Dialog,
+  Textarea,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Typography,
+} from "@mui/material";
 const MySwal = withReactContent(Swal);
 function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [openDialogId, setOpenDialogId] = useState(null);
   const authToken = localStorage.getItem("authToken");
+  const [postStates, setPostStates] = useState({});
   const { userInfor } = useSelector((state) => state.user);
-  const { listPosts, postCreate } = useSelector((state) => state.post);
+  const { listPosts, postCreate, postEdit } = useSelector(
+    (state) => state.post
+  );
   const [data, setData] = useState([]);
+  const [dialogData, setDialogData] = useState(null);
+  const [listComment, setListComment] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState(null);
   const [textValue, setTextValue] = useState("");
@@ -85,12 +105,61 @@ function Home() {
       timeDifference.charAt(0).toUpperCase() + timeDifference.slice(1);
     return capitalizedTimeDifference;
   };
-  const handleShowComments = (postId) => {
-    const newShowComments = [...showComments];
-    newShowComments[postId] = !newShowComments[postId];
-    setShowComments(newShowComments);
+  const handleShowComments = (index, postId) => {
+    const headers = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    axios
+      .get(`http://localhost:5001/api/comments/${postId}`, {
+        headers: headers,
+      })
+      .then((response) => {
+        // setListComment(response.data);
+        setPostStates((prevState) => ({
+          ...prevState,
+          [postId]: {
+            showComments: !prevState[postId]?.showComments,
+            listComment: response.data,
+          },
+        }));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    // const newShowComments = [...showComments];
+    // newShowComments[index] = !newShowComments[index];
+    // setShowComments(newShowComments);
   };
   console.log(userInfor);
+  console.log(listComment);
+  const handleOpenDialog = (postId) => {
+    setOpenDialogId(postId);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialogId(null);
+    setContent();
+  };
+  const handleEditPost = (postId) => {
+    dispatch(
+      CallApiEditPost({
+        headers: { authorization: `Bearer ${authToken}` },
+        postId: postId,
+        desc: content,
+      })
+    ).then(() => {
+      setOpenDialogId(false);
+      Swal.fire({
+        title: "Thành công",
+        text: "Bài viết đã được đăng",
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => {
+        window.location.reload(); // Reload the page after clicking "OK"
+      });
+    });
+  };
+
   return (
     <>
       {!userInfor && !listPosts ? (
@@ -124,139 +193,42 @@ function Home() {
                       .reverse()
                       .map((post, index) => {
                         return (
-                          <section
-                            key={index}
-                            className="main-post-item"
-                            style={{
-                              backgroundColor: "white",
-                              width: "100%",
-                              borderRadius: "10px",
-                            }}
-                          >
-                            <div
+                          <>
+                            <section
+                              key={index}
+                              className="main-post-item"
                               style={{
-                                padding: "20px",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                gap: "10px",
+                                backgroundColor: "white",
+                                width: "100%",
+                                borderRadius: "10px",
                               }}
                             >
                               <div
-                                className="img-container"
                                 style={{
+                                  padding: "20px",
                                   display: "flex",
-                                  justifyContent: "flex-start",
-                                  alignItems: "center",
+                                  flexDirection: "column",
+                                  justifyContent: "center",
                                   gap: "10px",
-                                  cursor: "pointer",
                                 }}
-                                onClick={() =>
-                                  navigate(`/profile/${post.account._id}`)
-                                }
                               >
-                                <img
-                                  src={post.account.img}
-                                  className="img-src"
-                                  alt=""
-                                  style={{
-                                    height: "40px",
-                                    width: "40px",
-                                    borderRadius: "50%",
-                                    overflow: "hidden",
-                                    cursor: "pointer",
-                                  }}
-                                />
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                  }}
-                                >
-                                  <span
+                                <div style={{ display: "flex" }}>
+                                  <div
+                                    className="img-container"
                                     style={{
-                                      fontWeight: "bold",
+                                      display: "flex",
+                                      justifyContent: "flex-start",
+                                      alignItems: "center",
+                                      gap: "10px",
+                                      width: "100%",
                                       cursor: "pointer",
                                     }}
-                                  >
-                                    {post.account.fullname}
-                                  </span>
-                                  <span>{daybefore(post.createdAt)}</span>
-                                </div>
-                              </div>
-                              <img
-                                className="img-src"
-                                alt=""
-                                style={{
-                                  height: "400px",
-                                  width: "100%",
-                                  objectFit: "cover",
-                                  objectPosition: "center",
-                                }}
-                                src={post.img}
-                              ></img>
-                              <div style={{ width: "100%" }}>{post.desc}</div>
-                              <div
-                                className="emotions"
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "flex-start",
-                                  alignItems: "center",
-                                  gap: "10px",
-                                  height: "40px",
-                                }}
-                              >
-                                <ion-icon
-                                  style={{
-                                    cursor: "pointer",
-                                    color: "red",
-                                    height: "30px",
-                                    width: "30px",
-                                  }}
-                                  name="heart"
-                                ></ion-icon>
-                                <ion-icon
-                                  onClick={() => handleShowComments(index)}
-                                  style={{
-                                    cursor: "pointer",
-                                    height: "30px",
-                                    width: "30px",
-                                  }}
-                                  name="chatbubble-outline"
-                                ></ion-icon>
-                                <ion-icon
-                                  style={{
-                                    cursor: "pointer",
-                                    color: "",
-                                    height: "30px",
-                                    width: "30px",
-                                  }}
-                                  name="share-social-outline"
-                                ></ion-icon>
-                              </div>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "flex-start",
-                                  gap: "5px",
-                                }}
-                              >
-                                <span>
-                                  Được thích bởi Tiến Minh and 2,200 người khác
-                                </span>
-                              </div>
-                              {showComments[index] && (
-                                <>
-                                  <section
-                                    className="containerComment"
-                                    style={{
-                                      width: "100%",
-                                      position: "relative",
-                                    }}
+                                    onClick={() =>
+                                      navigate(`/profile/${post.account._id}`)
+                                    }
                                   >
                                     <img
-                                      src={userInfor.account.img}
+                                      src={post.account.img}
                                       className="img-src"
                                       alt=""
                                       style={{
@@ -264,121 +236,375 @@ function Home() {
                                         width: "40px",
                                         borderRadius: "50%",
                                         overflow: "hidden",
-                                        position: "absolute",
-                                        left: "20px",
-                                        top: "15px",
+                                        cursor: "pointer",
                                       }}
                                     />
-                                    {/* <textarea
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          fontWeight: "bold",
+                                          cursor: "pointer",
+                                        }}
+                                      >
+                                        {post.account.fullname}
+                                      </span>
+                                      <span>{daybefore(post.createdAt)}</span>
+                                    </div>
+                                  </div>
+                                  <ion-icon
+                                    onClick={() =>
+                                      handleOpenDialog(post.postId)
+                                    }
+                                    name="ellipsis-horizontal-outline"
+                                    style={{
+                                      display: "block",
+                                      height: "20px",
+                                      width: "30px",
+                                      padding: "10px",
+                                      cursor: "pointer",
+                                    }}
+                                  ></ion-icon>
+                                </div>
+
+                                <img
+                                  className="img-src"
+                                  alt=""
+                                  style={{
+                                    height: "auto",
+                                    width: "100%",
+                                    maxWidth: "100%",
+                                    maxHeight: "500px",
+                                    objectFit: "cover",
+                                    objectPosition: "center",
+                                  }}
+                                  src={post.img}
+                                ></img>
+                                <div style={{ width: "100%" }}>{post.desc}</div>
+                                <div
+                                  className="emotions"
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "flex-start",
+                                    alignItems: "center",
+                                    gap: "10px",
+                                    height: "40px",
+                                  }}
+                                >
+                                  <ion-icon
+                                    style={{
+                                      cursor: "pointer",
+                                      color: "red",
+                                      height: "30px",
+                                      width: "30px",
+                                    }}
+                                    name="heart"
+                                  ></ion-icon>
+                                  <ion-icon
+                                    onClick={() =>
+                                      handleShowComments(index, post.postId)
+                                    }
+                                    style={{
+                                      cursor: "pointer",
+                                      height: "30px",
+                                      width: "30px",
+                                    }}
+                                    name="chatbubble-outline"
+                                  ></ion-icon>
+                                  <ion-icon
+                                    style={{
+                                      cursor: "pointer",
+                                      color: "",
+                                      height: "30px",
+                                      width: "30px",
+                                    }}
+                                    name="share-social-outline"
+                                  ></ion-icon>
+                                </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "flex-start",
+                                    gap: "5px",
+                                  }}
+                                >
+                                  <span>
+                                    Được thích bởi Tiến Minh and 2,200 người
+                                    khác
+                                  </span>
+                                </div>
+                                {postStates[post.postId]?.showComments &&
+                                postStates[post.postId]?.listComment ? (
+                                  <>
+                                    <section
+                                      className="containerComment"
+                                      style={{
+                                        width: "100%",
+                                        position: "relative",
+                                      }}
+                                    >
+                                      <img
+                                        src={userInfor.account.img}
+                                        className="img-src"
+                                        alt=""
+                                        style={{
+                                          height: "40px",
+                                          width: "40px",
+                                          borderRadius: "50%",
+                                          overflow: "hidden",
+                                          position: "absolute",
+                                          left: "20px",
+                                          top: "15px",
+                                        }}
+                                      />
+                                      {/* <textarea
                                   key={index}
                                   id="textComment"
                                   value={textCommentValue}
                                   onChange={handleTextComment}
                                 ></textarea> */}
-                                    <textarea
-                                      key={index}
-                                      id={"textComment"}
-                                      value={comments[index]}
-                                      onChange={(e) => {
-                                        const newComments = [...comments];
-                                        newComments[index] = e.target.value;
-                                        setComments(newComments);
-                                      }}
-                                    ></textarea>
-                                    <button
-                                      onClick={() => {
-                                        alert(comments[index]);
-                                      }}
-                                      type="button"
-                                      style={{
-                                        position: "absolute",
-                                        right: "20px",
-                                        top: "20px",
-                                        padding: "5px 10px",
-                                        borderRadius: "10px",
-                                        // backgroundColor: COLORS.mainColor,
-                                        backgroundColor: "#FC3208",
-                                        color: "white",
-                                        fontWeight: "bold",
-                                        border: "none",
-                                        boxSizing: "border-box",
-                                        cursor: "pointer",
-                                      }}
+                                      <textarea
+                                        key={index}
+                                        id={"textComment"}
+                                        value={comments[index]}
+                                        onChange={(e) => {
+                                          const newComments = [...comments];
+                                          newComments[index] = e.target.value;
+                                          setComments(newComments);
+                                        }}
+                                      ></textarea>
+                                      <button
+                                        onClick={() => {
+                                          // alert(comments[index]);
+                                          alert(post.postId);
+                                        }}
+                                        type="button"
+                                        style={{
+                                          position: "absolute",
+                                          right: "20px",
+                                          top: "20px",
+                                          padding: "5px 10px",
+                                          borderRadius: "10px",
+                                          // backgroundColor: COLORS.mainColor,
+                                          backgroundColor: "#FC3208",
+                                          color: "white",
+                                          fontWeight: "bold",
+                                          border: "none",
+                                          boxSizing: "border-box",
+                                          cursor: "pointer",
+                                        }}
+                                      >
+                                        Đăng
+                                      </button>
+                                    </section>
+                                    {postStates[post.postId]?.listComment.map(
+                                      (comment, index) => {
+                                        return (
+                                          <div
+                                            key={index}
+                                            style={{
+                                              width: "100%",
+                                              padding: "0",
+                                              display: "flex",
+                                              justifyContent: "flex-start",
+                                              alignItems: "center",
+                                            }}
+                                          >
+                                            <img
+                                              alt=""
+                                              src={comment.userimg}
+                                              style={{
+                                                width: "20px",
+                                                height: "20px",
+                                                borderRadius: "50%",
+                                                marginRight: "5px",
+                                              }}
+                                            />
+                                            <span
+                                              onClick={() => {
+                                                navigate(
+                                                  `/profile/${comment.userId}`
+                                                );
+                                              }}
+                                              style={{
+                                                cursor: "pointer",
+                                                display: "inline-block",
+                                                fontWeight: "bold",
+                                                marginRight: "5px",
+                                              }}
+                                            >
+                                              {comment.fullname
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                                comment.fullname.slice(1)}
+                                            </span>
+                                            <span>
+                                              {Readmore(comment.content)}
+                                            </span>
+                                          </div>
+                                        );
+                                      }
+                                    )}
+                                  </>
+                                ) : (
+                                  <></>
+                                )}
+                              </div>
+                              {openDialogId === post.postId && (
+                                <Dialog
+                                  open={openDialogId === post.postId}
+                                  onClose={handleCloseDialog}
+                                  style={{}}
+                                  key={index}
+                                >
+                                  <DialogTitle
+                                    style={{ backgroundColor: COLORS.green }}
+                                  >
+                                    <Box
+                                      display="flex"
+                                      justifyContent="space-between"
+                                      alignItems="center"
                                     >
-                                      Đăng
-                                    </button>
-                                  </section>
-                                  <div style={{}}>
-                                    <div
-                                      style={{ height: "100%", width: "100%" }}
+                                      <span
+                                        style={{
+                                          fontWeight: "bold",
+                                          color: "white",
+                                        }}
+                                      >
+                                        Chỉnh sửa bài viết
+                                      </span>
+                                      <ion-icon
+                                        name="close-circle-outline"
+                                        onClick={handleCloseDialog}
+                                        style={{
+                                          cursor: "pointer",
+                                          width: "30px",
+                                          height: "30px",
+                                          display: "block",
+                                          border: "none",
+                                          zIndex: "6",
+                                          fontWeight: "bold",
+                                          color: "white",
+                                        }}
+                                      ></ion-icon>
+                                    </Box>
+                                  </DialogTitle>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      justifyContent: "space-around",
+                                      position: "relative",
+                                      padding: "40px",
+                                      maxWidth: "600px",
+                                      height: "400px",
+                                      gap: "10px",
+                                    }}
+                                  >
+                                    <Box
+                                      maxWidth="600px"
+                                      style={{
+                                        display: "flex",
+                                        gap: "10px",
+                                        position: "relative",
+                                      }}
                                     >
                                       <div
                                         style={{
-                                          display: "block",
-                                          marginRight: "10px",
-                                          fontWeight: "bold",
+                                          width: "300px",
+                                          position: "relative",
                                         }}
                                       >
-                                        Minh Bảo
-                                        <span style={{ marginLeft: "10px" }}>
-                                          {Readmore(
-                                            "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
-                                          )}
-                                          ...
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    style={{
-                                      width: "100%",
-                                      padding: "0",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        display: "inline-block",
-                                        fontWeight: "bold",
-                                        marginRight: "5px",
-                                      }}
-                                    >
-                                      Minh Baro
-                                    </span>
-                                    <span>
-                                      {Readmore(
-                                        "Proident eiusmod quiProident eiusmod quiProident eiusmod quiProident eiusmod quiProident eiusmod qui s veniam eiusmod ad eu deserunt laborum excepteur dolore voluptate et. Laboris laborum  eiusmod aliquip sint cupidatat anim voluptate est commodo"
-                                      )}
-                                      ...
-                                    </span>
-                                  </div>
-                                  <div style={{}}>
-                                    <div style={{ height: "100%" }}>
-                                      <span
-                                        style={{
-                                          marginRight: "10px",
-                                          fontWeight: "bold",
-                                        }}
-                                      >
-                                        Minh Bảo
-                                      </span>
-                                      <span>
-                                        {Readmore(
-                                          "Lorem Ipsum is simply dummy text of the printing an typesetting industry. Lorem Ipsum has been dustrystandard dummy text ever since the 1500s, when an unknown printer took a galley of type an scrambled it to make a type spec"
+                                        {loading ? (
+                                          <>
+                                            <div
+                                              style={{
+                                                width: "100%",
+                                                height: "253px",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                              }}
+                                            >
+                                              <CircularProgress />
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <img
+                                              src={post.img}
+                                              width="100%"
+                                              alt="bag photos"
+                                              style={{
+                                                display: "block",
+                                                height: "253px",
+                                                objectFit: "cover",
+                                                objectPosition: "center",
+                                              }}
+                                            />
+                                            <input
+                                              onChange={{}}
+                                              type="file"
+                                              style={{
+                                                position: "absolute",
+                                                top: "0",
+                                                left: "0",
+                                                width: "100%",
+                                                height: "100%",
+                                                opacity: "0",
+                                                cursor: "pointer",
+                                              }}
+                                            />
+                                          </>
                                         )}
-                                        ...
-                                      </span>
-                                    </div>
+                                      </div>
+                                      <textarea
+                                        aria-label="empty textarea"
+                                        placeholder={post.desc}
+                                        style={{
+                                          width: "300px",
+                                          height: "253px", // change this to a smaller value
+                                          minHeight: "100px", // set a smaller minHeight value
+                                          border: "none",
+                                          resize: "none",
+                                          outline: "none",
+                                          overflowY: "scroll",
+                                          overflow: "hidden",
+                                        }}
+                                        value={content}
+                                        onChange={(e) =>
+                                          setContent(e.target.value)
+                                        }
+                                      />
+                                    </Box>
+                                    <Button
+                                      onClick={() =>
+                                        handleEditPost(post.postId)
+                                      }
+                                      variant="contained"
+                                      style={{
+                                        backgroundColor: COLORS.green,
+                                        borderRadius: "0",
+                                        fontWeight: "bold",
+                                      }}
+                                      fullWidth
+                                    >
+                                      Cập nhật
+                                    </Button>
                                   </div>
-                                </>
+                                </Dialog>
                               )}
-                            </div>
-                          </section>
+                            </section>
+                          </>
                         );
                       })}
                 </section>
               </Grid>
-              {/* Right */}
-              {/* <RequestFriends /> */}
             </Grid>
           </HomePage>
         </>

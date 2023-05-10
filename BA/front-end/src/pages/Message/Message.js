@@ -136,14 +136,6 @@ function Message() {
       img: response.payload.img,
     });
     setMessageContent("");
-    dispatch(
-      CallGetMessage({
-        headers: { authorization: `Bearer ${authToken}` },
-        conversationID: response.payload.conversationId,
-      })
-    ).then((response) => {
-      setAllMess(response.payload);
-    });
   };
 
   useEffect(() => {
@@ -173,7 +165,7 @@ function Message() {
 
   // ================================================================
   // console.log("All Message", allmess);
-  // console.log("Nhan tin nhan", getMessage);
+  console.log("Nhan tin nhan", getMessage);
   // console.log("Gui tin nhan", postMessage);
   // // console.log("User dang login", userCurrent);
   // console.log("All conversations", allConversations);
@@ -426,11 +418,7 @@ function Message() {
                       }}
                       className="message-area"
                     >
-                      {!getMessage ? (
-                        <CircularProgress
-                          style={{ height: "100%", width: "100%" }}
-                        />
-                      ) : (
+                      {getMessage ? (
                         <>
                           {allmess &&
                             allmess
@@ -451,6 +439,10 @@ function Message() {
                                 );
                               })}
                         </>
+                      ) : (
+                        <CircularProgress
+                          style={{ height: "100%", width: "100%" }}
+                        />
                       )}
                     </div>
                     <div

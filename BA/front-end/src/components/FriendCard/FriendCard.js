@@ -73,12 +73,14 @@ function FriendCard(props) {
         }}
       >
         <img
-          src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+          src={props.people.img}
           className="img-src"
           alt=""
           style={{
             height: "40px",
             width: "40px",
+            objectFit: "cover",
+            objectPosition: "center",
             borderRadius: "50%",
             overflow: "hidden",
           }}
