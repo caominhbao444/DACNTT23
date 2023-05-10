@@ -191,7 +191,6 @@ if (checkPost.accountId != account._id) {
     req.params.id,
     {
       desc: req.body.desc,
-      img:req.body.img,
       updatedAt: moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
     },
     {
