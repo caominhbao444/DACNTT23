@@ -17,6 +17,7 @@ import {
   CallApiAllPosts,
   CallApiCreatePost,
   CallApiEditPost,
+  CallApiPostNewComment,
 } from "../../features/postSlice";
 import {
   CircularProgress,
@@ -40,7 +41,7 @@ function Home() {
   const authToken = localStorage.getItem("authToken");
   const [postStates, setPostStates] = useState({});
   const { userInfor } = useSelector((state) => state.user);
-  const { listPosts, postCreate, postEdit } = useSelector(
+  const { listPosts, postCreate, postEdit, postNewComment } = useSelector(
     (state) => state.post
   );
   const [data, setData] = useState([]);
@@ -155,8 +156,45 @@ function Home() {
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => {
-        window.location.reload(); // Reload the page after clicking "OK"
+        window.top.location.reload(); // Reload the page after clicking "OK"
       });
+    });
+  };
+  console.log(listPosts);
+  const check = (postOfId) => {
+    if (userInfor) {
+      if (userInfor.account._id === postOfId) {
+        return true;
+      } else return false;
+    }
+  };
+  const handlePostNewComment = (postId, contentComment, index) => {
+    dispatch(
+      CallApiPostNewComment({
+        headers: { authorization: `Bearer ${authToken}` },
+        postId: postId,
+        content: contentComment,
+      })
+    ).then(() => {
+      const headers = {
+        Authorization: `Bearer ${authToken}`,
+      };
+      axios
+        .get(`http://localhost:5001/api/comments/${postId}`, {
+          headers: headers,
+        })
+        .then((response) => {
+          setPostStates((prevState) => ({
+            ...prevState,
+            [postId]: {
+              ...prevState[postId],
+              listComment: response.data,
+            },
+          }));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     });
   };
 
@@ -256,19 +294,23 @@ function Home() {
                                       <span>{daybefore(post.createdAt)}</span>
                                     </div>
                                   </div>
-                                  <ion-icon
-                                    onClick={() =>
-                                      handleOpenDialog(post.postId)
-                                    }
-                                    name="ellipsis-horizontal-outline"
-                                    style={{
-                                      display: "block",
-                                      height: "20px",
-                                      width: "30px",
-                                      padding: "10px",
-                                      cursor: "pointer",
-                                    }}
-                                  ></ion-icon>
+                                  {check(post.account._id) ? (
+                                    <ion-icon
+                                      onClick={() =>
+                                        handleOpenDialog(post.postId)
+                                      }
+                                      name="ellipsis-horizontal-outline"
+                                      style={{
+                                        display: "block",
+                                        height: "20px",
+                                        width: "30px",
+                                        padding: "10px",
+                                        cursor: "pointer",
+                                      }}
+                                    ></ion-icon>
+                                  ) : (
+                                    <></>
+                                  )}
                                 </div>
 
                                 <img
@@ -334,8 +376,7 @@ function Home() {
                                   }}
                                 >
                                   <span>
-                                    Được thích bởi Tiến Minh and 2,200 người
-                                    khác
+                                    Được thích bởi {post.numLike} người khác
                                   </span>
                                 </div>
                                 {postStates[post.postId]?.showComments &&
@@ -381,7 +422,19 @@ function Home() {
                                       <button
                                         onClick={() => {
                                           // alert(comments[index]);
-                                          alert(post.postId);
+                                          // alert(post.postId);
+                                          handlePostNewComment(
+                                            post.postId,
+                                            comments[index],
+                                            index
+                                          );
+                                          setComments((prevComments) => {
+                                            const newComments = [
+                                              ...prevComments,
+                                            ];
+                                            newComments[index] = ""; // Set the comment to an empty string
+                                            return newComments;
+                                          });
                                         }}
                                         type="button"
                                         style={{

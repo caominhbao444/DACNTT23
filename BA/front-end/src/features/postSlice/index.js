@@ -6,6 +6,7 @@ const initialState = {
   postCreate: [],
   postUserId: [],
   postComment: [],
+  postNewComment: [],
   postEdit: [],
   isLoading: false,
   isFailed: false,
@@ -120,7 +121,28 @@ export const CallApiEditPost = createAsyncThunk(
     }
   }
 );
-
+//CallApiPostNewComment
+export const CallApiPostNewComment = createAsyncThunk(
+  "post/callApiPostNewComment",
+  async function ({ headers, postId, content }) {
+    try {
+      const apiPostComment = await axios.post(
+        `http://localhost:5001/api/comments/${postId}`,
+        {
+          content,
+        },
+        {
+          headers: {
+            Authorization: headers.authorization,
+          },
+        }
+      );
+      return apiPostComment.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 /// ======================================================
 const postSlice = createSlice({
   name: "postinfor",
@@ -179,6 +201,17 @@ const postSlice = createSlice({
         state.postEdit = action.payload;
       })
       .addCase(CallApiEditPost.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(CallApiPostNewComment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CallApiPostNewComment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.postNewComment = action.payload;
+      })
+      .addCase(CallApiPostNewComment.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
       });
