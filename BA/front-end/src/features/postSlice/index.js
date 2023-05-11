@@ -8,7 +8,9 @@ const initialState = {
   postComment: [],
   postNewComment: [],
   deleteComment: [],
+  editComment: [],
   postEdit: [],
+  like: [],
   isLoading: false,
   isFailed: false,
 };
@@ -145,7 +147,7 @@ export const CallApiPostNewComment = createAsyncThunk(
   }
 );
 ///CallApiDeleteComment
-//CallApiPostNewComment
+
 export const CallApiDeleteComment = createAsyncThunk(
   "post/callApiDeleteComment",
   async function ({ headers, commentId }) {
@@ -160,6 +162,48 @@ export const CallApiDeleteComment = createAsyncThunk(
         }
       );
       return apiDeleteComment.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+//CallApiEditComment
+export const CallApiEditComment = createAsyncThunk(
+  "post/callApiEditComment",
+  async function ({ headers, postId, commentId, content }) {
+    try {
+      const apiEditComment = await axios.put(
+        `http://localhost:5001/api/comments/${postId}/${commentId}`,
+        {
+          content,
+        },
+        {
+          headers: {
+            Authorization: headers.authorization,
+          },
+        }
+      );
+      return apiEditComment.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+//CallApiLike
+export const CallApiLike = createAsyncThunk(
+  "post/callApiLikePost",
+  async function ({ headers, postId }) {
+    try {
+      const apiLike = await axios.post(
+        `http://localhost:5001/api/posts/like/${postId}`,
+
+        {
+          headers: {
+            Authorization: headers.authorization,
+          },
+        }
+      );
+      return apiLike.data;
     } catch (error) {
       console.log(error);
     }
@@ -246,6 +290,28 @@ const postSlice = createSlice({
         state.deleteComment = action.payload;
       })
       .addCase(CallApiDeleteComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(CallApiEditComment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CallApiEditComment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.editComment = action.payload;
+      })
+      .addCase(CallApiEditComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(CallApiLike.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CallApiLike.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.like = action.payload;
+      })
+      .addCase(CallApiLike.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
       });

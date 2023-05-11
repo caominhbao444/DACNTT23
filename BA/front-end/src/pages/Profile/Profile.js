@@ -31,17 +31,25 @@ import {
   CallApiAllUsers,
   CallApiCheckFriends,
 } from "../../features/userSlice";
-import { CallApiGetPostId, CallApiCreatePost } from "../../features/postSlice";
+import {
+  CallApiGetPostId,
+  CallApiCreatePost,
+  CallApiEditComment,
+  CallApiEditPost,
+} from "../../features/postSlice";
 import { useParams } from "react-router";
 import axios from "axios";
 function Profile() {
   let { userID } = useParams();
   const [showComments, setShowComments] = useState([]);
   const [comments, setComments] = useState("");
+  const [openDialogId, setOpenDialogId] = useState(null);
+  const [openDialogCommentId, setOpenDialogCommentId] = useState(null);
   const [checkId, setCheckId] = useState(false);
   const [textContentButton, setTextContentButton] = useState("Theo dõi");
-  const [check, setcheck] = useState(true);
+
   const [open, setOpen] = useState(false);
+  const [contentEditPost, setContentEditPost] = useState("");
   const [Urlimg, setUrlimg] = useState(
     "https://us.123rf.com/450wm/mathier/mathier1905/mathier190500002/134557216-no-thumbnail-image-placeholder-for-forums-blogs-and-websites.jpg?ver=6"
   );
@@ -60,7 +68,7 @@ function Profile() {
     allUserInfor,
     checkFriends,
   } = useSelector((state) => state.user);
-  const { postUserId } = useSelector((state) => state.post);
+  const { postUserId, postEdit } = useSelector((state) => state.post);
   const [loading, setLoading] = useState(false);
   function handleFileChange(event) {
     setLoading(true);
@@ -144,6 +152,7 @@ function Profile() {
       });
     }
   };
+
   const handleCreatePost = () => {
     dispatch(
       CallApiCreatePost({
@@ -187,7 +196,45 @@ function Profile() {
     //   CallApiAllUsers({ headers: { authorization: `Bearer ${authToken}` } })
     // );
   }, [userID, authToken, dispatch]);
-
+  const handleOpenDialog = (postId) => {
+    setOpenDialogId(postId);
+  };
+  const check = (postOfId) => {
+    if (userInfor) {
+      if (userInfor.account._id === postOfId) {
+        return true;
+      } else return false;
+    }
+  };
+  const handleCloseDialog = () => {
+    setOpenDialogId(null);
+    setContentEditPost();
+  };
+  const handleEditPost = (postId) => {
+    dispatch(
+      CallApiEditPost({
+        headers: { authorization: `Bearer ${authToken}` },
+        postId: postId,
+        desc: content,
+      })
+    ).then(() => {
+      setOpenDialogId(false);
+      Swal.fire({
+        title: "Thành công",
+        text: "Bài viết đã được đăng",
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => {
+        setContent("");
+        dispatch(
+          CallApiGetPostId({
+            headers: { authorization: `Bearer ${authToken}` },
+            userID,
+          })
+        );
+      });
+    });
+  };
   const handleFollower = async () => {
     const headers = {
       Authorization: `Bearer ${authToken}`,
@@ -213,6 +260,7 @@ function Profile() {
     return <Loading />;
   }
   console.log(postUserId);
+  console.log(userInfor);
   return (
     <>
       <Navbar />
@@ -795,44 +843,64 @@ function Profile() {
                                 gap: "10px",
                               }}
                             >
-                              <div
-                                className="img-container"
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "flex-start",
-                                  alignItems: "center",
-                                  gap: "10px",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                <img
-                                  src={post.userimg}
-                                  className="img-src"
-                                  alt=""
-                                  style={{
-                                    height: "40px",
-                                    width: "40px",
-                                    borderRadius: "50%",
-                                    overflow: "hidden",
-                                    cursor: "pointer",
-                                  }}
-                                />
+                              <div style={{ display: "flex" }}>
                                 <div
+                                  className="img-container"
                                   style={{
                                     display: "flex",
-                                    flexDirection: "column",
+                                    justifyContent: "flex-start",
+                                    alignItems: "center",
+                                    gap: "10px",
+                                    width: "100%",
+                                    cursor: "pointer",
                                   }}
                                 >
-                                  <span
+                                  <img
+                                    src={post.userimg}
+                                    className="img-src"
+                                    alt=""
                                     style={{
-                                      fontWeight: "bold",
+                                      height: "40px",
+                                      width: "40px",
+                                      borderRadius: "50%",
+                                      overflow: "hidden",
                                       cursor: "pointer",
                                     }}
+                                  />
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                    }}
                                   >
-                                    {post.fullname}
-                                  </span>
-                                  <span>{daybefore(post.createdAt)}</span>
+                                    <span
+                                      style={{
+                                        fontWeight: "bold",
+                                        cursor: "pointer",
+                                      }}
+                                    >
+                                      {post.fullname}
+                                    </span>
+                                    <span>{daybefore(post.createdAt)}</span>
+                                  </div>
                                 </div>
+                                {check(post.id) ? (
+                                  <ion-icon
+                                    onClick={() =>
+                                      handleOpenDialog(post.postId)
+                                    }
+                                    name="ellipsis-horizontal-outline"
+                                    style={{
+                                      display: "block",
+                                      height: "20px",
+                                      width: "30px",
+                                      padding: "10px",
+                                      cursor: "pointer",
+                                    }}
+                                  ></ion-icon>
+                                ) : (
+                                  <></>
+                                )}
                               </div>
                               <img
                                 className="img-src"
@@ -1022,6 +1090,148 @@ function Profile() {
                                 </>
                               )}
                             </div>
+                            {openDialogId === post.postId && (
+                              <Dialog
+                                open={openDialogId === post.postId}
+                                onClose={handleCloseDialog}
+                                style={{}}
+                                key={index}
+                              >
+                                <DialogTitle
+                                  style={{ backgroundColor: COLORS.green }}
+                                >
+                                  <Box
+                                    display="flex"
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                  >
+                                    <span
+                                      style={{
+                                        fontWeight: "bold",
+                                        color: "white",
+                                      }}
+                                    >
+                                      Chỉnh sửa bài viết
+                                    </span>
+                                    <ion-icon
+                                      name="close-circle-outline"
+                                      onClick={handleCloseDialog}
+                                      style={{
+                                        cursor: "pointer",
+                                        width: "30px",
+                                        height: "30px",
+                                        display: "block",
+                                        border: "none",
+                                        zIndex: "6",
+                                        fontWeight: "bold",
+                                        color: "white",
+                                      }}
+                                    ></ion-icon>
+                                  </Box>
+                                </DialogTitle>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-around",
+                                    position: "relative",
+                                    padding: "40px",
+                                    maxWidth: "600px",
+                                    height: "400px",
+                                    gap: "10px",
+                                  }}
+                                >
+                                  <Box
+                                    maxWidth="600px"
+                                    style={{
+                                      display: "flex",
+                                      gap: "10px",
+                                      position: "relative",
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        width: "300px",
+                                        position: "relative",
+                                      }}
+                                    >
+                                      {loading ? (
+                                        <>
+                                          <div
+                                            style={{
+                                              width: "100%",
+                                              height: "253px",
+                                              display: "flex",
+                                              justifyContent: "center",
+                                              alignItems: "center",
+                                            }}
+                                          >
+                                            <CircularProgress />
+                                          </div>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <img
+                                            src={post.img}
+                                            width="100%"
+                                            alt="bag photos"
+                                            style={{
+                                              display: "block",
+                                              height: "253px",
+                                              objectFit: "cover",
+                                              objectPosition: "center",
+                                            }}
+                                          />
+                                          <input
+                                            onChange={{}}
+                                            type="file"
+                                            style={{
+                                              position: "absolute",
+                                              top: "0",
+                                              left: "0",
+                                              width: "100%",
+                                              height: "100%",
+                                              opacity: "0",
+                                              cursor: "pointer",
+                                            }}
+                                          />
+                                        </>
+                                      )}
+                                    </div>
+                                    <textarea
+                                      aria-label="empty textarea"
+                                      placeholder={post.desc}
+                                      style={{
+                                        width: "300px",
+                                        height: "253px", // change this to a smaller value
+                                        minHeight: "100px", // set a smaller minHeight value
+                                        border: "none",
+                                        resize: "none",
+                                        outline: "none",
+                                        overflowY: "scroll",
+                                        overflow: "hidden",
+                                      }}
+                                      value={content}
+                                      onChange={(e) =>
+                                        setContent(e.target.value)
+                                      }
+                                    />
+                                  </Box>
+                                  <Button
+                                    onClick={() => handleEditPost(post.postId)}
+                                    variant="contained"
+                                    style={{
+                                      backgroundColor: COLORS.green,
+                                      borderRadius: "0",
+                                      fontWeight: "bold",
+                                    }}
+                                    fullWidth
+                                  >
+                                    Cập nhật
+                                  </Button>
+                                </div>
+                              </Dialog>
+                            )}
                           </section>
                         );
                       })}

@@ -19,6 +19,8 @@ import {
   CallApiEditPost,
   CallApiPostNewComment,
   CallApiDeleteComment,
+  CallApiEditComment,
+  CallApiLike,
 } from "../../features/postSlice";
 import {
   CircularProgress,
@@ -39,11 +41,19 @@ function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [openDialogId, setOpenDialogId] = useState(null);
+  const [openDialogCommentId, setOpenDialogCommentId] = useState(null);
   const authToken = localStorage.getItem("authToken");
   const [postStates, setPostStates] = useState({});
   const { userInfor } = useSelector((state) => state.user);
-  const { listPosts, postCreate, postEdit, postNewComment, deleteComment } =
-    useSelector((state) => state.post);
+  const {
+    listPosts,
+    postCreate,
+    postEdit,
+    postNewComment,
+    deleteComment,
+    editComment,
+    like,
+  } = useSelector((state) => state.post);
   const [data, setData] = useState([]);
   const [dialogData, setDialogData] = useState(null);
   const [listComment, setListComment] = useState([]);
@@ -53,6 +63,9 @@ function Home() {
   const [textValue, setTextValue] = useState("");
   const [showComments, setShowComments] = useState([]);
   const [textCommentValue, setTextCommentValue] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
+  const [contentEdit, setContentEdit] = useState("");
+  const [likePost, setLikePost] = useState(false);
   useEffect(() => {
     dispatch(
       CallApiUser({ headers: { authorization: `Bearer ${authToken}` } })
@@ -78,6 +91,7 @@ function Home() {
     if (userInfor) {
       const textarea = document.querySelector("#myTextarea");
       const textcommentarea = document.querySelector("#textComment");
+      const texteditcommentarea = document.querySelector("#textEditComment");
       if (textcommentarea) {
         textcommentarea.addEventListener("keyup", (e) => {
           textcommentarea.style.height = "50px";
@@ -88,6 +102,12 @@ function Home() {
         textarea.addEventListener("keyup", (e) => {
           textarea.style.height = "60px";
           textarea.style.height = `${e.target.scrollHeight}px`;
+        });
+      }
+      if (texteditcommentarea) {
+        texteditcommentarea.addEventListener("keyup", (e) => {
+          texteditcommentarea.style.height = "60px";
+          texteditcommentarea.style.height = `${e.target.scrollHeight}px`;
         });
       }
     }
@@ -129,9 +149,6 @@ function Home() {
       .catch((error) => {
         console.log(error);
       });
-    // const newShowComments = [...showComments];
-    // newShowComments[index] = !newShowComments[index];
-    // setShowComments(newShowComments);
   };
   console.log(userInfor);
 
@@ -142,6 +159,14 @@ function Home() {
   const handleCloseDialog = () => {
     setOpenDialogId(null);
     setContent();
+  };
+  const handleOpenDialogComment = (commentId) => {
+    setOpenDialogCommentId(commentId);
+  };
+
+  const handleCloseDialogComment = () => {
+    setOpenDialogCommentId(null);
+    setContentEdit();
   };
   const handleEditPost = (postId) => {
     dispatch(
@@ -238,12 +263,71 @@ function Home() {
         });
     });
   };
+  const handleEditComment = (postId, commentId) => {
+    dispatch(
+      CallApiEditComment({
+        headers: { authorization: `Bearer ${authToken}` },
+        commentId: commentId,
+        postId: postId,
+        content: contentEdit,
+      })
+    ).then(() => {
+      const headers = {
+        Authorization: `Bearer ${authToken}`,
+      };
+      axios
+        .get(`http://localhost:5001/api/comments/${postId}`, {
+          headers: headers,
+        })
+        .then((response) => {
+          setOpenDialogCommentId(false);
+          setContentEdit("");
+          setPostStates((prevState) => ({
+            ...prevState,
+            [postId]: {
+              ...prevState[postId],
+              listComment: response.data,
+            },
+          }));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+  };
+  const CheckLike = (listLike) => {
+    if (userInfor && listPosts) {
+      for (let i = 0; i < listLike.length; i++) {
+        const postlike = listLike[i];
+        if (postlike.accountId === userInfor.account._id) {
+          return true; // Stop the iteration and return true
+        }
+      }
+    }
+    return false; // Return false if the condition is not met or the loop completes
+  };
+  const handleLike = (postId) => {
+    axios
+      .post(`http://localhost:5001/api/posts/like/${postId}`, null, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
+      .then(() => {
+        dispatch(
+          CallApiAllPosts({ headers: { authorization: `Bearer ${authToken}` } })
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
   console.log(listComment);
   return (
     <>
       {!userInfor && !listPosts ? (
         <CircularProgress />
-      ) : (
+      ) : userInfor && listPosts ? (
         <>
           <Navbar />
           <HomePage
@@ -379,13 +463,17 @@ function Home() {
                                   }}
                                 >
                                   <ion-icon
+                                    onClick={() => handleLike(post.postId)}
+                                    aria-hidden="true"
                                     style={{
                                       cursor: "pointer",
-                                      color: "red",
+                                      color: CheckLike(post.like)
+                                        ? "red"
+                                        : "black",
                                       height: "30px",
                                       width: "30px",
                                     }}
-                                    name="heart"
+                                    name="heart-outline"
                                   ></ion-icon>
                                   <ion-icon
                                     onClick={() =>
@@ -395,6 +483,8 @@ function Home() {
                                       cursor: "pointer",
                                       height: "30px",
                                       width: "30px",
+                                      fill: "white",
+                                      color: "black",
                                     }}
                                     name="chatbubble-outline"
                                   ></ion-icon>
@@ -540,6 +630,7 @@ function Home() {
                                                   .toUpperCase() +
                                                   comment.fullname.slice(1)}
                                               </span>
+
                                               <span>
                                                 {Readmore(comment.content)}
                                               </span>
@@ -554,7 +645,11 @@ function Home() {
                                                 }}
                                               >
                                                 <ion-icon
-                                                  onClick={() => alert("edit")}
+                                                  onClick={() =>
+                                                    handleOpenDialogComment(
+                                                      comment._id
+                                                    )
+                                                  }
                                                   name="create-outline"
                                                   style={{ display: "block" }}
                                                 ></ion-icon>
@@ -571,6 +666,99 @@ function Home() {
                                               </div>
                                             ) : (
                                               <></>
+                                            )}
+                                            {openDialogCommentId ===
+                                              comment._id && (
+                                              <Dialog
+                                                open={
+                                                  openDialogCommentId ===
+                                                  comment._id
+                                                }
+                                                onClose={
+                                                  handleCloseDialogComment
+                                                }
+                                                style={{}}
+                                                key={index}
+                                              >
+                                                <DialogTitle
+                                                  style={{
+                                                    backgroundColor:
+                                                      COLORS.green,
+                                                  }}
+                                                >
+                                                  <Box
+                                                    style={{
+                                                      display: "flex",
+                                                      justifyContent:
+                                                        "space-between",
+                                                      alignItems: "center",
+                                                      gap: "10px",
+                                                    }}
+                                                  >
+                                                    <span
+                                                      style={{
+                                                        fontWeight: "bold",
+                                                        color: "white",
+                                                      }}
+                                                    >
+                                                      Chỉnh sửa bình luận
+                                                    </span>
+                                                    <ion-icon
+                                                      name="close-circle-outline"
+                                                      onClick={
+                                                        handleCloseDialogComment
+                                                      }
+                                                      style={{
+                                                        cursor: "pointer",
+                                                        width: "30px",
+                                                        height: "30px",
+                                                        display: "block",
+                                                        border: "none",
+                                                        zIndex: "6",
+                                                        fontWeight: "bold",
+                                                        color: "white",
+                                                      }}
+                                                    ></ion-icon>
+                                                  </Box>
+                                                </DialogTitle>
+                                                <div
+                                                  style={{
+                                                    backgroundColor: "#f5f5f5",
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    padding: "20px",
+                                                    gap: "10px",
+                                                  }}
+                                                >
+                                                  <textarea
+                                                    placeholder={
+                                                      comment.content
+                                                    }
+                                                    id="textEditComment"
+                                                    style={{
+                                                      resize: "none",
+                                                      outline: "none",
+                                                      border: "none",
+                                                    }}
+                                                    value={contentEdit}
+                                                    onChange={(e) =>
+                                                      setContentEdit(
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                  ></textarea>
+                                                  <BtnEditComment
+                                                    onClick={() =>
+                                                      handleEditComment(
+                                                        post.postId,
+                                                        comment._id
+                                                      )
+                                                    }
+                                                  >
+                                                    Cập nhật
+                                                  </BtnEditComment>
+                                                </div>
+                                              </Dialog>
                                             )}
                                           </div>
                                         );
@@ -734,6 +922,8 @@ function Home() {
             </Grid>
           </HomePage>
         </>
+      ) : (
+        <></>
       )}
     </>
   );
@@ -742,6 +932,7 @@ function Home() {
 const HomePage = styled.section`
   min-height: 100vh;
   width: 100%;
+
   .comment_item:hover {
     background-color: #f5f5f5;
     margin-right: 20px;
@@ -816,6 +1007,22 @@ const HomePage = styled.section`
   #textComment::-webkit-scrollbar {
     width: 0;
   }
+  #textEditComment {
+    width: 100%;
+    height: 50px;
+    padding: 15px 80px 15px 60px;
+    line-height: 20px;
+    box-sizing: border-box;
+    outline: none;
+    resize: none;
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    max-height: 100px;
+  }
+  #textEditComment::-webkit-scrollbar {
+    width: 0;
+  }
   .container_img {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
@@ -843,6 +1050,19 @@ const HomePage = styled.section`
     border: none;
     box-sizing: border-box;
     cursor: pointer;
+  }
+`;
+const BtnEditComment = styled.section`
+  background-color: #58a168;
+  padding: 5px 10px;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  border: 1px solid #58a168;
+  cursor: pointer;
+  &:hover {
+    background-color: white;
+    color: #58a168;
   }
 `;
 export default Home;
