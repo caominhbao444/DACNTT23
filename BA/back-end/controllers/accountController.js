@@ -233,18 +233,6 @@ const unfollowAccount = asyncHandler(async (req, res) => {
 });
 
 const friendsAccount = asyncHandler(async (req, res) => {
-  //   const account = await Account.findOne(req.account);
-  //   const friends = await Promise.all(
-  //     account.followings.map((friendId) => {
-  //       return Account.findById(friendId);
-  //     })
-  //   );
-  //   const friendList = friends.map((friend) => {
-  //     const { _id, fullname } = friend;
-  //     return { _id, fullname };
-  //   });
-  //   res.status(200).json(friendList);
-  // });
   try {
     const account = await Account.findOne(req.account).lean();
     const friendIds = account.followings;

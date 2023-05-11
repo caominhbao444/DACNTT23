@@ -25,22 +25,6 @@ const createConversation = asyncHandler(async (req, res) => {
   }
 });
 
-const getConversationByTwoUsers = asyncHandler(async (req, res) => {
-  try {
-    const conversation = await Conversation.find({
-      senderId: req.params.senderId,
-      receiverId: req.params.receiverId,
-    });
-    if (conversation) {
-      res.status(200).json(conversation);
-    } else {
-      res.status(404);
-      throw new Error("Conversation not found");
-    }
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
 
 const getConversationsById = asyncHandler(async (req, res) => {
   try {
@@ -170,7 +154,6 @@ const deleteConversation = asyncHandler(async(req,res)=>{
 
 module.exports = {
   createConversation,
-  getConversationByTwoUsers,
   getConversationsById,
   getCurrentConversations,
   deleteConversation,

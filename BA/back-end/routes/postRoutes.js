@@ -15,6 +15,9 @@ const {
 const validateToken = require("../middleware/validateTokenHandler");
 router.use(validateToken);
 
+router.route("/").post(createPost);
+
+router.route("/like/:id").post(likePost);
 
 router.route("/all").get(getPosts)
 
@@ -25,10 +28,6 @@ router.route("/current").get(getCurrentPosts);
 router.route("/test/:id").get(testPost);
 
 router.route("/single/:id").get(getPostById);
-
-router.route("/").post(createPost);
-
-router.route("/like/:id").post(likePost);
 
 // userId / id bài post nhé
 router.route("/:id").put(updatePost).delete(deletePost);

@@ -15,7 +15,6 @@ const {
   updateAccount
 } = require("../controllers/accountController");
 const validateToken = require("../middleware/validateTokenHandler");
-const { route } = require("./userRoutes");
 
 const router = express.Router();
 
