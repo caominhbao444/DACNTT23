@@ -8,9 +8,9 @@ const {
   updateComments,
   getSingleCommentsPost,
   deleteComment,
+  getCommentUser,
 } = require("../controllers//commentsController");
 const validateToken = require("../middleware/validateTokenHandler");
-const { route } = require("./userRoutes");
 router.use(validateToken);
 
 //tạo comment , id của post
@@ -18,6 +18,8 @@ router.route("/:id").post(createComments);
 
 //lấy tất cả comments của tất cả bài post
 router.route("/").get(getCommentsAllPost);
+
+router.route("/users").get(getCommentUser);
 
 //lấy hết comments của bài post , id của post
 router.route("/:id").get(getCommentsPost);

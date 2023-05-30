@@ -61,6 +61,13 @@ const getSingleCommentsPost = asyncHandler(async(req,res)=>{
   res.status(200).json(commentList);
 });
 
+const getCommentUser = asyncHandler(async(req,res)=>{
+  const posts = await Post.find();
+  //const comments = await Comments.find({postId  : {$in :posts}})
+  res.status(200).json(posts);
+
+});
+
 const getCommentsAllPost = asyncHandler(async (req, res) => {
   const posts = await Post.find();
   const postIds = posts.map((p) => p._id);
@@ -140,6 +147,7 @@ module.exports = {
   createComments,
   getCommentsPost,
   getSingleCommentsPost,
+  getCommentUser,
   getCommentsAllPost,
   updateComments,
   deleteComment

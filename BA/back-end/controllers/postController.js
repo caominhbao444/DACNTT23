@@ -26,6 +26,67 @@ const getPosts = asyncHandler(async (req, res) => {
     res.status(500).json(err);
   }
 });
+const getPostById = asyncHandler(async(req,res)=>{
+  const posts = await Post.find({ _id: req.params.id });
+
+  const users = await Account.find({ _id: { $in: posts.map(p => p.accountId) } });
+  
+  const finalResults = posts.map((p, index) => ({
+    postId: req.params.id,
+    desc: p.desc,
+    like: p.likes,
+    numLike: p.likes.length,
+    img: p.img,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+    id: users[index]._id,
+    fullname: users[index].fullname,
+    userimg: users[index].img,
+  }));
+  
+  res.status(200).json(finalResults);
+});
+
+const getAllPostUser = asyncHandler(async (req, res) => {
+  try {
+    const posts = await Post.find({ accountId: req.params.accountId });
+
+    const accountIds = posts.map((p) => p.accountId);
+
+    const users = await Account.find({ _id: { $in: accountIds } });
+
+    const postsList = posts.map((p) => ({
+      postId: p._id,
+      desc: p.desc,
+      like: p.likes,
+      numLike:p.likes.length,
+      img: p.img,
+      createdAt: p.createdAt,
+      updatedAt : p.updatedAt
+    }));
+
+    const inforUser = posts.map((p) =>
+      users.find((u) => u._id.toString() === p.accountId.toString())
+    );
+
+    const finalResults = postsList.map((p, index) => ({
+      postId: p.postId,
+      desc: p.desc,
+      like: p.like,
+      numLike:p.numLike,
+      img: p.img,
+      createdAt: p.createdAt,
+      updatedAt : p.updatedAt,
+      id: inforUser[index]._id,
+      fullname: inforUser[index].fullname,
+      userimg: inforUser[index].img,
+    }));
+
+    res.status(200).json(finalResults);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 const getCurrentPosts = asyncHandler(async (req, res) => {
   try {
@@ -84,102 +145,37 @@ const createPost = asyncHandler(async (req, res) => {
   }
 });
 
-// const getPostById = asyncHandler(async (req, res) => {
-
-//     const posts = await Post.findById(req.params.id);
-    
-//     const accountIds = posts.map((p) => p.accountId);
-
-//     const users = await Account.find({ _id: { $in: accountIds } });
-
-//     const postsList = posts.map((p) => ({
-//       postId: p._id,
-//       desc: p.desc,
-//       like: p.likes,
-//       numLike: p.likes.length,
-//       img: p.img,
-//       createdAt: p.createdAt,
-//       updatedAt: p.updatedAt
-//     }));
-
-//     const inforUser = posts.map((p) =>
-//       users.find((u) => u._id.toString() === p.accountId.toString())
-//     );
-
-//     const finalResults = postsList.map((p, index) => ({
-//       postId: p.postId,
-//       desc: p.desc,
-//       like: p.like,
-//       numLike: p.numLike,
-//       img: p.img,
-//       createdAt: p.createdAt,
-//       updatedAt: p.updatedAt,
-//       id: inforUser[index]._id,
-//       fullname: inforUser[index].fullname,
-//       userimg: inforUser[index].img,
-//     }));
-
-// });
-
-const getPostById = asyncHandler(async(req,res)=>{
-  const posts = await Post.find({ _id: req.params.id });
-
-  const users = await Account.find({ _id: { $in: posts.map(p => p.accountId) } });
-  
-  const finalResults = posts.map((p, index) => ({
-    postId: req.params.id,
-    desc: p.desc,
-    like: p.like,
-    numLike: p.numLike,
-    img: p.img,
-    createdAt: p.createdAt,
-    updatedAt: p.updatedAt,
-    id: users[index]._id,
-    fullname: users[index].fullname,
-    userimg: users[index].img,
-  }));
-  
-  res.status(200).json(finalResults);
-});
-
-const getAllPostUser = asyncHandler(async (req, res) => {
-  try {
-    const posts = await Post.find({ accountId: req.params.accountId });
-
-    const accountIds = posts.map((p) => p.accountId);
-
-    const users = await Account.find({ _id: { $in: accountIds } });
-
-    const postsList = posts.map((p) => ({
-      postId: p._id,
-      desc: p.desc,
-      like: p.likes,
-      img: p.img,
-      createdAt: p.createdAt,
-      updatedAt : p.updatedAt
-    }));
-
-    const inforUser = posts.map((p) =>
-      users.find((u) => u._id.toString() === p.accountId.toString())
-    );
-
-    const finalResults = postsList.map((p, index) => ({
-      postId: p.postId,
-      desc: p.desc,
-      like: p.likes,
-      img: p.img,
-      createdAt: p.createdAt,
-      updatedAt : p.updatedAt,
-      id: inforUser[index]._id,
-      fullname: inforUser[index].fullname,
-      userimg: inforUser[index].img,
-    }));
-
-    res.status(200).json(finalResults);
-  } catch (err) {
-    res.status(500).json(err);
+const likePost = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404);
+    throw new Error("Post not found");
   }
+  const likedByUser = post.likes.some(
+    (like) => like.accountId == req.account.id
+  );
+  if (likedByUser) {
+    await post.updateOne({
+      $pull: {
+        likes: { accountId: req.account.id, fullname: req.account.fullname },
+      },
+    });
+    console.log("DisLike !!!");
+  } else {
+    await post.updateOne({
+      $push: {
+        likes: { accountId: req.account.id, fullname: req.account.fullname },
+      },
+    });
+    console.log("Like !!!");
+  }
+  const updatedPost = await Post.findById(req.params.id);
+  const numLikes = updatedPost.likes.length;
+  res
+    .status(200)
+    .json({ postId: updatedPost._id, likes: updatedPost.likes, numLikes });
 });
+
 
 const updatePost = asyncHandler(async (req, res) => {
 const account = await Account.findOne(req.account);
@@ -220,36 +216,7 @@ const deletePost = asyncHandler(async (req, res) => {
   }
 });
 
-const likePost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  if (!post) {
-    res.status(404);
-    throw new Error("Post not found");
-  }
-  const likedByUser = post.likes.some(
-    (like) => like.accountId == req.account.id
-  );
-  if (likedByUser) {
-    await post.updateOne({
-      $pull: {
-        likes: { accountId: req.account.id, fullname: req.account.fullname },
-      },
-    });
-    console.log("DisLike !!!");
-  } else {
-    await post.updateOne({
-      $push: {
-        likes: { accountId: req.account.id, fullname: req.account.fullname },
-      },
-    });
-    console.log("Like !!!");
-  }
-  const updatedPost = await Post.findById(req.params.id);
-  const numLikes = updatedPost.likes.length;
-  res
-    .status(200)
-    .json({ postId: updatedPost._id, likes: updatedPost.likes, numLikes });
-});
+
 
 const testPost = asyncHandler(async (req, res) => {
   // const posts = await Post.find({ _id: req.params.id });
