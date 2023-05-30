@@ -10,6 +10,7 @@ const initialState = {
   deleteComment: [],
   editComment: [],
   postEdit: [],
+  postDelete: [],
   like: [],
   isLoading: false,
   isFailed: false,
@@ -124,6 +125,28 @@ export const CallApiEditPost = createAsyncThunk(
     }
   }
 );
+
+//CallApiDeletePost
+export const CallApiDeletePost = createAsyncThunk(
+  "post/callApiDeletePost",
+  async function ({ headers, postId }) {
+    try {
+      const apiDeletePost = await axios.delete(
+        `http://localhost:5001/api/posts/${postId}`,
+
+        {
+          headers: {
+            Authorization: headers.authorization,
+          },
+        }
+      );
+      return apiDeletePost.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
 //CallApiPostNewComment
 export const CallApiPostNewComment = createAsyncThunk(
   "post/callApiPostNewComment",
@@ -189,6 +212,7 @@ export const CallApiEditComment = createAsyncThunk(
     }
   }
 );
+
 //CallApiLike
 export const CallApiLike = createAsyncThunk(
   "post/callApiLikePost",
@@ -312,6 +336,17 @@ const postSlice = createSlice({
         state.like = action.payload;
       })
       .addCase(CallApiLike.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(CallApiDeletePost.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CallApiDeletePost.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.postDelete = action.payload;
+      })
+      .addCase(CallApiDeletePost.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
       });

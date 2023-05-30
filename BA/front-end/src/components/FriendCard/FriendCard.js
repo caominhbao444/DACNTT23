@@ -101,7 +101,7 @@ function FriendCard(props) {
           className="button_chat"
           style={{ textDecoration: "none" }}
         >
-          <span>Chat</span>
+          <span style={{ fontSize: "14px", fontWeight: "500" }}>Nhắn tin</span>
           <ion-icon
             name="navigate-outline"
             style={{ display: "inline-block" }}
@@ -112,7 +112,9 @@ function FriendCard(props) {
           className="button_chat"
           style={{ textDecoration: "none" }}
         >
-          <span>Profile</span>
+          <span style={{ fontSize: "14px", fontWeight: "500" }}>
+            Trang cá nhân
+          </span>
           <ion-icon
             name="accessibility-outline"
             style={{ display: "inline-block" }}

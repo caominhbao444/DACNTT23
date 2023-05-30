@@ -7,7 +7,7 @@ import { COLORS } from "../../assets/Color";
 import Modal from "./Modal";
 import { useDispatch, useSelector } from "react-redux";
 import { CallApiUser } from "../../features/userSlice";
-import { CallApiCreatePost } from "../../features/postSlice";
+import { CallApiCreatePost, CallApiAllPosts } from "../../features/postSlice";
 import Loading from "../../pages/Loading/Loading";
 import axios from "axios";
 import {
@@ -32,7 +32,7 @@ function SideBar() {
   );
   const authToken = localStorage.getItem("authToken");
   const { userInfor, isLoading } = useSelector((state) => state.user);
-  const { postCreate } = useSelector((state) => state.post);
+  const { postCreate, listPosts } = useSelector((state) => state.post);
   // const [isFriends, setIsFriends] = useState(true);
   console.log(userInfor.account);
   useEffect(() => {
@@ -127,6 +127,12 @@ function SideBar() {
         text: "Bài viết đã được đăng",
         icon: "success",
         confirmButtonText: "OK",
+      }).then(() => {
+        dispatch(
+          CallApiAllPosts({
+            headers: { authorization: `Bearer ${authToken}` },
+          })
+        );
       });
     });
   };
