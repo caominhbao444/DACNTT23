@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Field, useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import signup from "../../assets/signup.jpg";
 import Swal from "sweetalert2";
 import {
   Button,
@@ -135,313 +136,431 @@ function Signup() {
     }
   };
   return (
-    <SignupPage>
-      <div className="container" style={{ backgroundColor: "ButtonFace" }}>
-        <h2>Đăng ký</h2>
+    // <SignupPage>
+    //   <div className="container" style={{ backgroundColor: "ButtonFace" }}>
+    //     <h2>Đăng ký</h2>
+    //     <div
+    //       style={{
+    //         display: "flex",
+    //         flexDirection: "column",
+    //         alignItems: "center",
+    //         gap: "20px",
+    //       }}
+    //     >
+    //       <img
+    //         src={`${Urlimg}`}
+    //         alt=""
+    //         width="80px"
+    //         height="80px"
+    //         style={{
+    //           objectFit: "cover",
+    //           objectPosition: "center",
+    //           borderRadius: "50%",
+    //         }}
+    //       />
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           justifyContent: "center",
+    //           alignItems: "center",
+    //         }}
+    //       >
+    //         <button onClick={upLoad} className="btn_upload">
+    //           Chọn ảnh
+    //         </button>
+    //       </div>
+    //     </div>
+    //     <form
+    //       onSubmit={handleSubmit}
+    //       style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+    //     >
+    //       <Grid container style={{ backgroundColor: "", minHeight: "50vh" }}>
+    //         <Grid item xs={6} md={6}>
+    //           <div className="containerItem">
+    //             <div className="inputGroup">
+    //               <label className="label-input" for="fullname">
+    //                 Họ và tên
+    //               </label>
+    //               <input
+    //                 type="text"
+    //                 autoComplete="off"
+    //                 value={fullname}
+    //                 onChange={handleFullName}
+    //                 name="fullname"
+    //                 placeholder="Nhập họ và tên của bạn"
+    //                 id="fullname"
+    //                 required
+    //                 style={{
+    //                   boxSizing: "border-box",
+    //                   height: "100%",
+    //                   width: "80%",
+    //                   padding: "5px 0 5px 5px",
+    //                   border: "none",
+    //                   outline: "none",
+    //                 }}
+    //               />
+    //             </div>
+    //             <div className="inputGroup">
+    //               <label className="label-input" for="email">
+    //                 Email
+    //               </label>
+    //               <input
+    //                 required
+    //                 type="text"
+    //                 autoComplete="off"
+    //                 value={email}
+    //                 onChange={handleEmailInput}
+    //                 name="email"
+    //                 id="email"
+    //                 placeholder="Nhập email của bạn"
+    //                 style={{
+    //                   boxSizing: "border-box",
+    //                   height: "100%",
+    //                   width: "80%",
+    //                   padding: "5px 0 5px 5px",
+    //                   border: "none",
+    //                   outline: "none",
+    //                 }}
+    //               />
+    //             </div>
+    //             <div className="inputGroup">
+    //               <label className="label-input" for="password">
+    //                 Mật khẩu
+    //               </label>
+    //               <div
+    //                 style={{
+    //                   height: "100%",
+    //                   width: "80%",
+    //                   position: "relative",
+    //                 }}
+    //               >
+    //                 <input
+    //                   required
+    //                   type="password"
+    //                   name="password"
+    //                   autoComplete="off"
+    //                   id="password"
+    //                   value={password}
+    //                   onChange={handlePwdInput}
+    //                   style={{
+    //                     boxSizing: "border-box",
+    //                     height: "100%",
+    //                     width: "100%",
+    //                     paddingLeft: "5px",
+    //                     border: "none",
+    //                     outline: "none",
+    //                   }}
+    //                 />
+    //                 <span
+    //                   className="eyes"
+    //                   onClick={() => {
+    //                     var x = document.getElementById("password");
+    //                     var y = document.getElementById("hide1");
+    //                     var z = document.getElementById("hide2");
+    //                     if (x.type === "password") {
+    //                       x.type = "text";
+    //                       y.style.display = "block";
+    //                       z.style.display = "none";
+    //                     } else {
+    //                       x.type = "password";
+    //                       y.style.display = "none";
+    //                       z.style.display = "block";
+    //                     }
+    //                   }}
+    //                 >
+    //                   <ion-icon id="hide1" name="eye-outline"></ion-icon>
+    //                   <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
+    //                 </span>
+    //               </div>
+    //             </div>
+    //             <div className="inputGroup">
+    //               <label className="label-input" for="passwordConfirm">
+    //                 Nhập lại mật khẩu
+    //               </label>
+    //               <div
+    //                 style={{
+    //                   height: "100%",
+    //                   width: "80%",
+    //                   position: "relative",
+    //                 }}
+    //               >
+    //                 <input
+    //                   type="password"
+    //                   name="passwordConfirm"
+    //                   id="passwordConfirm"
+    //                   value={passwordConfirm}
+    //                   onChange={handlePasswordConfirm}
+    //                   style={{
+    //                     boxSizing: "border-box",
+    //                     height: "100%",
+    //                     width: "100%",
+    //                     padding: "5px 0 5px 5px",
+    //                     border: "none",
+    //                     outline: "none",
+    //                   }}
+    //                 />
+    //                 <span
+    //                   className="eyes"
+    //                   onClick={() => {
+    //                     var x = document.getElementById("password");
+    //                     var y = document.getElementById("hide1");
+    //                     var z = document.getElementById("hide2");
+    //                     if (x.type === "password") {
+    //                       x.type = "text";
+    //                       y.style.display = "block";
+    //                       z.style.display = "none";
+    //                     } else {
+    //                       x.type = "password";
+    //                       y.style.display = "none";
+    //                       z.style.display = "block";
+    //                     }
+    //                   }}
+    //                 >
+    //                   <ion-icon id="hide1" name="eye-outline"></ion-icon>
+    //                   <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
+    //                 </span>
+    //               </div>
+    //             </div>
+    //           </div>
+    //         </Grid>
+    //         <Grid item xs={6} md={6}>
+    //           <div className="containerItem1">
+    //             <div className="inputGroup1">
+    //               <label className="label-input" for="phone">
+    //                 Số điện thoại
+    //               </label>
+    //               <input
+    //                 type="text"
+    //                 value={numberPhone}
+    //                 onChange={handleNumber}
+    //                 name="phone"
+    //                 id="phone"
+    //                 style={{
+    //                   boxSizing: "border-box",
+    //                   height: "100%",
+    //                   width: "80%",
+    //                   padding: "5px 0 5px 5px",
+    //                   border: "none",
+    //                   outline: "none",
+    //                 }}
+    //               />
+    //             </div>
+    //             <div className="inputGroup1">
+    //               <label className="label-input" for="education">
+    //                 Học vấn
+    //               </label>
+    //               <input
+    //                 type="text"
+    //                 value={education}
+    //                 onChange={handleEducationInput}
+    //                 name="education"
+    //                 id="education"
+    //                 style={{
+    //                   boxSizing: "border-box",
+    //                   height: "100%",
+    //                   width: "80%",
+    //                   padding: "5px 0 5px 5px",
+    //                   border: "none",
+    //                   outline: "none",
+    //                 }}
+    //               />
+    //             </div>
+    //             <div className="inputGroup">
+    //               <label className="label-input" for="city">
+    //                 Thành phố
+    //               </label>
+    //               <input
+    //                 type="text"
+    //                 name="city"
+    //                 id="city"
+    //                 value={city}
+    //                 onChange={handleCityInput}
+    //                 style={{
+    //                   boxSizing: "border-box",
+    //                   height: "100%",
+    //                   width: "80%",
+    //                   padding: "5px 0 5px 5px",
+    //                   border: "none",
+    //                   outline: "none",
+    //                 }}
+    //               />
+    //             </div>
+    //             <div className="inputGroup">
+    //               <label className="label-input" for="from">
+    //                 Quốc gia
+    //               </label>
+    //               <input
+    //                 value={country}
+    //                 onChange={handleCountryInput}
+    //                 type="text"
+    //                 name="from"
+    //                 id="from"
+    //                 style={{
+    //                   boxSizing: "border-box",
+    //                   height: "100%",
+    //                   width: "80%",
+    //                   padding: "5px 0 5px 5px",
+    //                   border: "none",
+    //                   outline: "none",
+    //                 }}
+    //               />
+    //             </div>
+    //           </div>
+    //         </Grid>
+    //         <Grid></Grid>
+    //       </Grid>
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           justifyContent: "center",
+    //           alignItems: "center",
+    //         }}
+    //       >
+    //         <button
+    //           type="submit"
+    //           className="btn_upload"
+    //           style={{ width: "90%" }}
+    //         >
+    //           Đăng ký
+    //         </button>
+    //       </div>
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           justifyContent: "center",
+    //           alignItems: "center",
+    //           width: "50%",
+    //           marginLeft: "50%",
+    //           gap: "5px",
+    //           padding: "10px",
+    //         }}
+    //       >
+    //         <span>Bạn đã có tài khoản?</span>
+    //         <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+    //           Đăng nhập
+    //         </Link>
+    //       </div>
+    //     </form>
+    //   </div>
+    // </SignupPage>
+    <SignupPage1>
+      <section className="left-area">
+        <div
+          style={{
+            width: "80%",
+            height: "80%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        ></div>
+      </section>
+      <section className="right-area">
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+          }}
+        >
+          <h3>Đăng ký</h3>
+          <p>Chào mừng đến với mạng xã hội Instagram</p>
+        </div>
+        <ul
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            listStyle: "none",
             gap: "20px",
           }}
         >
-          <img
-            src={`${Urlimg}`}
-            alt=""
-            width="80px"
-            height="80px"
+          <li
             style={{
-              objectFit: "cover",
-              objectPosition: "center",
+              height: "40px",
+              textAlign: "center",
+              width: "40px",
+              lineHeight: "40px",
+              boxSizing: "border-box",
               borderRadius: "50%",
+              color: "white",
+              backgroundColor: "black",
             }}
-          />
+          >
+            1
+          </li>
+          <li
+            style={{
+              height: "40px",
+              textAlign: "center",
+              width: "40px",
+              lineHeight: "40px",
+              boxSizing: "border-box",
+              borderRadius: "50%",
+              color: "white",
+              backgroundColor: "black",
+            }}
+          >
+            2
+          </li>
+          <li
+            style={{
+              height: "40px",
+              textAlign: "center",
+              width: "40px",
+              lineHeight: "40px",
+              boxSizing: "border-box",
+              borderRadius: "50%",
+              color: "white",
+              backgroundColor: "black",
+            }}
+          >
+            3
+          </li>
+        </ul>
+        <div
+          style={{
+            height: "350px",
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            gap: "20px",
+          }}
+        >
           <div
             style={{
               display: "flex",
-              justifyContent: "center",
+              flexDirection: "column",
+              height: "350px",
               alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
             }}
           >
-            <button onClick={upLoad} className="btn_upload">
-              Chọn ảnh
+            <img
+              src="https://us.123rf.com/450wm/mathier/mathier1905/mathier190500002/134557216-no-thumbnail-image-placeholder-for-forums-blogs-and-websites.jpg?ver=6"
+              width={250}
+              height={250}
+              alt=""
+            ></img>
+            <p>Chọn ảnh đại diện của bạn</p>
+            <button
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "black",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+              }}
+            >
+              Tiếp tục
             </button>
           </div>
         </div>
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-        >
-          <Grid container style={{ backgroundColor: "", minHeight: "50vh" }}>
-            <Grid item xs={6} md={6}>
-              <div className="containerItem">
-                <div className="inputGroup">
-                  <label className="label-input" for="fullname">
-                    Họ và tên
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    value={fullname}
-                    onChange={handleFullName}
-                    name="fullname"
-                    placeholder="Nhập họ và tên của bạn"
-                    id="fullname"
-                    required
-                    style={{
-                      boxSizing: "border-box",
-                      height: "100%",
-                      width: "80%",
-                      padding: "5px 0 5px 5px",
-                      border: "none",
-                      outline: "none",
-                    }}
-                  />
-                </div>
-                <div className="inputGroup">
-                  <label className="label-input" for="email">
-                    Email
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    autoComplete="off"
-                    value={email}
-                    onChange={handleEmailInput}
-                    name="email"
-                    id="email"
-                    placeholder="Nhập email của bạn"
-                    style={{
-                      boxSizing: "border-box",
-                      height: "100%",
-                      width: "80%",
-                      padding: "5px 0 5px 5px",
-                      border: "none",
-                      outline: "none",
-                    }}
-                  />
-                </div>
-                <div className="inputGroup">
-                  <label className="label-input" for="password">
-                    Mật khẩu
-                  </label>
-                  <div
-                    style={{
-                      height: "100%",
-                      width: "80%",
-                      position: "relative",
-                    }}
-                  >
-                    <input
-                      required
-                      type="password"
-                      name="password"
-                      autoComplete="off"
-                      id="password"
-                      value={password}
-                      onChange={handlePwdInput}
-                      style={{
-                        boxSizing: "border-box",
-                        height: "100%",
-                        width: "100%",
-                        paddingLeft: "5px",
-                        border: "none",
-                        outline: "none",
-                      }}
-                    />
-                    <span
-                      className="eyes"
-                      onClick={() => {
-                        var x = document.getElementById("password");
-                        var y = document.getElementById("hide1");
-                        var z = document.getElementById("hide2");
-                        if (x.type === "password") {
-                          x.type = "text";
-                          y.style.display = "block";
-                          z.style.display = "none";
-                        } else {
-                          x.type = "password";
-                          y.style.display = "none";
-                          z.style.display = "block";
-                        }
-                      }}
-                    >
-                      <ion-icon id="hide1" name="eye-outline"></ion-icon>
-                      <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
-                    </span>
-                  </div>
-                </div>
-                <div className="inputGroup">
-                  <label className="label-input" for="passwordConfirm">
-                    Nhập lại mật khẩu
-                  </label>
-                  <div
-                    style={{
-                      height: "100%",
-                      width: "80%",
-                      position: "relative",
-                    }}
-                  >
-                    <input
-                      type="password"
-                      name="passwordConfirm"
-                      id="passwordConfirm"
-                      value={passwordConfirm}
-                      onChange={handlePasswordConfirm}
-                      style={{
-                        boxSizing: "border-box",
-                        height: "100%",
-                        width: "100%",
-                        padding: "5px 0 5px 5px",
-                        border: "none",
-                        outline: "none",
-                      }}
-                    />
-                    <span
-                      className="eyes"
-                      onClick={() => {
-                        var x = document.getElementById("password");
-                        var y = document.getElementById("hide1");
-                        var z = document.getElementById("hide2");
-                        if (x.type === "password") {
-                          x.type = "text";
-                          y.style.display = "block";
-                          z.style.display = "none";
-                        } else {
-                          x.type = "password";
-                          y.style.display = "none";
-                          z.style.display = "block";
-                        }
-                      }}
-                    >
-                      <ion-icon id="hide1" name="eye-outline"></ion-icon>
-                      <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Grid>
-            <Grid item xs={6} md={6}>
-              <div className="containerItem1">
-                <div className="inputGroup1">
-                  <label className="label-input" for="phone">
-                    Số điện thoại
-                  </label>
-                  <input
-                    type="text"
-                    value={numberPhone}
-                    onChange={handleNumber}
-                    name="phone"
-                    id="phone"
-                    style={{
-                      boxSizing: "border-box",
-                      height: "100%",
-                      width: "80%",
-                      padding: "5px 0 5px 5px",
-                      border: "none",
-                      outline: "none",
-                    }}
-                  />
-                </div>
-                <div className="inputGroup1">
-                  <label className="label-input" for="education">
-                    Học vấn
-                  </label>
-                  <input
-                    type="text"
-                    value={education}
-                    onChange={handleEducationInput}
-                    name="education"
-                    id="education"
-                    style={{
-                      boxSizing: "border-box",
-                      height: "100%",
-                      width: "80%",
-                      padding: "5px 0 5px 5px",
-                      border: "none",
-                      outline: "none",
-                    }}
-                  />
-                </div>
-                <div className="inputGroup">
-                  <label className="label-input" for="city">
-                    Thành phố
-                  </label>
-                  <input
-                    type="text"
-                    name="city"
-                    id="city"
-                    value={city}
-                    onChange={handleCityInput}
-                    style={{
-                      boxSizing: "border-box",
-                      height: "100%",
-                      width: "80%",
-                      padding: "5px 0 5px 5px",
-                      border: "none",
-                      outline: "none",
-                    }}
-                  />
-                </div>
-                <div className="inputGroup">
-                  <label className="label-input" for="from">
-                    Quốc gia
-                  </label>
-                  <input
-                    value={country}
-                    onChange={handleCountryInput}
-                    type="text"
-                    name="from"
-                    id="from"
-                    style={{
-                      boxSizing: "border-box",
-                      height: "100%",
-                      width: "80%",
-                      padding: "5px 0 5px 5px",
-                      border: "none",
-                      outline: "none",
-                    }}
-                  />
-                </div>
-              </div>
-            </Grid>
-            <Grid></Grid>
-          </Grid>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <button
-              type="submit"
-              className="btn_upload"
-              style={{ width: "90%" }}
-            >
-              Đăng ký
-            </button>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "50%",
-              marginLeft: "50%",
-              gap: "5px",
-              padding: "10px",
-            }}
-          >
-            <span>Bạn đã có tài khoản?</span>
-            <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-              Đăng nhập
-            </Link>
-          </div>
-        </form>
-      </div>
-    </SignupPage>
+      </section>
+
+      <div class="left-part"></div>
+      <div class="right-part"></div>
+    </SignupPage1>
   );
 }
 
@@ -571,6 +690,63 @@ const SignupPage = styled.section`
   .btn_upload:hover {
     color: #0000ff;
     background-color: white;
+  }
+`;
+const SignupPage1 = styled.section`
+  height: 100vh;
+  padding: 50px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+
+  display: flex;
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  .left-part {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(30% + 20px);
+    height: 100%;
+    background-color: #a2b3c3;
+    z-index: 1;
+  }
+  .right-part {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: calc(70% - 20px);
+    height: 100%;
+    background-color: #f6f6f6;
+    z-index: 1;
+  }
+  .left-area {
+    width: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 100px);
+    border-radius: 10px 0 0 10px;
+    background-image: url(${signup});
+    background-size: cover;
+    background-color: rgba(0.5, 0, 0, 0.5);
+    background-position: center;
+    z-index: 2;
+  }
+  .right-area {
+    width: 70%;
+    height: 100%;
+    border-radius: 0 10px 10px 0;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-item: center;
+    z-index: 2;
+    padding: 10px;
+    box-sizing: border-box;
+    gap: 10px;
   }
 `;
 export default Signup;
