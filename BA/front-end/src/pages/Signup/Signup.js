@@ -11,11 +11,13 @@ import signup from "../../assets/signup.jpg";
 import Swal from "sweetalert2";
 import {
   Button,
+  CircularProgress,
   FormControl,
   FormGroup,
   Input,
   InputLabel,
   OutlinedInput,
+  Skeleton,
   makeStyles,
 } from "@mui/material";
 
@@ -29,10 +31,50 @@ function Signup() {
   const [fullname, setFullName] = useState("");
   const navigate = useNavigate();
   const [img, setImg] = useState("");
-  const [Urlimg, setUrlimg] = useState(
-    "https://images.unsplash.com/photo-1517849845537-4d257902454a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZG9nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=600&q=60"
+  const [bao, setBao] = useState("");
+  const [imageUrl, setImageUrl] = useState(
+    "https://us.123rf.com/450wm/mathier/mathier1905/mathier190500002/134557216-no-thumbnail-image-placeholder-for-forums-blogs-and-websites.jpg?ver=6"
   );
   const [passwordConfirm, setPasswordCofirm] = useState("");
+  const [step, setStep] = useState(1);
+  const [fullnameError, setFullnameError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [numberPhoneError, setNumberPhoneError] = useState(false);
+  const [countryError, setCountryError] = useState(false);
+  const [cityError, setCityError] = useState(false);
+  const [educationError, setEducationError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordConfirmError, setPasswordConfirmError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  function handleFileChange(event) {
+    setLoading(true);
+    const selectedFile = event.target.files[0];
+    uploadImageToCloudinary(selectedFile)
+      .then((url) => {
+        setLoading(false);
+        setImageUrl(url);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error(error);
+      });
+  }
+
+  function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "pzoe2lzh"); // replace with your Cloudinary upload preset
+
+    return axios
+      .post("https://api.cloudinary.com/v1_1/djhhzmcps/image/upload", formData)
+      .then((response) => {
+        return response.data.url; // return the URL of the uploaded image
+      })
+      .catch((error) => {
+        console.error(error);
+        return null;
+      });
+  }
   // const onSubmit = async (values) => {
   //   const { fullname, email, password, phone, city, from, education } = values;
   //   await axios
@@ -70,7 +112,7 @@ function Signup() {
           city: city,
           from: country,
           education: education,
-          img: Urlimg,
+          img: imageUrl,
         })
         .then((response) => {
           localStorage.setItem("authToken", response.data.accessToken);
@@ -94,355 +136,15 @@ function Signup() {
     }
   };
   const handleEmailInput = (e) => setEmail(e.target.value);
-  const handlePwdInput = (e) => setPassWord(e.target.value);
   const handleFullName = (e) => setFullName(e.target.value);
+  const handlePwdInput = (e) => setPassWord(e.target.value);
   const handlePasswordConfirm = (e) => setPasswordCofirm(e.target.value);
   const handleCityInput = (e) => setCity(e.target.value);
   const handleCountryInput = (e) => setCountry(e.target.value);
   const handleEducationInput = (e) => setEducation(e.target.value);
   const handleNumber = (e) => setNumberPhone(e.target.value);
 
-  const upLoad = async () => {
-    const { value: file } = await Swal.fire({
-      title: "Chọn ảnh đại diện",
-      input: "file",
-      inputAttributes: {
-        accept: "image/*",
-        "aria-label": "Upload your profile picture",
-      },
-    });
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", "pzoe2lzh");
-        axios
-          .post(
-            "https://api.cloudinary.com/v1_1/djhhzmcps/image/upload",
-            formData
-          )
-          .then((response) => {
-            Swal.fire({
-              title: "Ảnh của bạn đã được đăng",
-              imageUrl: response.data.url,
-              imageAlt: "The uploaded picture",
-            });
-            setUrlimg(response.data.url);
-          });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
   return (
-    // <SignupPage>
-    //   <div className="container" style={{ backgroundColor: "ButtonFace" }}>
-    //     <h2>Đăng ký</h2>
-    //     <div
-    //       style={{
-    //         display: "flex",
-    //         flexDirection: "column",
-    //         alignItems: "center",
-    //         gap: "20px",
-    //       }}
-    //     >
-    //       <img
-    //         src={`${Urlimg}`}
-    //         alt=""
-    //         width="80px"
-    //         height="80px"
-    //         style={{
-    //           objectFit: "cover",
-    //           objectPosition: "center",
-    //           borderRadius: "50%",
-    //         }}
-    //       />
-    //       <div
-    //         style={{
-    //           display: "flex",
-    //           justifyContent: "center",
-    //           alignItems: "center",
-    //         }}
-    //       >
-    //         <button onClick={upLoad} className="btn_upload">
-    //           Chọn ảnh
-    //         </button>
-    //       </div>
-    //     </div>
-    //     <form
-    //       onSubmit={handleSubmit}
-    //       style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-    //     >
-    //       <Grid container style={{ backgroundColor: "", minHeight: "50vh" }}>
-    //         <Grid item xs={6} md={6}>
-    //           <div className="containerItem">
-    //             <div className="inputGroup">
-    //               <label className="label-input" for="fullname">
-    //                 Họ và tên
-    //               </label>
-    //               <input
-    //                 type="text"
-    //                 autoComplete="off"
-    //                 value={fullname}
-    //                 onChange={handleFullName}
-    //                 name="fullname"
-    //                 placeholder="Nhập họ và tên của bạn"
-    //                 id="fullname"
-    //                 required
-    //                 style={{
-    //                   boxSizing: "border-box",
-    //                   height: "100%",
-    //                   width: "80%",
-    //                   padding: "5px 0 5px 5px",
-    //                   border: "none",
-    //                   outline: "none",
-    //                 }}
-    //               />
-    //             </div>
-    //             <div className="inputGroup">
-    //               <label className="label-input" for="email">
-    //                 Email
-    //               </label>
-    //               <input
-    //                 required
-    //                 type="text"
-    //                 autoComplete="off"
-    //                 value={email}
-    //                 onChange={handleEmailInput}
-    //                 name="email"
-    //                 id="email"
-    //                 placeholder="Nhập email của bạn"
-    //                 style={{
-    //                   boxSizing: "border-box",
-    //                   height: "100%",
-    //                   width: "80%",
-    //                   padding: "5px 0 5px 5px",
-    //                   border: "none",
-    //                   outline: "none",
-    //                 }}
-    //               />
-    //             </div>
-    //             <div className="inputGroup">
-    //               <label className="label-input" for="password">
-    //                 Mật khẩu
-    //               </label>
-    //               <div
-    //                 style={{
-    //                   height: "100%",
-    //                   width: "80%",
-    //                   position: "relative",
-    //                 }}
-    //               >
-    //                 <input
-    //                   required
-    //                   type="password"
-    //                   name="password"
-    //                   autoComplete="off"
-    //                   id="password"
-    //                   value={password}
-    //                   onChange={handlePwdInput}
-    //                   style={{
-    //                     boxSizing: "border-box",
-    //                     height: "100%",
-    //                     width: "100%",
-    //                     paddingLeft: "5px",
-    //                     border: "none",
-    //                     outline: "none",
-    //                   }}
-    //                 />
-    //                 <span
-    //                   className="eyes"
-    //                   onClick={() => {
-    //                     var x = document.getElementById("password");
-    //                     var y = document.getElementById("hide1");
-    //                     var z = document.getElementById("hide2");
-    //                     if (x.type === "password") {
-    //                       x.type = "text";
-    //                       y.style.display = "block";
-    //                       z.style.display = "none";
-    //                     } else {
-    //                       x.type = "password";
-    //                       y.style.display = "none";
-    //                       z.style.display = "block";
-    //                     }
-    //                   }}
-    //                 >
-    //                   <ion-icon id="hide1" name="eye-outline"></ion-icon>
-    //                   <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
-    //                 </span>
-    //               </div>
-    //             </div>
-    //             <div className="inputGroup">
-    //               <label className="label-input" for="passwordConfirm">
-    //                 Nhập lại mật khẩu
-    //               </label>
-    //               <div
-    //                 style={{
-    //                   height: "100%",
-    //                   width: "80%",
-    //                   position: "relative",
-    //                 }}
-    //               >
-    //                 <input
-    //                   type="password"
-    //                   name="passwordConfirm"
-    //                   id="passwordConfirm"
-    //                   value={passwordConfirm}
-    //                   onChange={handlePasswordConfirm}
-    //                   style={{
-    //                     boxSizing: "border-box",
-    //                     height: "100%",
-    //                     width: "100%",
-    //                     padding: "5px 0 5px 5px",
-    //                     border: "none",
-    //                     outline: "none",
-    //                   }}
-    //                 />
-    //                 <span
-    //                   className="eyes"
-    //                   onClick={() => {
-    //                     var x = document.getElementById("password");
-    //                     var y = document.getElementById("hide1");
-    //                     var z = document.getElementById("hide2");
-    //                     if (x.type === "password") {
-    //                       x.type = "text";
-    //                       y.style.display = "block";
-    //                       z.style.display = "none";
-    //                     } else {
-    //                       x.type = "password";
-    //                       y.style.display = "none";
-    //                       z.style.display = "block";
-    //                     }
-    //                   }}
-    //                 >
-    //                   <ion-icon id="hide1" name="eye-outline"></ion-icon>
-    //                   <ion-icon id="hide2" name="eye-off-outline"></ion-icon>
-    //                 </span>
-    //               </div>
-    //             </div>
-    //           </div>
-    //         </Grid>
-    //         <Grid item xs={6} md={6}>
-    //           <div className="containerItem1">
-    //             <div className="inputGroup1">
-    //               <label className="label-input" for="phone">
-    //                 Số điện thoại
-    //               </label>
-    //               <input
-    //                 type="text"
-    //                 value={numberPhone}
-    //                 onChange={handleNumber}
-    //                 name="phone"
-    //                 id="phone"
-    //                 style={{
-    //                   boxSizing: "border-box",
-    //                   height: "100%",
-    //                   width: "80%",
-    //                   padding: "5px 0 5px 5px",
-    //                   border: "none",
-    //                   outline: "none",
-    //                 }}
-    //               />
-    //             </div>
-    //             <div className="inputGroup1">
-    //               <label className="label-input" for="education">
-    //                 Học vấn
-    //               </label>
-    //               <input
-    //                 type="text"
-    //                 value={education}
-    //                 onChange={handleEducationInput}
-    //                 name="education"
-    //                 id="education"
-    //                 style={{
-    //                   boxSizing: "border-box",
-    //                   height: "100%",
-    //                   width: "80%",
-    //                   padding: "5px 0 5px 5px",
-    //                   border: "none",
-    //                   outline: "none",
-    //                 }}
-    //               />
-    //             </div>
-    //             <div className="inputGroup">
-    //               <label className="label-input" for="city">
-    //                 Thành phố
-    //               </label>
-    //               <input
-    //                 type="text"
-    //                 name="city"
-    //                 id="city"
-    //                 value={city}
-    //                 onChange={handleCityInput}
-    //                 style={{
-    //                   boxSizing: "border-box",
-    //                   height: "100%",
-    //                   width: "80%",
-    //                   padding: "5px 0 5px 5px",
-    //                   border: "none",
-    //                   outline: "none",
-    //                 }}
-    //               />
-    //             </div>
-    //             <div className="inputGroup">
-    //               <label className="label-input" for="from">
-    //                 Quốc gia
-    //               </label>
-    //               <input
-    //                 value={country}
-    //                 onChange={handleCountryInput}
-    //                 type="text"
-    //                 name="from"
-    //                 id="from"
-    //                 style={{
-    //                   boxSizing: "border-box",
-    //                   height: "100%",
-    //                   width: "80%",
-    //                   padding: "5px 0 5px 5px",
-    //                   border: "none",
-    //                   outline: "none",
-    //                 }}
-    //               />
-    //             </div>
-    //           </div>
-    //         </Grid>
-    //         <Grid></Grid>
-    //       </Grid>
-    //       <div
-    //         style={{
-    //           display: "flex",
-    //           justifyContent: "center",
-    //           alignItems: "center",
-    //         }}
-    //       >
-    //         <button
-    //           type="submit"
-    //           className="btn_upload"
-    //           style={{ width: "90%" }}
-    //         >
-    //           Đăng ký
-    //         </button>
-    //       </div>
-    //       <div
-    //         style={{
-    //           display: "flex",
-    //           justifyContent: "center",
-    //           alignItems: "center",
-    //           width: "50%",
-    //           marginLeft: "50%",
-    //           gap: "5px",
-    //           padding: "10px",
-    //         }}
-    //       >
-    //         <span>Bạn đã có tài khoản?</span>
-    //         <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-    //           Đăng nhập
-    //         </Link>
-    //       </div>
-    //     </form>
-    //   </div>
-    // </SignupPage>
     <SignupPage1>
       <section className="left-area">
         <div
@@ -460,6 +162,7 @@ function Signup() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            height: "10%",
           }}
         >
           <h3>Đăng ký</h3>
@@ -472,46 +175,51 @@ function Signup() {
             alignItems: "center",
             listStyle: "none",
             gap: "20px",
+            height: "10%",
           }}
         >
           <li
             style={{
-              height: "40px",
+              height: "20px",
               textAlign: "center",
-              width: "40px",
-              lineHeight: "40px",
+              width: "20px",
+              lineHeight: "20px",
               boxSizing: "border-box",
               borderRadius: "50%",
-              color: "white",
-              backgroundColor: "black",
+              color: step === 1 || step === 2 || step === 3 ? "white" : "black",
+              backgroundColor:
+                step === 1 || step === 2 || step === 3 ? "black" : "white",
+              border: "1px solid black",
             }}
           >
             1
           </li>
           <li
             style={{
-              height: "40px",
+              height: "20px",
               textAlign: "center",
-              width: "40px",
-              lineHeight: "40px",
+              width: "20px",
+              lineHeight: "20px",
               boxSizing: "border-box",
               borderRadius: "50%",
-              color: "white",
-              backgroundColor: "black",
+              color: step === 2 || step === 3 ? "white" : "black",
+              backgroundColor: step === 2 || step === 3 ? "black" : "white",
+              border: "1px solid black",
             }}
           >
             2
           </li>
           <li
             style={{
-              height: "40px",
+              height: "20px",
               textAlign: "center",
-              width: "40px",
-              lineHeight: "40px",
+              width: "20px",
+              lineHeight: "20px",
               boxSizing: "border-box",
               borderRadius: "50%",
-              color: "white",
-              backgroundColor: "black",
+              color: step === 3 ? "white" : "black",
+              backgroundColor: step === 3 ? "black" : "white",
+              border: "1px solid black",
             }}
           >
             3
@@ -519,42 +227,383 @@ function Signup() {
         </ul>
         <div
           style={{
-            height: "350px",
+            height: "80%",
             width: "100%",
             display: "flex",
             justifyContent: "center",
             gap: "20px",
           }}
         >
-          <div
+          <form
+            onSubmit={handleSubmit}
             style={{
               display: "flex",
+              position: "relative",
               flexDirection: "column",
-              height: "350px",
+              height: "100%",
               alignItems: "center",
-              justifyContent: "center",
-              gap: "10px",
+              justifyContent:
+                step === 2 || step === 3 ? "flex-start" : "center",
+              gap: "20px",
             }}
           >
-            <img
-              src="https://us.123rf.com/450wm/mathier/mathier1905/mathier190500002/134557216-no-thumbnail-image-placeholder-for-forums-blogs-and-websites.jpg?ver=6"
-              width={250}
-              height={250}
-              alt=""
-            ></img>
-            <p>Chọn ảnh đại diện của bạn</p>
-            <button
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "black",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-              }}
-            >
-              Tiếp tục
-            </button>
-          </div>
+            <>
+              {step === 1 ? (
+                <>
+                  {loading ? (
+                    <div
+                      style={{
+                        width: "250px",
+                        height: "200px",
+                        position: "relative",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Skeleton
+                        style={{
+                          width: "250px",
+                          height: "200px",
+                        }}
+                      ></Skeleton>
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                        }}
+                      >
+                        <CircularProgress />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <img
+                        src={imageUrl}
+                        width={250}
+                        height={200}
+                        alt=""
+                        style={{ objectFit: "cover" }}
+                      ></img>
+                      <input
+                        onChange={handleFileChange}
+                        type="file"
+                        style={{
+                          position: "absolute",
+                          top: "20px",
+                          left: "0",
+                          width: "230px",
+                          height: "180px",
+                          opacity: "0",
+                          cursor: "pointer",
+                        }}
+                      />
+                    </>
+                  )}
+                  <p>Chọn ảnh đại diện của bạn</p>
+                  <button
+                    className="button"
+                    onClick={() => {
+                      setStep(2);
+                    }}
+                    style={{
+                      padding: "10px 20px",
+                      backgroundColor: "black",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      display:
+                        loading ||
+                        imageUrl ===
+                          "https://us.123rf.com/450wm/mathier/mathier1905/mathier190500002/134557216-no-thumbnail-image-placeholder-for-forums-blogs-and-websites.jpg?ver=6"
+                          ? "none"
+                          : "block",
+                    }}
+                  >
+                    Tiếp tục
+                  </button>
+                </>
+              ) : step === 2 ? (
+                <>
+                  {/* <input
+                    value={bao}
+                    onChange={(e) => {
+                      setBao(e.target.value);
+                    }}
+                  ></input>
+                  <p>Chọn ảnh đại diện của bạn2</p> */}
+                  <h4>Nhập thông tin của bạn</h4>
+                  <div style={{ display: "flex" }} className="input-container">
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label htmlFor="fullname">
+                        Nhập họ và tên{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "red",
+                            display:
+                              fullnameError || !fullname ? "inline" : "none",
+                          }}
+                        >
+                          (Bắt buộc)
+                        </span>
+                      </label>
+                      <input
+                        value={fullname}
+                        onChange={handleFullName}
+                        id="fullname"
+                      ></input>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label htmlFor="email">
+                        Nhập email{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "red",
+                            display: emailError || !email ? "inline" : "none",
+                          }}
+                        >
+                          (Bắt buộc)
+                        </span>
+                      </label>
+                      <input
+                        value={email}
+                        onChange={handleEmailInput}
+                        id="email"
+                      ></input>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex" }} className="input-container">
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label htmlFor="password">
+                        Mật khẩu{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "red",
+                            display:
+                              passwordError || !password ? "inline" : "none",
+                          }}
+                        >
+                          (Bắt buộc)
+                        </span>
+                      </label>
+                      <input
+                        id="password"
+                        value={password}
+                        onChange={handlePwdInput}
+                      />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label htmlFor="passwordConfirm">
+                        Nhập lại mật khẩu{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "red",
+                            display:
+                              passwordConfirmError || !passwordConfirm
+                                ? "inline"
+                                : "none",
+                          }}
+                        >
+                          (Bắt buộc)
+                        </span>
+                      </label>
+                      <input
+                        id="passwordConfirm"
+                        onChange={handlePasswordConfirm}
+                        value={passwordConfirm}
+                      ></input>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                      className="button"
+                      onClick={() => {
+                        setStep(1);
+                      }}
+                      style={{
+                        padding: "10px 20px",
+                        backgroundColor: "black",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      Quay lại
+                    </button>
+                    <button
+                      className="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (!fullname) {
+                          setFullnameError(true);
+                        } else if (!email) {
+                          setEmailError(true);
+                        } else if (!password) {
+                          setPasswordError(true);
+                        } else if (!passwordConfirm) {
+                          setPasswordConfirmError(true);
+                        } else {
+                          setFullnameError(false);
+                          setEmailError(false);
+                          setPasswordError(false);
+                          setPasswordConfirmError(false);
+                          setStep(3);
+                        }
+                      }}
+                      style={{
+                        padding: "10px 20px",
+                        backgroundColor: "black",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      Tiếp tục
+                    </button>
+                  </div>
+                </>
+              ) : step === 3 ? (
+                <>
+                  <h4>Nhập thông tin của bạn</h4>
+                  <div style={{ display: "flex" }} className="input-container">
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label htmlFor="city">
+                        Nhập thành phố{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "red",
+                            display: cityError || !city ? "inline" : "none",
+                          }}
+                        >
+                          (Bắt buộc)
+                        </span>
+                      </label>
+                      <input
+                        id="city"
+                        value={city}
+                        onChange={handleCityInput}
+                      ></input>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label htmlFor="from">
+                        Nhập quốc gia{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "red",
+                            display:
+                              countryError || !country ? "inline" : "none",
+                          }}
+                        >
+                          (Bắt buộc)
+                        </span>
+                      </label>
+                      <input
+                        value={country}
+                        onChange={handleCountryInput}
+                        id="from"
+                      ></input>
+                    </div>
+                  </div>{" "}
+                  <div style={{ display: "flex" }} className="input-container">
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label htmlFor="education">
+                        Học vấn{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "red",
+                            display:
+                              educationError || !education ? "inline" : "none",
+                          }}
+                        >
+                          (Bắt buộc)
+                        </span>
+                      </label>
+                      <input
+                        value={education}
+                        onChange={handleEducationInput}
+                        id="education"
+                      ></input>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label htmlFor="phone">
+                        Số điện thoại{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "red",
+                            display:
+                              numberPhoneError || !numberPhone
+                                ? "inline"
+                                : "none",
+                          }}
+                        >
+                          (Bắt buộc)
+                        </span>
+                      </label>
+                      <input
+                        value={numberPhone}
+                        onChange={handleNumber}
+                        id="phone"
+                      ></input>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                      className="button"
+                      onClick={() => {
+                        setStep(2);
+                      }}
+                      style={{
+                        padding: "10px 20px",
+                        backgroundColor: "black",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      Quay lại
+                    </button>
+                    <button
+                      type="submit"
+                      style={{
+                        padding: "10px 20px",
+                        backgroundColor:
+                          city && education && country && numberPhone
+                            ? "black"
+                            : "white",
+                        color:
+                          city && education && country && numberPhone
+                            ? "white"
+                            : "black",
+                        border: "1px solid black",
+                        borderRadius: "4px",
+                        cursor:
+                          city && education && country && numberPhone
+                            ? "pointer"
+                            : "default",
+                      }}
+                      disabled={
+                        !city || !education || !country || !numberPhone
+                          ? "true"
+                          : "false"
+                      }
+                    >
+                      Đăng ký
+                    </button>
+                  </div>
+                </>
+              ) : null}
+            </>
+          </form>
         </div>
       </section>
 
@@ -693,7 +742,7 @@ const SignupPage = styled.section`
   }
 `;
 const SignupPage1 = styled.section`
-  height: 100vh;
+  min-height: 100vh;
   padding: 50px;
   width: 100%;
   box-sizing: border-box;
@@ -737,7 +786,7 @@ const SignupPage1 = styled.section`
   }
   .right-area {
     width: 70%;
-    height: 100%;
+    min-height: calc(100vh - 100px);
     border-radius: 0 10px 10px 0;
     background-color: white;
     display: flex;
@@ -747,6 +796,50 @@ const SignupPage1 = styled.section`
     padding: 10px;
     box-sizing: border-box;
     gap: 10px;
+    .button {
+      cursor: pointer;
+    }
+    .input-container {
+      gap: 20px;
+    }
+    label {
+      margin-bottom: 5px;
+    }
+    input {
+      outline: none;
+      padding: 10px;
+    }
+  }
+  @media screen and (max-width: 750px) {
+    .left-area {
+      display: none;
+    }
+    .right-area {
+      width: 100%;
+    }
+    .left-part {
+      display: none;
+    }
+    .right-part {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #f6f6f6;
+      z-index: 1;
+    }
+  }
+  @media screen and (max-width: 550px) {
+    .right-area {
+      .input-container {
+        gap: 10px;
+        flex-direction: column;
+      }
+    }
+    input {
+      width: 50vw;
+    }
   }
 `;
 export default Signup;
