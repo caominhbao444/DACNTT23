@@ -76,7 +76,7 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            FlexSocial
+            Instagram
           </Typography>
 
           {/* <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} /> */}

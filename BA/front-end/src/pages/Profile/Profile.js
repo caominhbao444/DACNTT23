@@ -46,6 +46,7 @@ function Profile() {
   const [textContentButton, setTextContentButton] = useState("Theo dõi");
 
   const [open, setOpen] = useState(false);
+  const [openInfor, setOpenInfor] = useState(false);
   const [contentEditPost, setContentEditPost] = useState("");
   const listSixImg = [];
   const [Urlimg, setUrlimg] = useState(
@@ -254,7 +255,10 @@ function Profile() {
       })
       .then(() => {
         dispatch(
-          CallApiAllPosts({ headers: { authorization: `Bearer ${authToken}` } })
+          CallApiGetPostId({
+            headers: { authorization: `Bearer ${authToken}` },
+            userID,
+          })
         );
       })
       .catch((e) => {
@@ -781,6 +785,9 @@ function Profile() {
                     {checkInfor(userInfor, userInforId) ? (
                       <>
                         <button
+                          onClick={() => {
+                            setOpenInfor(true);
+                          }}
                           style={{
                             cursor: "pointer",
                             border: "none",
@@ -792,6 +799,141 @@ function Profile() {
                         >
                           Chỉnh sửa thông tin
                         </button>
+                        <Dialog
+                          open={openInfor}
+                          onClose={() => {
+                            setOpenInfor(false);
+                          }}
+                          style={{ width: "100%" }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              width: "600px",
+                              flexDirection: "column",
+
+                              boxSizing: "border-box",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                padding: "10px 20px",
+                                justifyContent: "space-between",
+                                backgroundColor: COLORS.green,
+                              }}
+                            >
+                              <p style={{ color: "white" }}>
+                                Chỉnh sửa thông tin cá nhân
+                              </p>
+                              <ion-icon
+                                name="close-circle-outline"
+                                onClick={() => {
+                                  setOpenInfor(false);
+                                }}
+                                style={{
+                                  cursor: "pointer",
+                                  width: "30px",
+                                  height: "30px",
+                                  display: "block",
+
+                                  border: "none",
+                                  zIndex: "6",
+                                  fontWeight: "bold",
+                                  color: "white",
+                                }}
+                              ></ion-icon>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "5px",
+                                padding: "10px 20px 0",
+                              }}
+                            >
+                              <label>Họ và tên</label>
+                              <input></input>
+                            </div>{" "}
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "5px",
+                                padding: "0 20px",
+                                flexDirection: "column",
+                              }}
+                            >
+                              <label>Email</label>
+                              <input></input>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "5px",
+                                padding: "0 20px",
+                                flexDirection: "column",
+                              }}
+                            >
+                              <label>Quốc tịch</label>
+                              <input></input>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "5px",
+                                padding: "0 20px",
+                                flexDirection: "column",
+                              }}
+                            >
+                              <label>Thành phố</label>
+                              <input></input>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "5px",
+                                padding: "0 20px",
+                                flexDirection: "column",
+                              }}
+                            >
+                              <label>Học vấn</label>
+                              <input></input>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "5px",
+                                padding: "0 20px",
+                                flexDirection: "column",
+                              }}
+                            >
+                              <label>Số điện thoại</label>
+                              <input></input>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                padding: "10px 20px",
+                                justifyContent: "flex-end",
+                              }}
+                            >
+                              <button
+                                style={{
+                                  padding: "10px 20px",
+                                  backgroundColor: COLORS.green,
+                                  color: "white",
+                                  border: "none",
+                                  outline: "none",
+                                  borderRadius: "5px",
+                                }}
+                              >
+                                Cập nhật
+                              </button>
+                            </div>
+                          </div>
+                        </Dialog>
                       </>
                     ) : (
                       <></>
@@ -1177,7 +1319,7 @@ function Profile() {
                                     height: "40px",
                                   }}
                                 >
-                                  {/* <ion-icon
+                                  <ion-icon
                                     onClick={() => handleLike(post.postId)}
                                     aria-hidden="true"
                                     style={{
@@ -1189,7 +1331,7 @@ function Profile() {
                                       width: "30px",
                                     }}
                                     name="heart-outline"
-                                  ></ion-icon> */}
+                                  ></ion-icon>
                                   <ion-icon
                                     onClick={() =>
                                       handleShowComments(index, post.postId)
@@ -1221,9 +1363,9 @@ function Profile() {
                                     gap: "5px",
                                   }}
                                 >
-                                  {/* <span>
+                                  <span>
                                     Được thích bởi {post.numLike} người khác
-                                  </span> */}
+                                  </span>
                                 </div>
                                 {postStates[post.postId]?.showComments &&
                                 postStates[post.postId]?.listComment ? (
@@ -1647,7 +1789,7 @@ function Profile() {
 const ProfilePage = styled.section`
   min-height: 100vh;
   width: 100%;
-  background-color: #ffd4d8;
+  background-color: #f6f6f6;
   .avata-item {
     height: 30px;
     width: 30px;
@@ -1657,6 +1799,17 @@ const ProfilePage = styled.section`
   .css-1ytufz-MuiAvatarGroup-root .MuiAvatar-root {
     border: none;
   }
+  .MuiPaper-root
+    .MuiPaper-elevation
+    .MuiPaper-rounded
+    .MuiPaper-elevation24
+    .MuiDialog-paper
+    .MuiDialog-paperScrollPaper
+    .MuiDialog-paperWidthSm
+    .css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+    max-width: 0;
+  }
+
   .containerComment {
     ${"" /* height: 50px; */}
     width: 100%;
@@ -1708,4 +1861,5 @@ const BtnEditComment = styled.section`
     color: #58a168;
   }
 `;
+
 export default Profile;

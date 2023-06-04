@@ -71,7 +71,7 @@ function Home() {
         <>
           <Navbar />
           <HomePage
-            style={{ backgroundColor: "#FFD4D8", position: "relative" }}
+            style={{ backgroundColor: "#f6f6f6", position: "relative" }}
           >
             <Grid container style={{ padding: "0" }}>
               {/* Left */}

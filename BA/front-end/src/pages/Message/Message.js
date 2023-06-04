@@ -532,7 +532,7 @@ function Message() {
 const MessagePage = styled.section`
   min-height: calc(100vh - 64px);
   width: 100%;
-  background-color: #ffd4d8;
+  background-color: #f6f6f6;
   .message-item {
     background-color: none;
   }

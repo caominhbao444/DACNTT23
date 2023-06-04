@@ -75,29 +75,6 @@ function Signup() {
         return null;
       });
   }
-  // const onSubmit = async (values) => {
-  //   const { fullname, email, password, phone, city, from, education } = values;
-  //   await axios
-  //     .post("http://localhost:5001/api/accounts/register", {
-  //       fullname: fullname,
-  //       email: email,
-  //       password: password,
-  //       phone: phone,
-  //       city: city,
-  //       from: from,
-  //       education: education,
-  //     })
-  //     .then((response) => {
-  //       // Handle successful login
-  //       console.log(response.data);
-  //       localStorage.setItem("authToken", response.data.accessToken);
-  //       window.location.href = "/";
-  //     })
-  //     .catch((error) => {
-  //       // Handle failed login
-  //       console.error(error.response.data);
-  //     });
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -175,6 +152,7 @@ function Signup() {
             alignItems: "center",
             listStyle: "none",
             gap: "20px",
+            // backgroundColor: "red",
             height: "10%",
           }}
         >
@@ -190,6 +168,7 @@ function Signup() {
               backgroundColor:
                 step === 1 || step === 2 || step === 3 ? "black" : "white",
               border: "1px solid black",
+              zIndex: 3,
             }}
           >
             1
@@ -205,6 +184,7 @@ function Signup() {
               color: step === 2 || step === 3 ? "white" : "black",
               backgroundColor: step === 2 || step === 3 ? "black" : "white",
               border: "1px solid black",
+              zIndex: 3,
             }}
           >
             2
@@ -217,6 +197,7 @@ function Signup() {
               lineHeight: "20px",
               boxSizing: "border-box",
               borderRadius: "50%",
+              zIndex: 3,
               color: step === 3 ? "white" : "black",
               backgroundColor: step === 3 ? "black" : "white",
               border: "1px solid black",
@@ -591,11 +572,6 @@ function Signup() {
                             ? "pointer"
                             : "default",
                       }}
-                      disabled={
-                        !city || !education || !country || !numberPhone
-                          ? "true"
-                          : "false"
-                      }
                     >
                       Đăng ký
                     </button>
@@ -809,6 +785,14 @@ const SignupPage1 = styled.section`
       outline: none;
       padding: 10px;
     }
+  }
+  ul::after {
+    content: "";
+    background-color: black;
+    width: 100px;
+    height: 1px;
+    position: absolute;
+    z-index: 2;
   }
   @media screen and (max-width: 750px) {
     .left-area {
