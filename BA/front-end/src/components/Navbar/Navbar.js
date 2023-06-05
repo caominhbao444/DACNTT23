@@ -54,7 +54,7 @@ function Navbar() {
     return <Loading />;
   }
   return (
-    <AppBar position="static" style={{ backgroundColor: "#58A168" }}>
+    <AppBar position="static" style={{ backgroundColor: "#a2b3c3" }}>
       <Container maxWidth="xl">
         <Toolbar
           disableGutters

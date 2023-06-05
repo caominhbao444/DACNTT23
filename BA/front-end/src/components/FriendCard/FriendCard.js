@@ -126,7 +126,7 @@ function FriendCard(props) {
 }
 const CardFriend = styled.section`
   .button_chat {
-    background-color: ${COLORS.green};
+    background-color: #a2b3c3;
     display: flex;
     align-items: center;
     justify-content: center;

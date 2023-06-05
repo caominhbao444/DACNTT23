@@ -31,6 +31,7 @@ import {
 } from "../../features/postSlice";
 import { useParams } from "react-router";
 import axios from "axios";
+import Post from "../../components/Post/Post";
 function Profile() {
   let { userID } = useParams();
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ function Profile() {
   const [openDialogCommentId, setOpenDialogCommentId] = useState(null);
   const [loading1, setLoading1] = useState(true);
   const [textContentButton, setTextContentButton] = useState("Theo dõi");
-
+  const [openUpdateField, setOpenUpdateField] = useState(false);
   const [open, setOpen] = useState(false);
   const [openInfor, setOpenInfor] = useState(false);
   const [contentEditPost, setContentEditPost] = useState("");
@@ -153,7 +154,12 @@ function Profile() {
       });
     }
   };
-
+  const handleOpenDialogInfor = () => {
+    setOpenInfor(false);
+    if (openUpdateField) {
+      setOpenUpdateField(false);
+    }
+  };
   const handleCreatePost = () => {
     dispatch(
       CallApiCreatePost({
@@ -207,75 +213,7 @@ function Profile() {
     //   CallApiAllUsers({ headers: { authorization: `Bearer ${authToken}` } })
     // );
   }, [userID, authToken, dispatch]);
-  const handleOpenDialog = (postId) => {
-    setOpenDialogId(postId);
-  };
-  const check = (postOfId) => {
-    if (userInfor) {
-      if (userInfor.account._id === postOfId) {
-        return true;
-      } else return false;
-    }
-  };
-  const handleCloseDialog = () => {
-    setOpenDialogId(null);
-    setContentEditPost();
-  };
-  const handleEditPost = (postId) => {
-    dispatch(
-      CallApiEditPost({
-        headers: { authorization: `Bearer ${authToken}` },
-        postId: postId,
-        desc: content,
-      })
-    ).then(() => {
-      setOpenDialogId(false);
-      Swal.fire({
-        title: "Thành công",
-        text: "Bài viết đã được đăng",
-        icon: "success",
-        confirmButtonText: "OK",
-      }).then(() => {
-        setContent("");
-        dispatch(
-          CallApiGetPostId({
-            headers: { authorization: `Bearer ${authToken}` },
-            userID,
-          })
-        );
-      });
-    });
-  };
-  const handleLike = (postId) => {
-    axios
-      .post(`http://localhost:5001/api/posts/like/${postId}`, null, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
-      .then(() => {
-        dispatch(
-          CallApiGetPostId({
-            headers: { authorization: `Bearer ${authToken}` },
-            userID,
-          })
-        );
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-  const CheckLike = (listLike) => {
-    if (userInfor && listPosts) {
-      for (let i = 0; i < listLike.length; i++) {
-        const postlike = listLike[i];
-        if (postlike.accountId === userInfor.account._id) {
-          return true; // Stop the iteration and return true
-        }
-      }
-    }
-    return false; // Return false if the condition is not met or the loop completes
-  };
+
   const handleFollower = async () => {
     const headers = {
       Authorization: `Bearer ${authToken}`,
@@ -292,165 +230,7 @@ function Profile() {
         console.log(error);
       });
   };
-  const checkComment = (commentOfId) => {
-    if (bao && userInfor) {
-      if (userInfor.account._id === commentOfId) {
-        return true;
-      } else return false;
-    }
-  };
-  const handlePostNewComment = (postId, contentComment, index) => {
-    dispatch(
-      CallApiPostNewComment({
-        headers: { authorization: `Bearer ${authToken}` },
-        postId: postId,
-        content: contentComment,
-      })
-    ).then(() => {
-      const headers = {
-        Authorization: `Bearer ${authToken}`,
-      };
-      axios
-        .get(`http://localhost:5001/api/comments/${postId}`, {
-          headers: headers,
-        })
-        .then((response) => {
-          setPostStates((prevState) => ({
-            ...prevState,
-            [postId]: {
-              ...prevState[postId],
-              listComment: response.data,
-            },
-          }));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    });
-  };
-  const handleShowComments = (index, postId) => {
-    setBao(true);
-    const headers = {
-      Authorization: `Bearer ${authToken}`,
-    };
-    axios
-      .get(`http://localhost:5001/api/comments/${postId}`, {
-        headers: headers,
-      })
-      .then((response) => {
-        // setListComment(response.data);
-        setPostStates((prevState) => ({
-          ...prevState,
-          [postId]: {
-            showComments: !prevState[postId]?.showComments,
-            listComment: response.data,
-          },
-        }));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  const handleOpenDialogComment = (commentId) => {
-    setOpenDialogCommentId(commentId);
-  };
-  const handleDeleteComment = (commentId, postId) => {
-    dispatch(
-      CallApiDeleteComment({
-        headers: { authorization: `Bearer ${authToken}` },
-        commentId: commentId,
-      })
-    ).then(() => {
-      const headers = {
-        Authorization: `Bearer ${authToken}`,
-      };
-      axios
-        .get(`http://localhost:5001/api/comments/${postId}`, {
-          headers: headers,
-        })
-        .then((response) => {
-          console.log(response);
-          setPostStates((prevState) => ({
-            ...prevState,
-            [postId]: {
-              ...prevState[postId],
-              listComment: response.data,
-            },
-          }));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    });
-  };
-  const handleEditComment = (postId, commentId) => {
-    dispatch(
-      CallApiEditComment({
-        headers: { authorization: `Bearer ${authToken}` },
-        commentId: commentId,
-        postId: postId,
-        content: contentEdit,
-      })
-    ).then(() => {
-      const headers = {
-        Authorization: `Bearer ${authToken}`,
-      };
-      axios
-        .get(`http://localhost:5001/api/comments/${postId}`, {
-          headers: headers,
-        })
-        .then((response) => {
-          setOpenDialogCommentId(false);
-          setContentEdit("");
-          setPostStates((prevState) => ({
-            ...prevState,
-            [postId]: {
-              ...prevState[postId],
-              listComment: response.data,
-            },
-          }));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    });
-  };
-  const handleCloseDialogComment = () => {
-    setOpenDialogCommentId(null);
-    setContentEdit();
-  };
-  const handleDeletePost = (postId) => {
-    Swal.fire({
-      title: "Bỏ bài viết?",
-      text: "Nếu rời đi, bạn sẽ mất những gì vừa chỉnh sửa.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Quay lại",
-      cancelButtonText: "Xóa",
-    }).then((result) => {
-      if (result.isDismissed) {
-        dispatch(
-          CallApiDeletePost({
-            headers: { authorization: `Bearer ${authToken}` },
-            postId: postId,
-          })
-        ).then(() => {
-          Swal.fire("Xóa", "Bài viết nháp đã được xóa.", "success");
-          dispatch(
-            CallApiGetPostId({
-              headers: { authorization: `Bearer ${authToken}` },
-              userID,
-            })
-          );
-          window.scrollTo(0, 0);
-          setOpenOption(false);
-        });
-      } else {
-      }
-    });
-  };
+
   if (!userInforId && !userInfor && !userID && !checkFriends && !postUserId) {
     return <Loading />;
   }
@@ -464,6 +244,7 @@ function Profile() {
   console.log("bao", postUserId);
   console.log("bao2", listSixImg);
   console.log(userInfor);
+  console.log(openUpdateField);
   return (
     <>
       <Navbar />
@@ -638,7 +419,7 @@ function Profile() {
                       Đăng bài
                     </div>
                     <Dialog open={open} onClose={handleClose} style={{}}>
-                      <DialogTitle style={{ backgroundColor: COLORS.green }}>
+                      <DialogTitle style={{ backgroundColor: "#a2b3c3" }}>
                         <Box
                           display="flex"
                           justifyContent="space-between"
@@ -748,7 +529,7 @@ function Profile() {
                           onClick={handleCreatePost}
                           variant="contained"
                           style={{
-                            backgroundColor: COLORS.green,
+                            backgroundColor: "#a2b3c3",
                             borderRadius: "0",
                             fontWeight: "bold",
                           }}
@@ -801,9 +582,7 @@ function Profile() {
                         </button>
                         <Dialog
                           open={openInfor}
-                          onClose={() => {
-                            setOpenInfor(false);
-                          }}
+                          onClose={handleOpenDialogInfor}
                           style={{ width: "100%" }}
                         >
                           <div
@@ -821,17 +600,15 @@ function Profile() {
                                 alignItems: "center",
                                 padding: "10px 20px",
                                 justifyContent: "space-between",
-                                backgroundColor: COLORS.green,
+                                backgroundColor: "#a2b3c3",
                               }}
                             >
-                              <p style={{ color: "white" }}>
+                              <p style={{ color: "white", fontWeight: "bold" }}>
                                 Chỉnh sửa thông tin cá nhân
                               </p>
                               <ion-icon
                                 name="close-circle-outline"
-                                onClick={() => {
-                                  setOpenInfor(false);
-                                }}
+                                onClick={handleOpenDialogInfor}
                                 style={{
                                   cursor: "pointer",
                                   width: "30px",
@@ -845,87 +622,286 @@ function Profile() {
                                 }}
                               ></ion-icon>
                             </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "5px",
-                                padding: "10px 20px 0",
-                              }}
-                            >
-                              <label>Họ và tên</label>
-                              <input></input>
-                            </div>{" "}
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "5px",
-                                padding: "0 20px",
-                                flexDirection: "column",
-                              }}
-                            >
-                              <label>Email</label>
-                              <input></input>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "5px",
-                                padding: "0 20px",
-                                flexDirection: "column",
-                              }}
-                            >
-                              <label>Quốc tịch</label>
-                              <input></input>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "5px",
-                                padding: "0 20px",
-                                flexDirection: "column",
-                              }}
-                            >
-                              <label>Thành phố</label>
-                              <input></input>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "5px",
-                                padding: "0 20px",
-                                flexDirection: "column",
-                              }}
-                            >
-                              <label>Học vấn</label>
-                              <input></input>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "5px",
-                                padding: "0 20px",
-                                flexDirection: "column",
-                              }}
-                            >
-                              <label>Số điện thoại</label>
-                              <input></input>
-                            </div>
+                            <Grid container>
+                              <Grid
+                                item
+                                xs={12}
+                                md={12}
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "5px",
+                                  padding: "10px 20px 0",
+                                }}
+                              >
+                                <label>Họ và tên</label>
+                                {openUpdateField ? (
+                                  <>
+                                    <input
+                                      placeholder={userInfor.account.fullname}
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        border: "1px solid black",
+                                        outline: "none",
+                                        borderRadius: "5px",
+                                        fontSize: "16px",
+                                      }}
+                                    ></input>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        display: "block",
+                                        margin: "0",
+                                        border: "1px solid black",
+                                        borderRadius: "5px",
+                                      }}
+                                    >
+                                      {userInfor.account.fullname}
+                                    </p>
+                                  </>
+                                )}
+                              </Grid>
+
+                              <Grid
+                                item
+                                xs={6}
+                                md={6}
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "5px",
+                                  padding: "10px 10px 0 20px",
+                                }}
+                              >
+                                <label>Quốc tịch</label>
+                                {openUpdateField ? (
+                                  <>
+                                    <input
+                                      placeholder={userInfor.account.from}
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        border: "1px solid black",
+                                        outline: "none",
+                                        borderRadius: "5px",
+                                        fontSize: "16px",
+                                      }}
+                                    ></input>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        display: "block",
+                                        margin: "0",
+                                        border: "1px solid black",
+                                        borderRadius: "5px",
+                                      }}
+                                    >
+                                      {userInfor.account.from}
+                                    </p>
+                                  </>
+                                )}
+                              </Grid>
+                              <Grid
+                                item
+                                xs={6}
+                                md={6}
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "5px",
+                                  padding: "10px 20px 0 10px",
+                                }}
+                              >
+                                <label>Thành phố</label>
+                                {openUpdateField ? (
+                                  <>
+                                    <input
+                                      placeholder={userInfor.account.city}
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        border: "1px solid black",
+                                        outline: "none",
+                                        borderRadius: "5px",
+                                        fontSize: "16px",
+                                      }}
+                                    ></input>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        display: "block",
+                                        margin: "0",
+                                        border: "1px solid black",
+                                        borderRadius: "5px",
+                                      }}
+                                    >
+                                      {userInfor.account.city}
+                                    </p>
+                                  </>
+                                )}
+                              </Grid>
+                              <Grid
+                                item
+                                xs={6}
+                                md={6}
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "5px",
+                                  padding: "10px 10px 0 20px",
+                                }}
+                              >
+                                <label>Học vấn</label>
+                                {openUpdateField ? (
+                                  <>
+                                    <input
+                                      placeholder={userInfor.account.education}
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        border: "1px solid black",
+                                        outline: "none",
+                                        borderRadius: "5px",
+                                        fontSize: "16px",
+                                      }}
+                                    ></input>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        display: "block",
+                                        margin: "0",
+                                        border: "1px solid black",
+                                        borderRadius: "5px",
+                                      }}
+                                    >
+                                      {userInfor.account.education}
+                                    </p>
+                                  </>
+                                )}
+                              </Grid>
+                              <Grid
+                                item
+                                xs={6}
+                                md={6}
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "5px",
+                                  padding: "10px 20px 0 10px",
+                                }}
+                              >
+                                <label>Số điện thoại</label>
+                                {openUpdateField ? (
+                                  <>
+                                    <input
+                                      placeholder={userInfor.account.phone}
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        border: "1px solid black",
+                                        outline: "none",
+                                        borderRadius: "5px",
+                                        fontSize: "16px",
+                                      }}
+                                    ></input>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p
+                                      style={{
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        display: "block",
+                                        margin: "0",
+                                        border: "1px solid black",
+                                        borderRadius: "5px",
+                                      }}
+                                    >
+                                      {userInfor.account.phone}
+                                    </p>
+                                  </>
+                                )}
+                              </Grid>
+                            </Grid>
+
                             <div
                               style={{
                                 display: "flex",
                                 alignItems: "center",
                                 padding: "10px 20px",
                                 justifyContent: "flex-end",
+                                gap: "10px",
                               }}
                             >
+                              {!openUpdateField ? (
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      setOpenUpdateField(true);
+                                    }}
+                                    style={{
+                                      padding: "10px 20px",
+                                      backgroundColor: "#a2b3c3",
+                                      color: "white",
+                                      border: "none",
+                                      outline: "none",
+                                      cursor: "pointer",
+                                      borderRadius: "5px",
+                                    }}
+                                  >
+                                    Chỉnh sửa
+                                  </button>
+                                </>
+                              ) : (
+                                <></>
+                              )}
+                              {openUpdateField ? (
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      setOpenUpdateField(false);
+                                    }}
+                                    style={{
+                                      padding: "10px 20px",
+                                      backgroundColor: "#a2b3c3",
+                                      color: "white",
+                                      border: "none",
+                                      outline: "none",
+                                      cursor: "pointer",
+                                      borderRadius: "5px",
+                                    }}
+                                  >
+                                    Hủy bỏ
+                                  </button>
+                                </>
+                              ) : (
+                                <></>
+                              )}
                               <button
                                 style={{
                                   padding: "10px 20px",
-                                  backgroundColor: COLORS.green,
+                                  backgroundColor: "#a2b3c3",
                                   color: "white",
                                   border: "none",
                                   outline: "none",
+                                  cursor: "pointer",
                                   borderRadius: "5px",
                                 }}
                               >
@@ -1030,19 +1006,6 @@ function Profile() {
                     <span style={{ fontWeight: "bold", fontSize: "17px" }}>
                       Album ảnh
                     </span>
-                    {/* <Link
-                  to="/"
-                  style={{
-                    textDecoration: "none",
-                    color: "black",
-                    padding: "10px",
-                    width: "100%",
-                    backgroundColor: "whitesmoke",
-                    display: "block",
-                  }}
-                >
-                  <p>Chỉnh sửa thông tin</p>
-                </Link> */}
 
                     <div style={{ width: "100%" }}>
                       <Grid container style={{ width: "100%" }}>
@@ -1050,6 +1013,7 @@ function Profile() {
                           listSixImg.map((item, index) => {
                             return (
                               <Grid
+                                key={index}
                                 item
                                 xs={4}
                                 md={4}
@@ -1131,646 +1095,21 @@ function Profile() {
                       .map((post, index) => {
                         return (
                           <>
-                            <section
-                              key={index}
-                              className="main-post-item"
-                              style={{
-                                backgroundColor: "white",
-                                width: "100%",
-                                borderRadius: "10px",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  padding: "20px",
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  justifyContent: "center",
-                                  gap: "10px",
-                                }}
-                              >
-                                <div style={{ display: "flex" }}>
-                                  <div
-                                    className="img-container"
-                                    style={{
-                                      display: "flex",
-                                      justifyContent: "flex-start",
-                                      alignItems: "center",
-                                      gap: "10px",
-                                      width: "100%",
-                                      cursor: "pointer",
-                                    }}
-                                    onClick={() =>
-                                      navigate(`/profile/${post.id}`)
-                                    }
-                                  >
-                                    <img
-                                      src={post.userimg}
-                                      className="img-src"
-                                      alt=""
-                                      style={{
-                                        height: "40px",
-                                        width: "40px",
-                                        borderRadius: "50%",
-                                        overflow: "hidden",
-                                        cursor: "pointer",
-                                      }}
-                                    />
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                      }}
-                                    >
-                                      <span
-                                        style={{
-                                          fontWeight: "bold",
-                                          cursor: "pointer",
-                                        }}
-                                      >
-                                        {post.fullname}
-                                      </span>
-                                      <span>{daybefore(post.createdAt)}</span>
-                                    </div>
-                                  </div>
-                                  {/* {check(post.id) ? (
-                                    <ion-icon
-                                      onClick={() =>
-                                        handleOpenDialog(post.postId)
-                                      }
-                                      name="ellipsis-horizontal-outline"
-                                      style={{
-                                        display: "block",
-                                        height: "20px",
-                                        width: "30px",
-                                        padding: "10px",
-                                        cursor: "pointer",
-                                      }}
-                                    ></ion-icon>
-                                  ) : (
-                                    <></>
-                                  )} */}
-
-                                  {check(post.id) ? (
-                                    <div style={{ position: "relative" }}>
-                                      <ion-icon
-                                        onClick={() => {
-                                          if (openOption) {
-                                            setOpenOption(false);
-                                          } else {
-                                            setOpenOption(true);
-                                          }
-                                        }}
-                                        name="ellipsis-horizontal-outline"
-                                        style={{
-                                          display: "block",
-                                          height: "20px",
-                                          width: "30px",
-                                          padding: "10px",
-                                          cursor: "pointer",
-                                        }}
-                                      ></ion-icon>
-                                      {openOption ? (
-                                        <>
-                                          <div
-                                            style={{
-                                              left: "-30px",
-                                              position: "absolute",
-                                              height: "70px",
-                                              width: "100px",
-                                              display: "flex",
-                                              flexDirection: "column",
-                                              gap: "5px",
-
-                                              justifyContent: "center",
-                                              backgroundColor: "white",
-                                              border: "1px solid black",
-                                            }}
-                                          >
-                                            <div
-                                              style={{
-                                                cursor: "pointer",
-                                                borderBottom: "1px solid black",
-                                                textAlign: "center",
-                                                boxSizing: "border-box",
-                                                padding: "5px",
-                                              }}
-                                              onClick={() =>
-                                                handleOpenDialog(post.postId)
-                                              }
-                                            >
-                                              Chỉnh sửa
-                                            </div>
-
-                                            <div
-                                              style={{
-                                                cursor: "pointer",
-                                                textAlign: "center",
-                                                padding: "5px",
-                                              }}
-                                              onClick={() =>
-                                                handleDeletePost(post.postId)
-                                              }
-                                            >
-                                              Xóa
-                                            </div>
-                                          </div>
-                                        </>
-                                      ) : (
-                                        <></>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <></>
-                                  )}
-                                </div>
-                                {!post.img ? (
-                                  <Skeleton
-                                    variant="rectangular"
-                                    height={500}
-                                    style={{ width: "813px" }}
-                                  />
-                                ) : (
-                                  <>
-                                    <img
-                                      className="img-src"
-                                      alt=""
-                                      style={{
-                                        height: "auto",
-                                        width: "100%",
-                                        maxWidth: "100%",
-                                        maxHeight: "500px",
-                                        objectFit: "cover",
-                                        objectPosition: "center",
-                                      }}
-                                      src={post.img}
-                                    ></img>
-                                  </>
-                                )}
-
-                                <div style={{ width: "100%" }}>{post.desc}</div>
-                                <div
-                                  className="emotions"
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "flex-start",
-                                    alignItems: "center",
-                                    gap: "10px",
-                                    height: "40px",
-                                  }}
-                                >
-                                  <ion-icon
-                                    onClick={() => handleLike(post.postId)}
-                                    aria-hidden="true"
-                                    style={{
-                                      cursor: "pointer",
-                                      color: CheckLike(post.like)
-                                        ? "red"
-                                        : "black",
-                                      height: "30px",
-                                      width: "30px",
-                                    }}
-                                    name="heart-outline"
-                                  ></ion-icon>
-                                  <ion-icon
-                                    onClick={() =>
-                                      handleShowComments(index, post.postId)
-                                    }
-                                    style={{
-                                      cursor: "pointer",
-                                      height: "30px",
-                                      width: "30px",
-                                      fill: "white",
-                                      color: "black",
-                                    }}
-                                    name="chatbubble-outline"
-                                  ></ion-icon>
-                                  <ion-icon
-                                    style={{
-                                      cursor: "pointer",
-                                      color: "",
-                                      height: "30px",
-                                      width: "30px",
-                                    }}
-                                    name="share-social-outline"
-                                  ></ion-icon>
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "flex-start",
-                                    gap: "5px",
-                                  }}
-                                >
-                                  <span>
-                                    Được thích bởi {post.numLike} người khác
-                                  </span>
-                                </div>
-                                {postStates[post.postId]?.showComments &&
-                                postStates[post.postId]?.listComment ? (
-                                  <>
-                                    <section
-                                      className="containerComment"
-                                      style={{
-                                        width: "100%",
-                                        position: "relative",
-                                      }}
-                                    >
-                                      <img
-                                        src={userInfor.account.img}
-                                        className="img-src"
-                                        alt=""
-                                        style={{
-                                          height: "40px",
-                                          width: "40px",
-                                          borderRadius: "50%",
-                                          overflow: "hidden",
-                                          position: "absolute",
-                                          left: "20px",
-                                          top: "15px",
-                                        }}
-                                      />
-                                      <textarea
-                                        key={index}
-                                        id={"textComment"}
-                                        value={comments[index]}
-                                        onChange={(e) => {
-                                          const newComments = [...comments];
-                                          newComments[index] = e.target.value;
-                                          setComments(newComments);
-                                        }}
-                                      ></textarea>
-                                      <button
-                                        onClick={() => {
-                                          handlePostNewComment(
-                                            post.postId,
-                                            comments[index],
-                                            index
-                                          );
-                                          setComments((prevComments) => {
-                                            const newComments = [
-                                              ...prevComments,
-                                            ];
-                                            newComments[index] = ""; // Set the comment to an empty string
-                                            return newComments;
-                                          });
-                                        }}
-                                        type="button"
-                                        style={{
-                                          position: "absolute",
-                                          right: "20px",
-                                          top: "20px",
-                                          padding: "5px 10px",
-                                          borderRadius: "10px",
-                                          // backgroundColor: COLORS.mainColor,
-                                          backgroundColor: "#FC3208",
-                                          color: "white",
-                                          fontWeight: "bold",
-                                          border: "none",
-                                          boxSizing: "border-box",
-                                          cursor: "pointer",
-                                        }}
-                                      >
-                                        Bình luận
-                                      </button>
-                                    </section>
-                                    {postStates[post.postId]?.listComment.map(
-                                      (comment, index) => {
-                                        return (
-                                          <div
-                                            key={index}
-                                            className="comment_item"
-                                            style={{
-                                              width: "100%",
-                                              padding: "0 0 0 10px",
-                                              boxSizing: "border-box",
-                                              display: "flex",
-                                              justifyContent: "space-between",
-                                              alignItems: "center",
-                                              cursor: "pointer",
-                                            }}
-                                          >
-                                            <div
-                                              style={{
-                                                display: "flex",
-                                                justifyContent: "flex-start",
-                                                alignItems: "center",
-                                              }}
-                                            >
-                                              <img
-                                                alt=""
-                                                src={comment.userimg}
-                                                style={{
-                                                  width: "20px",
-                                                  height: "20px",
-                                                  borderRadius: "50%",
-                                                  marginRight: "5px",
-                                                }}
-                                              />
-                                              <span
-                                                onClick={() => {
-                                                  navigate(
-                                                    `/profile/${comment.userId}`
-                                                  );
-                                                  window.scrollTo(0, 0);
-                                                }}
-                                                style={{
-                                                  cursor: "pointer",
-                                                  display: "inline-block",
-                                                  fontWeight: "bold",
-                                                  marginRight: "5px",
-                                                }}
-                                              >
-                                                {comment.fullname
-                                                  .charAt(0)
-                                                  .toUpperCase() +
-                                                  comment.fullname.slice(1)}
-                                              </span>
-
-                                              <span>
-                                                {Readmore(comment.content)}
-                                              </span>
-                                            </div>
-                                            {checkComment(comment.userId) ? (
-                                              <div
-                                                style={{
-                                                  display: "flex",
-                                                  marginRight: "10px",
-                                                  gap: "10px",
-                                                  position: "relative",
-                                                }}
-                                              >
-                                                <ion-icon
-                                                  onClick={() =>
-                                                    handleOpenDialogComment(
-                                                      comment._id
-                                                    )
-                                                  }
-                                                  name="create-outline"
-                                                  style={{ display: "block" }}
-                                                ></ion-icon>
-                                                <ion-icon
-                                                  onClick={() =>
-                                                    handleDeleteComment(
-                                                      comment._id,
-                                                      post.postId
-                                                    )
-                                                  }
-                                                  name="trash-outline"
-                                                  style={{ display: "block" }}
-                                                ></ion-icon>
-                                              </div>
-                                            ) : (
-                                              <></>
-                                            )}
-                                            {openDialogCommentId ===
-                                              comment._id && (
-                                              <Dialog
-                                                open={
-                                                  openDialogCommentId ===
-                                                  comment._id
-                                                }
-                                                onClose={
-                                                  handleCloseDialogComment
-                                                }
-                                                style={{}}
-                                                key={index}
-                                              >
-                                                <DialogTitle
-                                                  style={{
-                                                    backgroundColor:
-                                                      COLORS.green,
-                                                  }}
-                                                >
-                                                  <Box
-                                                    style={{
-                                                      display: "flex",
-                                                      justifyContent:
-                                                        "space-between",
-                                                      alignItems: "center",
-                                                      gap: "10px",
-                                                    }}
-                                                  >
-                                                    <span
-                                                      style={{
-                                                        fontWeight: "bold",
-                                                        color: "white",
-                                                      }}
-                                                    >
-                                                      Chỉnh sửa bình luận
-                                                    </span>
-                                                    <ion-icon
-                                                      name="close-circle-outline"
-                                                      onClick={
-                                                        handleCloseDialogComment
-                                                      }
-                                                      style={{
-                                                        cursor: "pointer",
-                                                        width: "30px",
-                                                        height: "30px",
-                                                        display: "block",
-                                                        border: "none",
-                                                        zIndex: "6",
-                                                        fontWeight: "bold",
-                                                        color: "white",
-                                                      }}
-                                                    ></ion-icon>
-                                                  </Box>
-                                                </DialogTitle>
-                                                <div
-                                                  style={{
-                                                    backgroundColor: "#f5f5f5",
-                                                    display: "flex",
-                                                    flexDirection: "column",
-                                                    padding: "20px",
-                                                    gap: "10px",
-                                                  }}
-                                                >
-                                                  <textarea
-                                                    placeholder={
-                                                      comment.content
-                                                    }
-                                                    id="textEditComment"
-                                                    style={{
-                                                      resize: "none",
-                                                      outline: "none",
-                                                      border: "none",
-                                                    }}
-                                                    value={contentEdit}
-                                                    onChange={(e) =>
-                                                      setContentEdit(
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                  ></textarea>
-                                                  <BtnEditComment
-                                                    onClick={() =>
-                                                      handleEditComment(
-                                                        post.postId,
-                                                        comment._id
-                                                      )
-                                                    }
-                                                  >
-                                                    Cập nhật
-                                                  </BtnEditComment>
-                                                </div>
-                                              </Dialog>
-                                            )}
-                                          </div>
-                                        );
-                                      }
-                                    )}
-                                  </>
-                                ) : (
-                                  <></>
-                                )}
-                              </div>
-                              {openDialogId === post.postId && (
-                                <Dialog
-                                  open={openDialogId === post.postId}
-                                  onClose={handleCloseDialog}
-                                  style={{}}
-                                  key={index}
-                                >
-                                  <DialogTitle
-                                    style={{ backgroundColor: COLORS.green }}
-                                  >
-                                    <Box
-                                      display="flex"
-                                      justifyContent="space-between"
-                                      alignItems="center"
-                                    >
-                                      <span
-                                        style={{
-                                          fontWeight: "bold",
-                                          color: "white",
-                                        }}
-                                      >
-                                        Chỉnh sửa bài viết
-                                      </span>
-                                      <ion-icon
-                                        name="close-circle-outline"
-                                        onClick={handleCloseDialog}
-                                        style={{
-                                          cursor: "pointer",
-                                          width: "30px",
-                                          height: "30px",
-                                          display: "block",
-                                          border: "none",
-                                          zIndex: "6",
-                                          fontWeight: "bold",
-                                          color: "white",
-                                        }}
-                                      ></ion-icon>
-                                    </Box>
-                                  </DialogTitle>
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      flexDirection: "column",
-                                      justifyContent: "space-around",
-                                      position: "relative",
-                                      padding: "40px",
-                                      maxWidth: "600px",
-                                      height: "400px",
-                                      gap: "10px",
-                                    }}
-                                  >
-                                    <Box
-                                      maxWidth="600px"
-                                      style={{
-                                        display: "flex",
-                                        gap: "10px",
-                                        position: "relative",
-                                      }}
-                                    >
-                                      <div
-                                        style={{
-                                          width: "300px",
-                                          position: "relative",
-                                        }}
-                                      >
-                                        {loading ? (
-                                          <>
-                                            <div
-                                              style={{
-                                                width: "100%",
-                                                height: "253px",
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                              }}
-                                            >
-                                              <CircularProgress />
-                                            </div>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <img
-                                              src={post.img}
-                                              width="100%"
-                                              alt="bag photos"
-                                              style={{
-                                                display: "block",
-                                                height: "253px",
-                                                objectFit: "cover",
-                                                objectPosition: "center",
-                                              }}
-                                            />
-                                            {/* <input
-                                              onChange={handleFileChange}
-                                              type="file"
-                                              style={{
-                                                position: "absolute",
-                                                top: "0",
-                                                left: "0",
-                                                width: "100%",
-                                                height: "100%",
-                                                opacity: "0",
-                                                cursor: "pointer",
-                                              }}
-                                            /> */}
-                                          </>
-                                        )}
-                                      </div>
-                                      <textarea
-                                        aria-label="empty textarea"
-                                        placeholder={post.desc}
-                                        style={{
-                                          width: "300px",
-                                          height: "253px", // change this to a smaller value
-                                          minHeight: "100px", // set a smaller minHeight value
-                                          border: "none",
-                                          resize: "none",
-                                          outline: "none",
-                                          overflowY: "scroll",
-                                          overflow: "hidden",
-                                        }}
-                                        value={content}
-                                        onChange={(e) =>
-                                          setContent(e.target.value)
-                                        }
-                                      />
-                                    </Box>
-                                    <Button
-                                      onClick={() =>
-                                        handleEditPost(post.postId)
-                                      }
-                                      variant="contained"
-                                      style={{
-                                        backgroundColor: COLORS.green,
-                                        borderRadius: "0",
-                                        fontWeight: "bold",
-                                      }}
-                                      fullWidth
-                                    >
-                                      Cập nhật
-                                    </Button>
-                                  </div>
-                                </Dialog>
-                              )}
-                            </section>
+                            <Post
+                              key={post.postId}
+                              accountId={post.id}
+                              imgAccountId={post.userimg}
+                              fullnameAccountId={post.fullname}
+                              creatAt={post.createdAt}
+                              userInfor={userInfor}
+                              postId={post.postId}
+                              postImg={post.img}
+                              postDesc={post.desc}
+                              authToken={authToken}
+                              postLike={post.like}
+                              postNumlike={post.numLike}
+                              userID={userID}
+                            />
                           </>
                         );
                       })
@@ -1790,6 +1129,11 @@ const ProfilePage = styled.section`
   min-height: 100vh;
   width: 100%;
   background-color: #f6f6f6;
+  .input-infor {
+    border: none;
+    outline: none;
+    padding: 10px;
+  }
   .avata-item {
     height: 30px;
     width: 30px;
@@ -1799,6 +1143,7 @@ const ProfilePage = styled.section`
   .css-1ytufz-MuiAvatarGroup-root .MuiAvatar-root {
     border: none;
   }
+
   .MuiPaper-root
     .MuiPaper-elevation
     .MuiPaper-rounded

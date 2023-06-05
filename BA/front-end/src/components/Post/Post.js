@@ -22,6 +22,7 @@ import {
   CallApiEditComment,
   CallApiLike,
   CallApiDeletePost,
+  CallApiGetPostId,
 } from "../../features/postSlice";
 import { COLORS } from "../../assets/Color";
 import styled from "styled-components";
@@ -105,6 +106,12 @@ const Post = (props) => {
         dispatch(
           CallApiAllPosts({
             headers: { authorization: `Bearer ${props.authToken}` },
+          })
+        );
+        dispatch(
+          CallApiGetPostId({
+            headers: { authorization: `Bearer ${props.authToken}` },
+            userID: props.userID,
           })
         );
       })
@@ -321,7 +328,7 @@ const Post = (props) => {
   return (
     <>
       <PostContainer
-        key={props.key}
+        key={props.postId}
         className="main-post-item"
         style={{
           backgroundColor: "white",
@@ -675,7 +682,7 @@ const Post = (props) => {
                       >
                         <DialogTitle
                           style={{
-                            backgroundColor: COLORS.green,
+                            backgroundColor: "#a2b3c3",
                           }}
                         >
                           <Box
@@ -755,7 +762,7 @@ const Post = (props) => {
             style={{}}
             key={props.key}
           >
-            <DialogTitle style={{ backgroundColor: COLORS.green }}>
+            <DialogTitle style={{ backgroundColor: "#a2b3c3" }}>
               <Box
                 display="flex"
                 justifyContent="space-between"
@@ -875,7 +882,7 @@ const Post = (props) => {
                 onClick={() => handleEditPost(props.postId)}
                 variant="contained"
                 style={{
-                  backgroundColor: COLORS.green,
+                  backgroundColor: "#a2b3c3",
                   borderRadius: "0",
                   fontWeight: "bold",
                 }}
@@ -1011,7 +1018,7 @@ const PostContainer = styled.section`
   }
 `;
 const BtnEditComment = styled.section`
-  background-color: #58a168;
+  background-color: "#a2b3c3",
   padding: 5px 10px;
   text-align: center;
   color: white;

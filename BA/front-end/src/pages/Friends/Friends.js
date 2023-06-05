@@ -146,7 +146,7 @@ function Friends() {
                 borderWidth: "1px",
                 paddingLeft: "10px",
               }}
-              placeholder="Nhap ten can tim"
+              placeholder="Nhập tên cần tìm"
               value={inputFullName}
               onChange={(e) => {
                 setInputFullName(e.target.value);
@@ -175,7 +175,7 @@ function Friends() {
                     .filter((people1) => {
                       return people1.fullname.toLocaleLowerCase() === "" ? (
                         <>
-                          <p>Not founds</p>
+                          <p>Không tìm thấy</p>
                         </>
                       ) : (
                         people1.fullname
@@ -187,9 +187,10 @@ function Friends() {
                       return (
                         <>
                           <div
+                            key={index}
                             style={{
                               display: "flex",
-                              justifyContent: "space-around",
+                              justifyContent: "space-between",
                               alignItems: "center",
                               width: "100%",
                             }}
@@ -232,7 +233,7 @@ function Friends() {
                                 className="button_chat"
                                 style={{ textDecoration: "none" }}
                               >
-                                <span>Profile</span>
+                                <span>Trang cá nhân</span>
                                 <ion-icon
                                   name="accessibility-outline"
                                   style={{ display: "inline-block" }}
@@ -256,7 +257,7 @@ const FriendsPage = styled.section`
   box-sizing: border-box;
   background-color: #ffd4d8;
   .button_chat {
-    background-color: ${COLORS.green};
+    background-color: #a2b3c3;
     display: flex;
     align-items: center;
     justify-content: center;

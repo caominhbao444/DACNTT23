@@ -374,6 +374,7 @@ function Signup() {
                       </label>
                       <input
                         id="password"
+                        type="password"
                         value={password}
                         onChange={handlePwdInput}
                       />
@@ -395,6 +396,7 @@ function Signup() {
                         </span>
                       </label>
                       <input
+                        type="password"
                         id="passwordConfirm"
                         onChange={handlePasswordConfirm}
                         value={passwordConfirm}
