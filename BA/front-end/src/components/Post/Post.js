@@ -36,6 +36,7 @@ const Post = (props) => {
   const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState("");
   const [openDialogCommentId, setOpenDialogCommentId] = useState(null);
+  const [openDialogLike, setOpenDialogLike] = useState(null);
   const [contentEdit, setContentEdit] = useState("");
   const [content, setContent] = useState("");
   const [openOption, setOpenOption] = useState(false);
@@ -198,11 +199,18 @@ const Post = (props) => {
   const handleOpenDialogComment = (commentId) => {
     setOpenDialogCommentId(commentId);
   };
-
   const handleCloseDialogComment = () => {
     setOpenDialogCommentId(null);
     setContentEdit();
   };
+
+  const handleOpenDialogLike = (postId) => {
+    setOpenDialogLike(postId);
+  };
+  const handleCloseDialogLike = () => {
+    setOpenDialogLike(null);
+  };
+
   const handleDeleteComment = (commentId, postId) => {
     dispatch(
       CallApiDeleteComment({
@@ -289,6 +297,12 @@ const Post = (props) => {
             headers: { authorization: `Bearer ${props.authToken}` },
           })
         );
+        dispatch(
+          CallApiGetPostId({
+            headers: { authorization: `Bearer ${props.authToken}` },
+            userID: props.userID,
+          })
+        );
         setOpenOption(false); // Reload the page after clicking "OK"
       });
     });
@@ -315,6 +329,12 @@ const Post = (props) => {
           dispatch(
             CallApiAllPosts({
               headers: { authorization: `Bearer ${props.authToken}` },
+            })
+          );
+          dispatch(
+            CallApiGetPostId({
+              headers: { authorization: `Bearer ${props.authToken}` },
+              userID: props.userID,
             })
           );
           window.scrollTo(0, 0);
@@ -529,9 +549,94 @@ const Post = (props) => {
               alignItems: "center",
               justifyContent: "flex-start",
               gap: "5px",
+              cursor: "pointer",
             }}
           >
-            <span>Được thích bởi {props.postNumlike} người khác</span>
+            <span onClick={() => handleOpenDialogLike(props.postId)}>
+              Được thích bởi {props.postNumlike} người khác
+            </span>
+            {openDialogLike === props.postId && (
+              <Dialog
+                open={openDialogLike === props.postId}
+                onClose={handleCloseDialogLike}
+                style={{ width: "100%" }}
+                key={props.key}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    width: "400px",
+                    flexDirection: "column",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "10px 20px",
+                      justifyContent: "space-between",
+                      backgroundColor: "#a2b3c3",
+                    }}
+                  >
+                    <p style={{ color: "white", fontWeight: "bold" }}>
+                      Danh sách người thích
+                    </p>
+                    <ion-icon
+                      name="close-circle-outline"
+                      onClick={handleCloseDialogLike}
+                      style={{
+                        cursor: "pointer",
+                        width: "30px",
+                        height: "30px",
+                        display: "block",
+
+                        border: "none",
+                        zIndex: "6",
+                        fontWeight: "bold",
+                        color: "white",
+                      }}
+                    ></ion-icon>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px",
+                      overflow: "auto",
+                      height: "300px",
+                    }}
+                  >
+                    {props.postLike &&
+                      props.postLike.map((item, index) => {
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              padding: "10px",
+                              boxSizing: "border-box",
+                              gap: "10px",
+                            }}
+                          >
+                            <img
+                              src="http://res.cloudinary.com/djhhzmcps/image/upload/v1685902599/zf3btsotrtrnaeuvnesm.jpg"
+                              width={50}
+                              height={50}
+                              alt=""
+                              style={{ borderRadius: "50%" }}
+                            />
+                            <span style={{ fontSize: "14px" }}>
+                              {item.fullname}
+                            </span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              </Dialog>
+            )}
           </div>
           {postStates[props.postId]?.showComments &&
           postStates[props.postId]?.listComment ? (
@@ -619,6 +724,7 @@ const Post = (props) => {
                         display: "flex",
                         justifyContent: "flex-start",
                         alignItems: "center",
+                        gap: "5px",
                       }}
                     >
                       <img

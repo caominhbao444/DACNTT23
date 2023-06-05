@@ -205,7 +205,7 @@ function Friends() {
                               }}
                             >
                               <img
-                                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                                src={people.img}
                                 className="img-src"
                                 alt=""
                                 style={{
@@ -215,7 +215,9 @@ function Friends() {
                                   overflow: "hidden",
                                 }}
                               />
-                              <span style={{ fontWeight: "bold" }}>
+                              <span
+                                style={{ fontWeight: "bold", fontSize: "13px" }}
+                              >
                                 {people.fullname}
                               </span>
                               {/* <button onClick={handleRequestFriend}>Theo doi</button> */}
@@ -233,7 +235,9 @@ function Friends() {
                                 className="button_chat"
                                 style={{ textDecoration: "none" }}
                               >
-                                <span>Trang cá nhân</span>
+                                <span style={{ fontSize: "13px" }}>
+                                  Trang cá nhân
+                                </span>
                                 <ion-icon
                                   name="accessibility-outline"
                                   style={{ display: "inline-block" }}
@@ -263,6 +267,7 @@ const FriendsPage = styled.section`
     justify-content: center;
     padding: 5px 10px;
     cursor: pointer;
+    box-sizing: border-box;
     border: none;
     border-radius: 10px;
     flex-direction: row;

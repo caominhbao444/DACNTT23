@@ -287,9 +287,10 @@ function Profile() {
                     {userInforId.fullname}
                   </span>
                   <span style={{ color: "GrayText", fontSize: "13px" }}>
-                    1.1k bạn bè
+                    {userInforId.followers ? userInforId.followers.length : 0}{" "}
+                    người theo dõi
                   </span>
-                  <AvatarGroup
+                  {/* <AvatarGroup
                     max={4}
                     componentsProps={{
                       additionalAvatar: {
@@ -326,7 +327,7 @@ function Profile() {
                       alt="Trevor Henderson"
                       src="/static/images/avatar/5.jpg"
                     />
-                  </AvatarGroup>
+                  </AvatarGroup> */}
                 </div>
                 <div style={{ display: "flex", alignItems: "flex-end" }}>
                   {checkFriends.check === 0 ? (
@@ -590,7 +591,6 @@ function Profile() {
                               display: "flex",
                               width: "600px",
                               flexDirection: "column",
-
                               boxSizing: "border-box",
                             }}
                           >
@@ -923,7 +923,7 @@ function Profile() {
                       }}
                     >
                       <ion-icon name="location-outline"></ion-icon>
-                      <span>
+                      <span className="text-infor">
                         Sống tại
                         <span style={{ fontWeight: "bold" }}>
                           {" "}
@@ -940,7 +940,7 @@ function Profile() {
                       }}
                     >
                       <ion-icon name="book-outline"></ion-icon>
-                      <span>
+                      <span className="text-infor">
                         Học tại
                         <span style={{ fontWeight: "bold" }}>
                           {" "}
@@ -959,7 +959,7 @@ function Profile() {
                       }}
                     >
                       <ion-icon name="book-outline"></ion-icon>
-                      <span>
+                      <span className="text-infor">
                         Đến từ
                         <span style={{ fontWeight: "bold" }}>
                           {" "}
@@ -976,11 +976,14 @@ function Profile() {
                       }}
                     >
                       <ion-icon name="people-outline"></ion-icon>
-                      <span>
-                        Số bạn bè
+                      <span className="text-infor">
+                        Người theo dõi
                         <span style={{ fontWeight: "bold" }}>
                           {" "}
-                          2.200 người{" "}
+                          {userInforId.followers
+                            ? userInforId.followers.length
+                            : 0}{" "}
+                          người
                         </span>
                       </span>
                     </div>
@@ -1143,7 +1146,9 @@ const ProfilePage = styled.section`
   .css-1ytufz-MuiAvatarGroup-root .MuiAvatar-root {
     border: none;
   }
-
+  .text-infor {
+    font-size: 14px;
+  }
   .MuiPaper-root
     .MuiPaper-elevation
     .MuiPaper-rounded
