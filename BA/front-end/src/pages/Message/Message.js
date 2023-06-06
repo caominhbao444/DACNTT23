@@ -52,7 +52,7 @@ function Message() {
   const [allConversations, setAllConversations] = useState([]);
   const [listOnline, setListOnline] = useState("");
   const [listChat, setListChat] = useState("1");
-
+  const [loadingMess, setLoadingMess] = useState(true);
   const [messageList, setMessageList] = useState([]);
   const [bao, setBao] = useState("bao");
 
@@ -113,6 +113,7 @@ function Message() {
           conversationID,
         })
       ).then((response) => {
+        setLoadingMess(false);
         setAllMess(response.payload);
       });
       socket.emit("join chat", conversationID);
@@ -277,64 +278,21 @@ function Message() {
                               <span style={{ fontWeight: "bold" }}>
                                 {item.fullname}
                               </span>
-                              <span>Hôm nay ăn gì</span>
+                              <span>Bấm vào để trò chuyện</span>
                             </div>
                           </div>
                         </>
                       );
                     })
                   )}
-                  {/* {allConversations ? (
-                    <>
-                      <div
-                        to="/"
-                        className="message-item"
-                        style={{
-                          textDecoration: "none",
-                          color: "black",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                          gap: "5px",
-                          cursor: "pointer",
-                          width: "100%",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        <img
-                          src="https://images.unsplash.com/photo-1680955886049-ce69173143bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
-                          className="img-src"
-                          alt=""
-                          style={{
-                            height: "40px",
-                            width: "40px",
-                            borderRadius: "50%",
-                            overflow: "hidden",
-                          }}
-                        />
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "flex-start",
-                          }}
-                        >
-                          <span style={{ fontWeight: "bold" }}>Minh Bảo</span>
-                          <span>Hôm nay ăn gì</span>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <p>Không có cuộc hội thoại</p>
-                  )} */}
                 </div>
               </div>
             </div>
           </Grid>
           <Grid
             item
-            xs={6}
-            md={6}
+            xs={9}
+            md={9}
             style={{
               // backgroundColor: "green",
               width: "100%",
@@ -418,7 +376,7 @@ function Message() {
                       }}
                       className="message-area"
                     >
-                      {getMessage ? (
+                      {getMessage && !loadingMess ? (
                         <>
                           {allmess &&
                             allmess
@@ -519,7 +477,7 @@ function Message() {
 
           {/* Right-area */}
 
-          <Grid
+          {/* <Grid
             item
             xs={3}
             md={3}
@@ -565,7 +523,7 @@ function Message() {
                 )}
               </div>
             </div>
-          </Grid>
+          </Grid> */}
         </Grid>
       </MessagePage>
     </>
@@ -574,7 +532,7 @@ function Message() {
 const MessagePage = styled.section`
   min-height: calc(100vh - 64px);
   width: 100%;
-  background-color: #ffd4d8;
+  background-color: #f6f6f6;
   .message-item {
     background-color: none;
   }

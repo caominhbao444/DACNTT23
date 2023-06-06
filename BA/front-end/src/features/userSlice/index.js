@@ -166,7 +166,7 @@ export const CallGetInforConversation = createAsyncThunk(
 //getAllConversations
 export const CallGetAllConversation = createAsyncThunk(
   "user/callApiAllConversation",
-  async function ({ headers, userID }) {
+  async function ({ headers }) {
     try {
       const callApiAllConversationResponse = await axios.get(
         `http://localhost:5001/api/conversations/current`,

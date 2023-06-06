@@ -26,15 +26,6 @@ function MessageItem(props) {
   const authToken = localStorage.getItem("authToken");
   const [userCurrent, setUserCurrent] = useState("");
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(
-      CallApiUser({
-        headers: { authorization: `Bearer ${authToken}` },
-      })
-    ).then((response) => {
-      setUserCurrent(response.payload.account._id);
-    });
-  }, []);
   // console.log(userCurrent);
 
   if (!props) return <Loading />;

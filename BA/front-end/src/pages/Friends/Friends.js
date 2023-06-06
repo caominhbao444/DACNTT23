@@ -146,7 +146,7 @@ function Friends() {
                 borderWidth: "1px",
                 paddingLeft: "10px",
               }}
-              placeholder="Nhap ten can tim"
+              placeholder="Nhập tên cần tìm"
               value={inputFullName}
               onChange={(e) => {
                 setInputFullName(e.target.value);
@@ -175,7 +175,7 @@ function Friends() {
                     .filter((people1) => {
                       return people1.fullname.toLocaleLowerCase() === "" ? (
                         <>
-                          <p>Not founds</p>
+                          <p>Không tìm thấy</p>
                         </>
                       ) : (
                         people1.fullname
@@ -187,9 +187,10 @@ function Friends() {
                       return (
                         <>
                           <div
+                            key={index}
                             style={{
                               display: "flex",
-                              justifyContent: "space-around",
+                              justifyContent: "space-between",
                               alignItems: "center",
                               width: "100%",
                             }}
@@ -204,7 +205,7 @@ function Friends() {
                               }}
                             >
                               <img
-                                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                                src={people.img}
                                 className="img-src"
                                 alt=""
                                 style={{
@@ -214,7 +215,9 @@ function Friends() {
                                   overflow: "hidden",
                                 }}
                               />
-                              <span style={{ fontWeight: "bold" }}>
+                              <span
+                                style={{ fontWeight: "bold", fontSize: "13px" }}
+                              >
                                 {people.fullname}
                               </span>
                               {/* <button onClick={handleRequestFriend}>Theo doi</button> */}
@@ -232,7 +235,9 @@ function Friends() {
                                 className="button_chat"
                                 style={{ textDecoration: "none" }}
                               >
-                                <span>Profile</span>
+                                <span style={{ fontSize: "13px" }}>
+                                  Trang cá nhân
+                                </span>
                                 <ion-icon
                                   name="accessibility-outline"
                                   style={{ display: "inline-block" }}
@@ -256,12 +261,13 @@ const FriendsPage = styled.section`
   box-sizing: border-box;
   background-color: #ffd4d8;
   .button_chat {
-    background-color: ${COLORS.green};
+    background-color: #a2b3c3;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 5px 10px;
     cursor: pointer;
+    box-sizing: border-box;
     border: none;
     border-radius: 10px;
     flex-direction: row;

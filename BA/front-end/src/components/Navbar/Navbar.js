@@ -54,7 +54,7 @@ function Navbar() {
     return <Loading />;
   }
   return (
-    <AppBar position="static" style={{ backgroundColor: "#58A168" }}>
+    <AppBar position="static" style={{ backgroundColor: "#a2b3c3" }}>
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
@@ -76,7 +76,7 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            FlexSocial
+            Instagram
           </Typography>
 
           {/* <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} /> */}
@@ -131,7 +131,7 @@ function Navbar() {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
             </Menu>
           </Box>
         </Toolbar>
