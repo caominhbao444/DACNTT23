@@ -146,28 +146,30 @@ const createPost = asyncHandler(async (req, res) => {
 });
 
 const likePost = asyncHandler(async (req, res) => {
+  const account = await Account.findOne(req.account);
   const post = await Post.findById(req.params.id);
   if (!post) {
     res.status(404);
     throw new Error("Post not found");
   }
   const likedByUser = post.likes.some(
-    (like) => like.accountId == req.account.id
+    (like) => like.accountId == account.id
   );
   if (likedByUser) {
     await post.updateOne({
       $pull: {
-        likes: { accountId: req.account.id, fullname: req.account.fullname },
+        likes: { accountId: req.account.id},
       },
     });
     console.log("DisLike !!!");
   } else {
     await post.updateOne({
       $push: {
-        likes: { accountId: req.account.id, fullname: req.account.fullname },
+        likes: { accountId: account.id, fullname: account.fullname,img:account.img },
       },
     });
     console.log("Like !!!");
+    console.log(req.account);
   }
   const updatedPost = await Post.findById(req.params.id);
   const numLikes = updatedPost.likes.length;
@@ -235,7 +237,11 @@ const testPost = asyncHandler(async (req, res) => {
   //     " phút",
   // }));
   // res.status(200).json(postsList);
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findById(req.params.id)
+  if(!post){
+    res.status(404);
+    throw new Error("không tìm thấy Post");
+  }
   res.status(200).json(post);
 });
 

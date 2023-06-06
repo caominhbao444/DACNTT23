@@ -78,6 +78,8 @@ const loginAccount = asyncHandler(async (req, res) => {
           city: account.city,
           from: account.from,
           education: account.education,
+          img: account.img,
+          isAdmin : account.isAdmin,
         },
       },
       process.env.ACCESS_TOKEN_SECERT,
