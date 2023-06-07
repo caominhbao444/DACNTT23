@@ -95,7 +95,7 @@ const getCurrentConversations = asyncHandler(async (req, res) => {
       fullname: results[index].fullname,
       img: results[index].img,
     }));
-    res.status(200).json(conversations);
+    res.status(200).json(finalResults);
   } catch (err) {
     res.status(500).json(err);
   }
